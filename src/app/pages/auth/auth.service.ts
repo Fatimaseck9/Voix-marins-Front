@@ -5,7 +5,7 @@ import { CookieService } from 'ngx-cookie-service';
 
 @Injectable()
 export class AuthService {
-  
+
   constructor(private router: Router, private cookieService: CookieService) {}
 
   isLoggedIn(): boolean {
@@ -14,29 +14,23 @@ export class AuthService {
   }
 
   setAccount(account: Account) {
-    this.cookieService.set('currentAccount', JSON.stringify(account));
+    this.cookieService.set('currentAccount', JSON.stringify(account), undefined, '/');
   }
-
-  // getCurrentAccount(): Account {
-  //   const accountString = this.cookieService.get('currentAccount');
-  //   return JSON.parse(accountString || '{}');
-  // }
 
   getCurrentAccount(): Account | null {
     const accountString = this.cookieService.get('currentAccount');
     try {
-        const account: Account = JSON.parse(accountString);
-        // Vérifiez que l'objet de compte contient une propriété 'id' avant de le retourner
-        if (account && account.id) {
-            return account;
-        } else {
-            return null; // Retourne null si les données de compte ne sont pas valides
-        }
+      const account: Account = JSON.parse(accountString);
+      if (account && account.id) {
+        return account;
+      } else {
+        return null; // Retourne null si les données de compte ne sont pas valides
+      }
     } catch (error) {
-        console.error('Erreur lors de la lecture des données de compte depuis les cookies :', error);
-        return null; // Retourne null en cas d'erreur de lecture des données de compte
+      console.error('Erreur lors de la lecture des données de compte depuis les cookies :', error);
+      return null; // Retourne null en cas d'erreur de lecture des données de compte
     }
-}
+  }
 
   getRoleSectionView(idSection): boolean {
     const accountSectionsString = this.cookieService.get('accountSections');
@@ -45,7 +39,7 @@ export class AuthService {
   }
 
   setToken(token: string) {
-    this.cookieService.set('accessToken', token);
+    this.cookieService.set('accessToken', token, undefined, '/');
   }
 
   getToken(): string {
@@ -53,7 +47,7 @@ export class AuthService {
   }
 
   setTmpToken(token: string) {
-    this.cookieService.set('tmpToken', token);
+    this.cookieService.set('tmpToken', token, undefined, '/');
   }
 
   getTmpToken(): string {
@@ -71,16 +65,18 @@ export class AuthService {
       });
     });
 
-    this.cookieService.set('accountRoles', JSON.stringify(accountRoles));
-    this.cookieService.set('accountSections', JSON.stringify(accountSections));
+    this.cookieService.set('accountRoles', JSON.stringify(accountRoles), undefined, '/');
+    this.cookieService.set('accountSections', JSON.stringify(accountSections), undefined, '/');
   }
 
   getAccountRoles(): any {
+
     const accountRolesString = this.cookieService.get('accountRoles');
-    const accountRoles = JSON.parse(accountRolesString || '[]');
-    const accountSectionsString = this.cookieService.get('accountSections');
-    const accountSections = JSON.parse(accountSectionsString || '[]');
-    return { accountRoles, accountSections };
+    // const accountRoles = JSON.parse(accountRolesString || '[]');
+    // const accountSectionsString = this.cookieService.get('accountSections');
+    // const accountSections = JSON.parse(accountSectionsString || '[]');
+    // return { accountRoles, accountSections };
+    return JSON.parse(accountRolesString || '[]');
   }
 
   accountHasRole(roles: string[]): boolean {
@@ -98,11 +94,11 @@ export class AuthService {
   }
 
   logout() {
-    this.cookieService.delete('currentAccount');
-    this.cookieService.delete('accessToken');
-    this.cookieService.delete('tmpToken');
-    this.cookieService.delete('accountRoles');
-    this.cookieService.delete('accountSections');
+    this.cookieService.delete('currentAccount', '/');
+    this.cookieService.delete('accessToken', '/');
+    this.cookieService.delete('tmpToken', '/');
+    this.cookieService.delete('accountRoles', '/');
+    this.cookieService.delete('accountSections', '/');
   }
 
   getDe() {

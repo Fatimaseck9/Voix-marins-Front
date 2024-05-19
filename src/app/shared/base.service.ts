@@ -35,40 +35,78 @@ export class BaseService {
     );
   }
 
+  // post(url, auth, data): Observable<any> {
+  //   url = this.serverURL + url;
+    
+  //   // Ajouter un log pour afficher l'URL complète
+  //   console.log('URL de la requête :', url);
+  
+  //   if (this.authService.getCurrentAccount()) {
+  //       this.basicHeader();
+  //       // Ajouter un log pour indiquer que les en-têtes de base sont configurés
+  //       console.log('En-têtes de base configurés.');
+  //   }
+    
+  //   if (auth) {
+  //       this.updateHeaders();
+  //       // Ajouter un log pour indiquer que les en-têtes sont mis à jour
+  //       console.log('En-têtes mis à jour.');
+  //   }
+  
+  //   // Ajouter un log pour afficher les données envoyées
+  //   console.log('Données envoyées :', data);
+  
+  //   return this.http.post(url, data, { headers: this.headers }).pipe(
+  //       map((res: any) => {
+  //           // Ajouter un log pour afficher la réponse
+  //           console.log('Réponse de la requête :', res);
+  //           return res; // Retourner la réponse de la requête
+  //       }),
+  //       catchError((err) => {
+  //           // Ajouter un log pour afficher les erreurs
+  //           console.error('Erreur dans la requête HTTP :', err);
+  //           throw new Error(err);
+  //       })
+  //   );
+  // }
+
   post(url, auth, data): Observable<any> {
     url = this.serverURL + url;
     
-    // Ajouter un log pour afficher l'URL complète
-    console.log('URL de la requête :', url);
+    // console.log('URL de la requête :', url);
   
     if (this.authService.getCurrentAccount()) {
         this.basicHeader();
-        // Ajouter un log pour indiquer que les en-têtes de base sont configurés
-        console.log('En-têtes de base configurés.');
+        // console.log('En-têtes de base configurés.');
     }
     
     if (auth) {
         this.updateHeaders();
-        // Ajouter un log pour indiquer que les en-têtes sont mis à jour
-        console.log('En-têtes mis à jour.');
+        // console.log('En-têtes mis à jour.');
     }
   
-    // Ajouter un log pour afficher les données envoyées
-    console.log('Données envoyées :', data);
+    // Log the data before sending the request
+    // console.log('Données envoyées :', data);
+    
+    // Vérifier si principalId est défini et n'est pas NaN
+    if (!data.principalId) {
+      console.error('Erreur: principalId est null ou undefined');
+    }
   
     return this.http.post(url, data, { headers: this.headers }).pipe(
         map((res: any) => {
-            // Ajouter un log pour afficher la réponse
-            console.log('Réponse de la requête :', res);
-            return res; // Retourner la réponse de la requête
+            // Log the response
+            // console.log('Réponse de la requête :', res);
+            return res;
         }),
         catchError((err) => {
-            // Ajouter un log pour afficher les erreurs
+            // Log the errors
             console.error('Erreur dans la requête HTTP :', err);
             throw new Error(err);
         })
     );
-  }
+}
+
   
 
 
