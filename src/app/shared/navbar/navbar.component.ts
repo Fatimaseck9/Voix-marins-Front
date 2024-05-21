@@ -1,12 +1,14 @@
 import { Component, OnInit, Renderer2, ViewChild, ElementRef, Directive } from '@angular/core';
-import { ROUTES } from '../.././sidebar/sidebar.component';
+// import { ROUTES } from '../.././sidebar/sidebar.component';
 import { Router, ActivatedRoute, NavigationEnd, NavigationStart } from '@angular/router';
 import { BehaviorSubject, Observable, Subscription } from 'rxjs';
 import { filter } from 'rxjs/operators';
 import { Location, LocationStrategy, PathLocationStrategy } from '@angular/common';
 import { Account } from 'src/app/models/account';
-import { AuthService } from '../../pages/auth/auth.service';
+// import { AuthService } from '../../pages/auth/auth.service';
 import { BaseService } from '../base.service';
+import { ROUTES } from 'src/app/sidebar/sidebar.component';
+import { AuthService } from 'src/app/pages/auth/auth.service';
 const misc: any = {
     navbar_menu_visible: 0,
     active_collapse: true,
@@ -217,17 +219,24 @@ export class NavbarComponent implements OnInit {
         return this.location.prepareExternalUrl(this.location.path());
     }
 
-    logout(){
-        this.baseService.post("Accounts/logout", true,{accessTokenID: this.authService.getToken()})
+    logout() {
+        this.baseService.post("Accounts/logout", true, { accessTokenID: this.authService.getToken() })
         .subscribe(
             res => {
-            // redirect to login
-            this.router.navigate(['/pages/login']);
+                // Déconnexion réussie, continuer avec la déconnexion locale
+                this.authService.logout();
+                // Rediriger en rechargeant la page
+                window.location.href = '/pages/login';
             },
             err => {
-            console.log(err);
+                // Gérer l'erreur si nécessaire
+                console.log(err);
+                // Même en cas d'erreur, continuer avec la déconnexion locale et la redirection
+                this.authService.logout();
+                window.location.href = '/pages/login';
             }
-        )
-        this.authService.logout();
+        );
     }
+    
+    
 }

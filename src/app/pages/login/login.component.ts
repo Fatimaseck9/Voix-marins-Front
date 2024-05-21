@@ -75,115 +75,23 @@ export class LoginComponent implements OnInit, OnDestroy {
         )
     }
 
-    // onLogin() {
-
-    //     console.log('Username:', this.account.username);
-    //     console.log('Password:', this.account.password);
-
-    //     this.baseService.post('Accounts/login?include=user', false, {username: this.account.username.toLocaleUpperCase(), password: this.account.password })
-    //     .subscribe({
-    //         next: (res) => {
-    //             console.log('0:');
-    //             this.user = res.user;
-    //             if (this.account.username === this.account.password) {
-    //                 this.authService.setTmpToken(res.id);
-    //                 console.log('1:');
-    //             } else {
-    //                 this.authService.setToken(res.id);
-    //                 console.log('2:');
-    //             } 
-    //             // Création du compte dans les cookies
-    //             this.authService.setAccount(res.user);
-    //             // Obtenir les rôles du compte
-    //             this.baseService.get('Accounts/' + this.authService.getCurrentAccount().id + '/roles?filter={"include":["actions","sections"]}', true)
-    //             .subscribe({
-    //                 next: (res) => {          
-    //                     this.authService.setAccountRoles(res);
-    //                     if (this.account.username === this.account.password) {
-    //                          this.router.navigate(['/pages/register']);
-    //                     } else if (!this.user.disabled) {
-    //                         this.updateLastLogin(this.user.id);
-    //                         this.authService.redirect();
-    //                     } else {
-    //                         this.message.text = 'Ce compte a été désactivé';
-    //                         this.message.type = 'error';
-    //                     }
-    //                 },
-    //                 error: (err) => {
-    //                     console.log(err);
-    //                 }
-    //             });
-    //         },
-    //         error: (err) => {
-    //             this.message.text = 'Identifiants incorrects';
-    //             this.message.type = 'error';
-    //         }
-    //     });
-    // }
-
-    // onLogin() {
-    //     console.log('Username:', this.account.username);
-    //     console.log('Password:', this.account.password);
-    
-    //     // Utilisez les cookies pour stocker les données d'identification
-    //     this.authService.setAccount({ username: this.account.username, password: this.account.password });
-    
-    //     this.baseService.post('Accounts/login?include=user', false, { username: this.account.username.toLocaleUpperCase(), password: this.account.password })
-    //         .subscribe({
-    //             next: (res) => {
-    //                 console.log('0:');
-    //                 this.user = res.user;
-    //                 if (this.account.username === this.account.password) {
-    //                     this.authService.setTmpToken(res.id);
-    //                     console.log('1:');
-    //                 } else {
-    //                     this.authService.setToken(res.id);
-    //                     console.log('2:');
-    //                 } 
-    //                 // Pas besoin de créer le compte dans les cookies ici car vous l'avez déjà fait
-    //                 // Obtenir les rôles du compte
-    //                 this.baseService.get('Accounts/' + this.authService.getCurrentAccount().id + '/roles?filter={"include":["actions","sections"]}', true)
-    //                 .subscribe({
-    //                     next: (res) => {          
-    //                         this.authService.setAccountRoles(res);
-    //                         if (this.account.username === this.account.password) {
-    //                              this.router.navigate(['/pages/register']);
-    //                         } else if (!this.user.disabled) {
-    //                             this.updateLastLogin(this.user.id);
-    //                             this.authService.redirect();
-    //                         } else {
-    //                             this.message.text = 'Ce compte a été désactivé';
-    //                             this.message.type = 'error';
-    //                         }
-    //                     },
-    //                     error: (err) => {
-    //                         console.log(err);
-    //                     }
-    //                 });
-    //             },
-    //             error: (err) => {
-    //                 this.message.text = 'Identifiants incorrects';
-    //                 this.message.type = 'error';
-    //             }
-    //         });
-    // }
-
+   
     onLogin() {
-        console.log('Username:', this.account.username);
-        console.log('Password:', this.account.password);
+        // console.log('Username:', this.account.username);
+        // console.log('Password:', this.account.password);
     
         this.baseService.post('Accounts/login?include=user', false, {username: this.account.username.toLocaleUpperCase(), password: this.account.password })
         .subscribe({
             next: (res) => {
-                console.log('0:');
+               
                 this.user = res.user;
                 if (res.user && res.user.id) { // Vérifiez que l'objet 'user' et sa propriété 'id' ne sont pas null
                     if (this.account.username === this.account.password) {
                         this.authService.setTmpToken(res.id);
-                        console.log('1:');
+                     
                     } else {
                         this.authService.setToken(res.id);
-                        console.log('2:');
+                       
                     }
                     // Création du compte dans les cookies
                     this.authService.setAccount(res.user);
