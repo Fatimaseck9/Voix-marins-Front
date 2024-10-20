@@ -90,7 +90,7 @@ export class BaseService {
     
     // Vérifier si principalId est défini et n'est pas NaN
     if (!data.principalId) {
-      console.error('Erreur: principalId est null ou undefined');
+      // console.error('Erreur: principalId est null ou undefined');
     }
   
     return this.http.post(url, data, { headers: this.headers }).pipe(
