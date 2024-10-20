@@ -14,6 +14,7 @@
 					"builder": "ngx-build-plus:browser",
 					"options": {
 						"outputPath": "dist/demo",
+						"sourceMap": true,
 						"index": "src/index.html",
 						"main": "src/main.ts",
 						"polyfills": "src/polyfills.ts",
@@ -79,12 +80,12 @@
 						"development": {
 							"buildOptimizer": false,
 							"optimization": {
-								"scripts": true,
+								"scripts": false,
 								"styles": {
-								  "minify": true,
+								  "minify": false,
 								  "inlineCritical": false
 								},
-								"fonts": true
+								"fonts": false
 							  },
 							"vendorChunk": true,
 							"extractLicenses": false,
