@@ -1,0 +1,1166 @@
+<div class="row black-card">
+  <div class="col-md-4 text-left">
+    <nav style="--bs-breadcrumb-divider: '>'" aria-label="dark breadcrumb">
+      <ol class="breadcrumb breadcrumb-dark">
+        <li class="breadcrumb-item"><a href="metric">METRIC</a></li>
+        <li class="breadcrumb-item active text-white" aria-current="page">
+          Indicateurs
+        </li>
+      </ol>
+    </nav>
+  </div>
+  <div class="col-md-8 text-right">
+    <button
+      [hidden]="views[0].bool"
+      class="btn btn-outline-primary"
+      data-toggle="modal"
+      (click)="disableCollaborateur()"
+      data-target="#addIndicateurModal"
+    >
+      <span><i class="material-icons">add</i> Indicateur</span>
+    </button>
+    <button
+      [hidden]="views[0].bool"
+      class="btn btn-outline-primary"
+      data-toggle="modal"
+      data-target="#CreerIndicateurEnMasseModal"
+      (click)="reinitialiserEventFile()"
+    >
+      <span><i class="material-icons">post_add</i> KPIs en masse</span>
+    </button>
+    <button
+      class="btn btn-outline-primary"
+      data-toggle="modal"
+      data-target="#SaisieSuivisEnMasseModal"
+      (click)="reinitialiserEventFile()"
+    >
+      <span><i class="material-icons">playlist_add</i> Saisie en masse</span>
+    </button>
+    <button
+      [hidden]="views[0].bool"
+      class="btn btn-outline-primary"
+      data-toggle="modal"
+      data-target="#ReconductionEnMasseModal"
+    >
+      <span><i class="material-icons">update</i> Reconduction</span>
+    </button>
+    <a
+      [hidden]="views[2].bool"
+      class="btn btn-outline-primary"
+      [routerLink]="[
+        '/metric/structures/indicateurs-suivis',
+        userConnectedStructureManaged[0].id
+      ]"
+    >
+      Gestion demande Suivis
+    </a>
+  </div>
+</div>
+
+<!-- debut container -->
+<div class="container-fluid">
+  <div class="col-md-12">
+    <!-- Datatable Liste des Indicateurs -->
+    <div class="card">
+      <div class="card-header card-header-icon card-header-warning">
+        <div class="card-icon">
+          <i class="material-icons">assignment</i>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="row" *ngIf="!showListeIndicateur" class="mb-5">
+          <div class="col-md-12">
+            <mat-progress-bar
+              color="warn"
+              mode="indeterminate"
+            ></mat-progress-bar>
+          </div>
+        </div>
+        <div class="material-datatables" [hidden]="!showListeIndicateur">
+          <table
+            datatable
+            [dtOptions]="dtOptions"
+            [dtTrigger]="dtTrigger"
+            class="table table-striped table-no-bordered table-hover row-border hover"
+            style="width: 100%"
+            tableLayout="fixed"
+          >
+            <thead>
+              <tr>
+                <th hidden="true">ID</th>
+                <th style="width: 50%">Nom de l'indicateur</th>
+                <th class="text-center">Tendance</th>
+                <th class="text-center">Valeur Cible</th>
+                <th class="text-center">Unité</th>
+                <th class="text-center">Périodicité</th>
+                <th
+                  [hidden]="views[0].bool"
+                  class="disabled-sorting text-center"
+                  style="width: 13%"
+                >
+                  Actions
+                </th>
+                <th class="text-center" hidden="true">Propriétaires</th>
+                <th class="text-center" hidden="true">Suppléant</th>
+                <th class="text-center" hidden="true">Analystes</th>
+              </tr>
+            </thead>
+            <tbody>
+              <ng-container *ngFor="let indicateur of indicateurs">
+                <tr>
+                  <td hidden="true">
+                    {{ indicateur.id }}
+                  </td>
+
+                  <td
+                    style="width: 50%"
+                    [routerLink]="['/metric/indicateurs', indicateur.id]"
+                  >
+                    {{ indicateur.name }}
+                  </td>
+                  <ng-container *ngFor="let parametre of indicateur.parametres">
+                    <td
+                      class="text-center"
+                      [routerLink]="['/metric/indicateurs', indicateur.id]"
+                      *ngIf="parametre.type == 'tendance'"
+                    >
+                      {{ parametre.name }}
+                    </td>
+                  </ng-container>
+                  <td
+                    class="text-center"
+                    [routerLink]="['/metric/indicateurs', indicateur.id]"
+                  >
+                    {{ indicateur.valeur_cible }}
+                  </td>
+                  <ng-container *ngFor="let parametre of indicateur.parametres">
+                    <td
+                      class="text-center"
+                      [routerLink]="['/metric/indicateurs', indicateur.id]"
+                      *ngIf="parametre.type == 'unite'"
+                    >
+                      {{ parametre.name }}
+                    </td>
+                  </ng-container>
+                  <ng-container *ngFor="let parametre of indicateur.parametres">
+                    <td
+                      class="text-center"
+                      [routerLink]="['/metric/indicateurs', indicateur.id]"
+                      *ngIf="parametre.type == 'periodicite'"
+                    >
+                      {{ parametre.name }}
+                    </td>
+                  </ng-container>
+
+                  <td
+                    [hidden]="views[0].bool"
+                    class="text-center"
+                    style="width: 13%"
+                  >
+                    <a
+                      (click)="updateIndicateurForm(indicateur)"
+                      data-toggle="modal"
+                      data-target="#updateIndicateurModal"
+                      title="Modifier l'indicateur"
+                      class="btn btn-link btn-success btn-just-icon edit"
+                      ><i class="material-icons">edit</i></a
+                    >
+                    <a
+                      (click)="setIndicateurToStop(indicateur, true)"
+                      data-toggle="modal"
+                      data-target="#deleteIndicateurModal"
+                      title="Arrêter l'indicateur"
+                      class="btn btn-link btn-danger btn-just-icon delete"
+                      ><i class="material-icons">stop</i></a
+                    >
+                    <a
+                      (click)="setIndicateurToStop(indicateur)"
+                      data-toggle="modal"
+                      data-target="#deleteIndicateurModal"
+                      title="Supprimer l'indicateur"
+                      class="btn btn-link btn-danger btn-just-icon delete"
+                      ><i class="material-icons">delete</i></a
+                    >
+                  </td>
+
+                  <td class="text-center" hidden="true">
+                    <ng-container
+                      *ngFor="let proprietaire of indicateur.proprietaires"
+                    >
+                      {{ proprietaire.nomComplet }}
+                    </ng-container>
+                  </td>
+                  <td class="text-center" hidden="true">
+                    <ng-container
+                      *ngFor="let suppleant of indicateur.suppleants"
+                      >{{ suppleant.nomComplet }}
+                    </ng-container>
+                  </td>
+                  <td class="text-center" hidden="true">
+                    <ng-container *ngFor="let analyste of indicateur.users"
+                      >{{ analyste.nomComplet }}
+                    </ng-container>
+                  </td>
+                </tr>
+              </ng-container>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal AJOUT KPI-->
+  <div
+    class="modal fade col-md-12"
+    id="addIndicateurModal"
+    tabindex="-1"
+    role="dialog"
+    aria-labelledby="myModalLabel"
+    aria-hidden="true"
+  >
+    <!--  modal-dialog -->
+
+    <div class="modal-dialog modal-fade modal-xl" style="z-index: 1041">
+      <!--  en content -->
+
+      <div class="modal-content">
+        <!--  en header -->
+        <div class="modal-header">
+          <h4 class="modal-title" style="color: #ff6600">Nouvel Indicateur</h4>
+          <button
+            mat-button
+            type="button"
+            class="close"
+            data-dismiss="modal"
+            aria-hidden="true"
+          >
+            <i class="material-icons">clear</i>
+          </button>
+        </div>
+        <!--  en header -->
+
+        <!--  modal-body -->
+
+        <div class="modal-body">
+          <!--  form-group -->
+
+          <div
+            class="form-group bmd-form-group is-filled"
+            [formGroup]="indicateurForm"
+          >
+            <div class="row mb-5">
+              <div class="col-md-6">
+                <!-- Intitulé du KPI -->
+                <mat-form-field class="example-full-width">
+                  <textarea
+                    matInput
+                    type="text"
+                    name="name"
+                    placeholder="Intitulé de l'indicateur"
+                    formControlName="name"
+                    required
+                  ></textarea>
+                </mat-form-field>
+              </div>
+              <div class="col-md-6">
+                <br />
+                <br />
+                <ng-multiselect-dropdown
+                  [placeholder]="'Sous-objectif de rattachement'"
+                  [settings]="sousObjectisdropdownSettings"
+                  [data]="sousObjectifs"
+                  [formControl]="indicateurForm.controls['sousObjectifId']"
+                  required
+                >
+                </ng-multiselect-dropdown>
+              </div>
+            </div>
+
+            <div class="row mb-5">
+              <div class="col-md-6">
+                <!-- Description -->
+                <mat-form-field class="example-full-width">
+                  <textarea
+                    matInput
+                    type="text"
+                    name="description"
+                    placeholder="Description du KPI"
+                    formControlName="description"
+                  ></textarea>
+                </mat-form-field>
+              </div>
+
+              <!-- Structure du KPI -->
+              <div class="col-md-6">
+                <br />
+                <br />
+                <ng-multiselect-dropdown
+                  [placeholder]="'Structure  du KPI'"
+                  [settings]="structuredropdownSettings"
+                  [data]="structures"
+                  [formControl]="indicateurForm.controls['selectedStructures']"
+                  (onSelect)="onStructureSelect($event)"
+                  (onDeSelect)="onStructureDeSelect($event)"
+                  required
+                >
+                </ng-multiselect-dropdown>
+              </div>
+            </div>
+
+            <div class="row mb-5">
+              <div class="col-md-6">
+                <!-- Propriétaire de KPI -->
+
+                <ng-multiselect-dropdown
+                  [placeholder]="'Propriétaires de KPI'"
+                  [settings]="proprietairedropdownSettings"
+                  [data]="proprietaires"
+                  [formControl]="
+                    indicateurForm.controls['selectedProprietaires']
+                  "
+                  (onSelect)="onProprietaireSelect($event)"
+                  (onDeSelect)="onProprietaireDeSelect($event)"
+                  [disabled]="collaborateurDisabled"
+                  required
+                >
+                </ng-multiselect-dropdown>
+              </div>
+
+              <!-- Suppléants -->
+              <div class="col-md-6">
+                <ng-multiselect-dropdown
+                  [placeholder]="'Suppléant(s) du propriétaire de KPI'"
+                  [settings]="suppleantdropdownSettings"
+                  [data]="suppleants"
+                  [formControl]="indicateurForm.controls['selectedSuppleants']"
+                  (onSelect)="onSuppleantSelect($event)"
+                  (onDeSelect)="onSuppleantDeSelect($event)"
+                  [disabled]="collaborateurDisabled"
+                  required
+                >
+                </ng-multiselect-dropdown>
+              </div>
+            </div>
+
+            <div class="row mb-5">
+              <!-- Structure des analystes du KPI -->
+              <div class="col-md-6">
+                <ng-multiselect-dropdown
+                  [placeholder]="'Structure des analystes du KPI'"
+                  [settings]="structuredropdownSettings"
+                  [data]="structures"
+                  [formControl]="
+                    indicateurForm.controls['selectedAnalystesStructures']
+                  "
+                  (onSelect)="onStructureAnalysteSelect($event)"
+                  (onDeSelect)="onStructureAnalystesDeSelect($event)"
+                  required
+                >
+                </ng-multiselect-dropdown>
+              </div>
+
+              <!-- Responsable de l'analyse -->
+              <div class="col-md-6">
+                <ng-multiselect-dropdown
+                  [placeholder]="'Responsable des analyses du KPI'"
+                  [settings]="suppleantdropdownSettings"
+                  [data]="analystes"
+                  [formControl]="indicateurForm.controls['selectedAnalystes']"
+                  [disabled]="analystesChoiceDisabled"
+                  required
+                >
+                </ng-multiselect-dropdown>
+              </div>
+            </div>
+
+            <div class="row mb-5">
+              <!-- Origine -->
+              <div class="col-md-4">
+                <mat-form-field>
+                  <mat-select
+                    placeholder="Origine"
+                    formControlName="origineId"
+                    required
+                  >
+                    <mat-option
+                      *ngFor="let origine of origines"
+                      [value]="origine.id"
+                    >
+                      {{ origine.name }}
+                    </mat-option>
+                  </mat-select>
+                </mat-form-field>
+              </div>
+              <!-- Type d'indicateur -->
+              <div class="col-md-4">
+                <mat-form-field>
+                  <mat-select
+                    placeholder="Type d'indicateur"
+                    formControlName="typeIndicateurId"
+                    required
+                  >
+                    <mat-option
+                      *ngFor="let typeIndicateur of typeIndicateurs"
+                      [value]="typeIndicateur.id"
+                    >
+                      {{ typeIndicateur.name }}
+                    </mat-option>
+                  </mat-select>
+                </mat-form-field>
+              </div>
+              <!-- Périodicité -->
+              <div class="col-md-4">
+                <mat-form-field>
+                  <mat-select
+                    placeholder="Périodicité"
+                    formControlName="periodiciteId"
+                    required
+                  >
+                    <mat-option
+                      *ngFor="let periodicite of periodicites"
+                      [value]="periodicite.id"
+                    >
+                      {{ periodicite.name }}
+                    </mat-option>
+                  </mat-select>
+                </mat-form-field>
+              </div>
+            </div>
+
+            <div class="row mb-5">
+              <!-- Tendance -->
+              <div class="col-md-3">
+                <mat-form-field>
+                  <mat-select
+                    placeholder="Tendance"
+                    formControlName="tendanceId"
+                    required
+                  >
+                    <mat-option
+                      *ngFor="let tendance of tendances"
+                      [value]="tendance.id"
+                    >
+                      {{ tendance.name }}
+                    </mat-option>
+                  </mat-select>
+                </mat-form-field>
+              </div>
+              <!-- Valeur Cible -->
+              <div class="col-md-3">
+                <mat-form-field class="example-full-width">
+                  <input
+                    matInput
+                    type="number"
+                    name="valeur_cible"
+                    placeholder="Valeur Cible"
+                    formControlName="valeur_cible"
+                    required
+                  />
+                </mat-form-field>
+              </div>
+              <!-- Unité -->
+              <div class="col-md-3">
+                <mat-form-field>
+                  <mat-select
+                    placeholder="Unité"
+                    formControlName="uniteId"
+                    required
+                  >
+                    <mat-option *ngFor="let unite of unites" [value]="unite.id">
+                      {{ unite.name }}
+                    </mat-option>
+                  </mat-select>
+                </mat-form-field>
+              </div>
+              <!-- Opération -->
+              <div class="col-md-3">
+                <mat-form-field>
+                  <mat-select
+                    placeholder="Opération"
+                    formControlName="operationId"
+                    required
+                  >
+                    <mat-option
+                      *ngFor="let operation of operations"
+                      [value]="operation.id"
+                    >
+                      {{ operation.name }}
+                    </mat-option>
+                  </mat-select>
+                </mat-form-field>
+              </div>
+            </div>
+
+            <div class="row mb-5">
+              <!-- Formule de calcul -->
+              <div class="col-md-4">
+                <mat-form-field class="example-full-width">
+                  <textarea
+                    matInput
+                    type="text"
+                    name="formule_calcul"
+                    placeholder="Formule de calcul du KPI"
+                    formControlName="formule_calcul"
+                  ></textarea>
+                </mat-form-field>
+              </div>
+              <!-- Loi de composition -->
+              <div class="col-md-4">
+                <mat-form-field class="example-full-width">
+                  <textarea
+                    matInput
+                    type="text"
+                    name="loi_composition"
+                    placeholder="Loi de composition du KPI"
+                    formControlName="loi_composition"
+                  ></textarea>
+                </mat-form-field>
+              </div>
+
+              <!-- Analyse Requise -->
+              <div class="col-md-4">
+                <mat-radio-group
+                  class="example-radio-group"
+                  formControlName="analyseRequise"
+                >
+                  <mat-radio-button
+                    class="example-radio-button"
+                    [value]="true"
+                    style="margin-right: 10px"
+                  >
+                    Vérouiller PA
+                  </mat-radio-button>
+                  <mat-radio-button
+                    class="example-radio-button"
+                    [value]="false"
+                  >
+                    PA non vérouillé
+                  </mat-radio-button>
+                </mat-radio-group>
+              </div>
+            </div>
+          </div>
+          <!--  form-group -->
+        </div>
+        <!-- modal body -->
+
+        <!-- modal footer -->
+
+        <div class="modal-footer justify-content-center">
+          <button
+            mat-raised-button
+            aria-label="addIndicateur"
+            type="button"
+            class="btn btn-success mr-5"
+            [disabled]="!indicateurForm.valid"
+            (click)="addIndicateur(indicateurForm.value)"
+            data-dismiss="modal"
+          >
+            Valider
+          </button>
+          <button
+            mat-raised-button
+            type="button"
+            class="btn btn-danger"
+            data-dismiss="modal"
+          >
+            Annuler
+          </button>
+        </div>
+        <!-- modal footer -->
+      </div>
+
+      <!-- en modal content -->
+    </div>
+    <!-- end modal dialog -->
+  </div>
+  <!-- en modal fade -->
+
+  <!--  End Modal AJOUT KPI-->
+
+  <!-- Classic Modal AJOUT KPI en Masse-->
+  <div
+    class="modal fade col-md-12"
+    id="CreerIndicateurEnMasseModal"
+    tabindex="-1"
+    role="dialog"
+    aria-labelledby="myModalLabel"
+    aria-hidden="true"
+  >
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h4 class="modal-title l" style="color: #ff6600">
+            Indicateurs en masse
+          </h4>
+
+          <button
+            mat-button
+            type="button"
+            class="close"
+            data-dismiss="modal"
+            aria-hidden="true"
+            (click)="reinitialiserEventFile()"
+          >
+            <i class="material-icons">clear</i>
+          </button>
+        </div>
+        <div class="modal-body">
+          <div class="row">
+            <div class="col-md-12" style="text-align: center">
+              <div (click)="downloadModel('indicateurs')">
+                <span style="cursor: pointer; color: rgb(255, 136, 0)">
+                  <b>Télécharger le template indicateurs en masse</b>
+                </span>
+              </div>
+              <input
+                type="file"
+                (change)="onFileSelected($event)"
+                class="btn btn-sm"
+              />
+              <button class="btn btn-large" (click)="uploadFile('indicateurs')">
+                Charger
+              </button>
+              <!-- <br />
+              <hr />
+              <br /> -->
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!--  End Modal AJOUT KPI en Masse-->
+
+  <!-- Classic Modal AJOUT Suivis en Masse-->
+  <div
+    class="modal fade col-md-12"
+    id="SaisieSuivisEnMasseModal"
+    tabindex="-1"
+    role="dialog"
+    aria-labelledby="myModalLabel"
+    aria-hidden="true"
+  >
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h4 class="modal-title" style="color: #ff6600">Saisies en masse</h4>
+
+          <button
+            mat-button
+            type="button"
+            class="close"
+            data-dismiss="modal"
+            aria-hidden="true"
+            (click)="reinitialiserEventFile()"
+          >
+            <i class="material-icons">clear</i>
+          </button>
+        </div>
+        <div class="modal-body">
+          <div class="row">
+            <div class="col-md-12" style="text-align: center">
+              <div (click)="downloadModel('saisies')">
+                <span style="cursor: pointer; color: rgb(255, 136, 0)">
+                  <b>Télécharger le template saisie en masse</b>
+                </span>
+              </div>
+              <input
+                type="file"
+                (change)="onFileSelected($event)"
+                class="btn btn-sm"
+              />
+              <button class="btn btn-large" (click)="uploadFile('suivis')">
+                Charger
+              </button>
+              <!-- <br />
+              <hr />
+              <br /> -->
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!--  End Modal AJOUT Suivis en Masse-->
+
+  <!-- Classic Modal update KPI-->
+  <div
+    class="modal fade col-md-12"
+    id="updateIndicateurModal"
+    tabindex="-1"
+    role="dialog"
+    aria-labelledby="myModalLabel"
+    aria-hidden="true"
+  >
+    <div class="modal-dialog modal-xl" style="z-index: 1041">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h4 class="modal-title" style="color: #ff6600">
+            Modifier l'indicateur
+          </h4>
+          <button
+            mat-button
+            type="button"
+            class="close"
+            data-dismiss="modal"
+            aria-hidden="true"
+          >
+            <i class="material-icons">clear</i>
+          </button>
+        </div>
+        <div class="modal-body">
+          <div class="form-group bmd-form-group is-filled">
+            <form [formGroup]="indicateurUpdateForm">
+              <div class="row mt-5">
+                <div class="col-md-6">
+                  <mat-form-field class="example-full-width">
+                    <textarea
+                      matInput
+                      type="text"
+                      name="name"
+                      placeholder="Nom de l'indicateur"
+                      formControlName="name"
+                      required
+                    ></textarea>
+                  </mat-form-field>
+                </div>
+
+                <div class="col-md-6">
+                  <h5>Sous-objectif</h5>
+                  <ng-multiselect-dropdown
+                    [placeholder]="'Sous-objectif de rattachement'"
+                    [settings]="sousObjectisdropdownSettings"
+                    [data]="sousObjectifs"
+                    [formControl]="
+                      indicateurUpdateForm.controls['sousObjectifId']
+                    "
+                    required
+                  >
+                  </ng-multiselect-dropdown>
+                </div>
+              </div>
+
+              <div class="row mt-5">
+                <div class="col-md-6">
+                  <mat-form-field class="example-full-width">
+                    <textarea
+                      matInput
+                      type="text"
+                      name="description"
+                      placeholder="Description du KPI"
+                      formControlName="description"
+                    ></textarea>
+                  </mat-form-field>
+                </div>
+                <div class="col-md-6">
+                  <h5>Structure du KPI</h5>
+                  <ng-multiselect-dropdown
+                    [placeholder]="'Structure  du KPI'"
+                    [settings]="structuredropdownSettings"
+                    [data]="structures"
+                    [formControl]="
+                      indicateurUpdateForm.controls['selectedStructures']
+                    "
+                    (onSelect)="onUpdateStructureSelect($event)"
+                    (onDeSelect)="onUpdateStructureDeSelect($event)"
+                    required
+                  >
+                  </ng-multiselect-dropdown>
+                </div>
+              </div>
+              <div class="row mt-5">
+                <div class="col-md-6">
+                  <h5>Propriétaire de KPI</h5>
+                  <ng-multiselect-dropdown
+                    [placeholder]="'Propriétaire de KPI'"
+                    [settings]="proprietairedropdownSettings"
+                    [data]="proprietaires"
+                    [formControl]="
+                      indicateurUpdateForm.controls['selectedProprietaires']
+                    "
+                    (onSelect)="onProprietaireSelect($event)"
+                    (onDeSelect)="onProprietaireDeSelect($event)"
+                    [disabled]="collaborateurDisabled"
+                    required
+                  >
+                  </ng-multiselect-dropdown>
+                </div>
+                <div class="col-md-6">
+                  <h5>Suppléant(s) du propriétaire de KPI</h5>
+                  <ng-multiselect-dropdown
+                    [placeholder]="'Suppléant(s) du propriétaire de KPI'"
+                    [settings]="suppleantdropdownSettings"
+                    [data]="suppleants"
+                    [formControl]="
+                      indicateurUpdateForm.controls['selectedSuppleants']
+                    "
+                    (onSelect)="onSuppleantSelect($event)"
+                    (onDeSelect)="onSuppleantDeSelect($event)"
+                    [disabled]="collaborateurDisabled"
+                    required
+                  >
+                  </ng-multiselect-dropdown>
+                </div>
+              </div>
+              <div class="row mt-5">
+                <!-- Structure des analystes du KPI -->
+                <div class="col-md-6">
+                  <h5>Structure des analystes de KPI</h5>
+                  <ng-multiselect-dropdown
+                    [placeholder]="'Structure des analystes du KPI'"
+                    [settings]="structuredropdownSettings"
+                    [data]="structures"
+                    [formControl]="
+                      indicateurUpdateForm.controls[
+                        'selectedAnalystesStructures'
+                      ]
+                    "
+                    (onSelect)="onUpdateStructureAnalystesSelect($event)"
+                    (onDeSelect)="onUpdateStructureAnalystesDeSelect($event)"
+                    required
+                  >
+                  </ng-multiselect-dropdown>
+                </div>
+
+                <div class="col-md-6">
+                  <h5>Responsable des analystes de KPI</h5>
+                  <ng-multiselect-dropdown
+                    [placeholder]="'Responsable des analyses du KPI'"
+                    [settings]="suppleantdropdownSettings"
+                    [data]="analystes"
+                    [formControl]="
+                      indicateurUpdateForm.controls['selectedAnalystes']
+                    "
+                    [disabled]="analystesChoiceDisabled"
+                    required
+                  >
+                  </ng-multiselect-dropdown>
+                </div>
+              </div>
+              <div class="row mt-5">
+                <div class="col-md-4">
+                  <mat-form-field>
+                    <mat-select
+                      placeholder="Origine"
+                      formControlName="origineId"
+                      required
+                    >
+                      <mat-option
+                        *ngFor="let origine of origines"
+                        [value]="origine.id"
+                      >
+                        {{ origine.name }}
+                      </mat-option>
+                    </mat-select>
+                  </mat-form-field>
+                </div>
+                <div class="col-md-4">
+                  <mat-form-field>
+                    <mat-select
+                      placeholder="Type d'indicateur"
+                      formControlName="typeIndicateurId"
+                      required
+                    >
+                      <mat-option
+                        *ngFor="let typeIndicateur of typeIndicateurs"
+                        [value]="typeIndicateur.id"
+                      >
+                        {{ typeIndicateur.name }}
+                      </mat-option>
+                    </mat-select>
+                  </mat-form-field>
+                </div>
+
+                <div class="col-md-4">
+                  <mat-form-field>
+                    <mat-select
+                      placeholder="Périodicité"
+                      formControlName="periodiciteId"
+                      required
+                    >
+                      <mat-option
+                        *ngFor="let periodicite of periodicites"
+                        [value]="periodicite.id"
+                      >
+                        {{ periodicite.name }}
+                      </mat-option>
+                    </mat-select>
+                  </mat-form-field>
+                </div>
+              </div>
+
+              <div class="row mt-5">
+                <div class="col-md-3">
+                  <mat-form-field>
+                    <mat-select
+                      placeholder="Tendance"
+                      formControlName="tendanceId"
+                      required
+                    >
+                      <mat-option
+                        *ngFor="let tendance of tendances"
+                        [value]="tendance.id"
+                      >
+                        {{ tendance.name }}
+                      </mat-option>
+                    </mat-select>
+                  </mat-form-field>
+                </div>
+                <div class="col-md-3">
+                  <mat-form-field class="example-full-width">
+                    <input
+                      matInput
+                      type="number"
+                      name="valeur_cible"
+                      placeholder="Valeur Cible"
+                      formControlName="valeur_cible"
+                      required
+                    />
+                  </mat-form-field>
+                </div>
+                <div class="col-md-3">
+                  <mat-form-field>
+                    <mat-select
+                      placeholder="Unité"
+                      formControlName="uniteId"
+                      required
+                    >
+                      <mat-option
+                        *ngFor="let unite of unites"
+                        [value]="unite.id"
+                      >
+                        {{ unite.name }}
+                      </mat-option>
+                    </mat-select>
+                  </mat-form-field>
+                </div>
+                <div class="col-md-3">
+                  <mat-form-field>
+                    <mat-select
+                      placeholder="Opération"
+                      formControlName="operationId"
+                      required
+                    >
+                      <mat-option
+                        *ngFor="let operation of operations"
+                        [value]="operation.id"
+                      >
+                        {{ operation.name }}
+                      </mat-option>
+                    </mat-select>
+                  </mat-form-field>
+                </div>
+              </div>
+
+              <div class="row mt-5">
+                <div class="col-md-4">
+                  <mat-form-field class="example-full-width">
+                    <textarea
+                      matInput
+                      type="text"
+                      name="formule_calcul"
+                      placeholder="Formule de calcul du KPI"
+                      formControlName="formule_calcul"
+                    ></textarea>
+                  </mat-form-field>
+                </div>
+                <div class="col-md-4">
+                  <mat-form-field class="example-full-width">
+                    <textarea
+                      matInput
+                      type="text"
+                      name="loi_composition"
+                      placeholder="Loi de composition du KPI"
+                      formControlName="loi_composition"
+                    ></textarea>
+                  </mat-form-field>
+                </div>
+                <!-- Analyse Requise -->
+                <div class="col-md-4">
+                  <mat-radio-group
+                    class="example-radio-group"
+                    formControlName="analyseRequise"
+                  >
+                    <mat-radio-button
+                      class="example-radio-button"
+                      [value]="true"
+                      style="margin-right: 10px"
+                    >
+                      Vérouiller PA
+                    </mat-radio-button>
+                    <mat-radio-button
+                      class="example-radio-button"
+                      [value]="false"
+                    >
+                      PA non vérouillé
+                    </mat-radio-button>
+                  </mat-radio-group>
+                </div>
+              </div>
+            </form>
+          </div>
+        </div>
+        <div class="modal-footer justify-content-center">
+          <button
+            mat-raised-button
+            type="button"
+            class="btn mr-5"
+            [disabled]="!indicateurUpdateForm.valid"
+            (click)="updateIndicateur(indicateurUpdateForm.value)"
+            data-dismiss="modal"
+          >
+            Valider
+          </button>
+          <button
+            mat-raised-button
+            type="button"
+            class="btn btn-danger"
+            data-dismiss="modal"
+          >
+            Annuler
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!--  End Modal update KPI-->
+
+  <!-- Classic Modal delete KPI -->
+  <div
+    class="modal fade col-md-12"
+    id="deleteIndicateurModal"
+    tabindex="-1"
+    role="dialog"
+    aria-labelledby="myModalLabel"
+    aria-hidden="true"
+  >
+    <div class="modal-dialog modal-md" style="z-index: 1041">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h4 class="modal-title">{{ stopOrDeleteText }} l'indicateur</h4>
+        </div>
+        <div class="modal-body">
+          <div class="row">
+            <div class="col-md-12 text-center">
+              <p>Attention :</p>
+              <p>
+                Etes-vous sûr(e) de vouloir {{ stopOrDeleteText }} cet
+                indicateur?
+              </p>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer justify-content-center">
+          <button
+            mat-raised-button
+            type="button"
+            class="btn mr-5"
+            (click)="confirmArretIndicateur(indicateurToStop)"
+            data-dismiss="modal"
+          >
+            Confirmer
+          </button>
+          <button
+            mat-raised-button
+            type="button"
+            class="btn btn-danger"
+            data-dismiss="modal"
+          >
+            Annuler
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!--  End Modal delete KPI-->
+
+  <!-- Modal Reconduction en Masse -->
+  <div
+    class="modal fade col-md-12"
+    id="ReconductionEnMasseModal"
+    tabindex="-1"
+    role="dialog"
+    aria-labelledby="myModalLabel"
+    aria-hidden="true"
+  >
+    <div class="modal-dialog modal-lg" style="z-index: 1041">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h4 class="modal-title" style="color: #ff6600">
+            Reconduction des indicateurs
+          </h4>
+          <button
+            mat-button
+            type="button"
+            class="close"
+            data-dismiss="modal"
+            aria-hidden="true"
+          >
+            <i class="material-icons">clear</i>
+          </button>
+        </div>
+        <div class="modal-body">
+          <div
+            class="form-grformGroupoup bmd-form-group is-filled"
+            [formGroup]="reconductionForm"
+          >
+            <div class="col-md-10 mr-auto ml-auto">
+              <ng-multiselect-dropdown
+                [placeholder]="'Choisir l\'année de reconduction'"
+                [settings]="anneedropdownSettings"
+                [data]="anneesDeReconduction"
+                [formControl]="reconductionForm.controls['annees']"
+                (onSelect)="onAnnneReconductionSelect($event)"
+                (onDeSelect)="onAnnneReconductionDeSelect($event)"
+                required
+                class="text-center"
+              >
+              </ng-multiselect-dropdown>
+            </div>
+            <br />
+            <div class="col-md-10 mr-auto ml-auto">
+              <ng-multiselect-dropdown
+                [placeholder]="'Indicateurs à reconduire'"
+                [settings]="indicateursAReconduiredropdownSettings"
+                [data]="indicateursAReconduire"
+                [formControl]="reconductionForm.controls['indicateurs']"
+                [disabled]="desactiverReconduction"
+                [settings]="MultiSelectSettingsByGroup"
+                required
+                style="width: 100%"
+              >
+              </ng-multiselect-dropdown>
+            </div>
+            <br />
+          </div>
+        </div>
+        <div class="modal-footer justify-content-center">
+          <button
+            mat-raised-button
+            type="button"
+            class="btn mr-5"
+            [disabled]="!reconductionForm.valid"
+            (click)="reconduireIndicateurs(reconductionForm.value)"
+            data-dismiss="modal"
+          >
+            Valider
+          </button>
+          <button
+            mat-raised-button
+            type="button"
+            class="btn btn-danger"
+            data-dismiss="modal"
+          >
+            Annuler
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!--  End Reconduction en masse-->
+
+  <!-- fin container -->
+</div>

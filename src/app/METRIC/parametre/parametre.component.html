@@ -1,0 +1,1190 @@
+<div class="row black-card">
+  <div class="col-md-4 text-left">
+    <nav style="--bs-breadcrumb-divider: '>'" aria-label="dark breadcrumb">
+      <ol class="breadcrumb breadcrumb-dark">
+        <li class="breadcrumb-item"><a href="metric">METRIC</a></li>
+        <li class="breadcrumb-item active text-white" aria-current="page">
+          Paramètres
+        </li>
+      </ol>
+    </nav>
+  </div>
+  <div class="col-md-8 text-right"></div>
+</div>
+
+<div class="container-fluid">
+  <div class="col-md-12">
+    <div class="tab-content tab-space tab-subcategories">
+      <div class="tab-pane active">
+        <div class="card">
+          <div class="card-header card-header-icon card-header-warning">
+            <div class="card-icon">
+              <i class="material-icons">settings</i>
+            </div>
+          </div>
+          <div class="card-body">
+            <!-- <div class="card-header black-card card-header-tabs"> -->
+            <div class="nav-tabs-navigation">
+              <div class="nav-tabs-wrapper">
+                <ul
+                  class="nav nav-tabs black-card justify-content-center"
+                  data-tabs="tabs">
+                  <li class="nav-item" (click)="annuler()">
+                    <a
+                      class="nav-link active"
+                      href="#origine"
+                      data-toggle="tab">
+                      <i class="material-icons">house</i>
+                      Origines
+                      <div class="ripple-container"></div>
+                    </a>
+                  </li>
+                  <li class="nav-item" (click)="annuler()">
+                    <a class="nav-link" href="#objectif" data-toggle="tab">
+                      <i class="material-icons">flag</i>
+                      Objectifs
+                      <div class="ripple-container"></div>
+                    </a>
+                  </li>
+                  <li class="nav-item" (click)="annuler()">
+                    <a class="nav-link" href="#sous-objectif" data-toggle="tab">
+                      <i class="material-icons">dvr</i>
+                      Sous-Objectifs
+                      <div class="ripple-container"></div>
+                    </a>
+                  </li>
+                  <li class="nav-item" (click)="annuler()">
+                    <a class="nav-link" href="#tendance" data-toggle="tab">
+                      <i class="material-icons">trending_up</i>
+                      Tendances
+                      <div class="ripple-container"></div>
+                    </a>
+                  </li>
+                  <li class="nav-item" (click)="annuler()">
+                    <a class="nav-link" href="#operation" data-toggle="tab">
+                      <i class="material-icons">functions</i>
+                      Opérations
+                      <div class="ripple-container"></div>
+                    </a>
+                  </li>
+                  <li class="nav-item" (click)="annuler()">
+                    <a class="nav-link" href="#unite" data-toggle="tab">
+                      <i class="material-icons">emoji_symbols</i>
+                      Unités
+                      <div class="ripple-container"></div>
+                    </a>
+                  </li>
+                  <li class="nav-item" (click)="annuler()">
+                    <a class="nav-link" href="#periodicite" data-toggle="tab">
+                      <i class="material-icons">repeat</i>
+                      Périodicités
+                      <div class="ripple-container"></div>
+                    </a>
+                  </li>
+
+                  <li class="nav-item" (click)="annuler()">
+                    <a
+                      class="nav-link"
+                      href="#type-indicateur"
+                      data-toggle="tab">
+                      <i class="material-icons">reply_all</i>
+                      Types d'Indicateur
+                      <div class="ripple-container"></div>
+                    </a>
+                  </li>
+                </ul>
+              </div>
+            </div>
+            <!-- </div> -->
+          </div>
+        </div>
+      </div>
+
+      <!-- Table et formulaire -->
+      <div class="card-body">
+        <div class="tab-content">
+          <!-- tendance tab debut -->
+          <div class="tab-pane" id="tendance">
+            <div class="container-fluid">
+              <div class="row">
+                <div class="col-md-6">
+                  <div class="card">
+                    <div
+                      class="card-header card-header-icon card-header-warning">
+                      <div class="card-icon">
+                        <i class="material-icons">trending_up</i>
+                      </div>
+                      <h4 class="card-title">Les tendances</h4>
+                    </div>
+                    <div class="card-body">
+                      <div class="material-datatables">
+                        <table
+                          datatable
+                          [dtOptions]="dtOptions"
+                          [dtTrigger]="dtTriggerTendance"
+                          class="table table-striped table-no-bordered table-hover"
+                          style="width: 100%">
+                          <thead class="text-primary">
+                            <tr>
+                              <th hidden="true">id</th>
+                              <th style="width: 75%">Nom de la tendance</th>
+                              <th
+                                class="disabled-sorting text-center"
+                                style="width: 25%">
+                                Actions
+                              </th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            <tr *ngFor="let tendance of tendances">
+                              <td hidden="true">id</td>
+                              <td style="width: 75%">{{ tendance.name }}</td>
+                              <td class="text-right" style="width: 25%">
+                                <a
+                                  (click)="getParametre(tendance, true)"
+                                  class="btn btn-link btn-success btn-just-icon edit"
+                                  ><i class="material-icons">edit</i></a
+                                >
+
+                                <a
+                                  (click)="getParametre(tendance, false)"
+                                  class="btn btn-link btn-danger btn-just-icon edit"
+                                  data-toggle="modal"
+                                  data-target="#deleteParametreModal"
+                                  ><i class="material-icons">delete</i>
+                                </a>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <div class="card">
+                    <div
+                      class="card-header card-header-warning card-header-icon">
+                      <div class="card-icon">
+                        <i class="material-icons">settings_applications </i>
+                      </div>
+                      <h4 class="card-title">
+                        {{ update ? 'Modifier' : 'Ajouter' }}
+                      </h4>
+                    </div>
+                    <div class="card-body">
+                      <form class="form-horizontal" [formGroup]="parametreForm">
+                        <div class="row">
+                          <div class="col-md-12 col-9">
+                            <mat-form-field class="example-full-width">
+                              <input
+                                matInput
+                                type="text"
+                                name="parametre"
+                                formControlName="parametreName"
+                                placeholder="Entrer le nom de la tendance"
+                                required />
+                            </mat-form-field>
+                          </div>
+                        </div>
+                      </form>
+                    </div>
+                    <div class="card-footer">
+                      <div class="row">
+                        <div class="col-md-5">
+                          <button
+                            *ngIf="!update"
+                            mat-raised-button
+                            (click)="
+                              addParametre(parametreForm.value, 'tendance')
+                            "
+                            class="btn btn-fill btn-warning"
+                            matTooltip="ajouter un parametre"
+                            matTooltipPosition="below"
+                            [disabled]="!parametreForm.valid">
+                            Ajouter
+                          </button>
+                          <button
+                            *ngIf="update"
+                            mat-raised-button
+                            (click)="updateParametre(parametreForm.value)"
+                            class="btn btn-fill btn-info">
+                            Modifier
+                          </button>
+                        </div>
+                        <div class="col-md-5">
+                          <button
+                            *ngIf="update"
+                            mat-raised-button
+                            (click)="annuler()"
+                            class="btn btn-fill btn-danger">
+                            Annuler
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- tendance tab fin -->
+          <!-- operation tab debut  -->
+
+          <div class="tab-pane" id="operation">
+            <div class="container-fluid">
+              <div class="row">
+                <div class="col-md-6">
+                  <div class="card">
+                    <div
+                      class="card-header card-header-icon card-header-warning">
+                      <div class="card-icon">
+                        <i class="material-icons">functions</i>
+                      </div>
+                      <h4 class="card-title">Les opérations</h4>
+                    </div>
+                    <div class="card-body">
+                      <div class="material-datatables">
+                        <table
+                          datatable
+                          [dtOptions]="dtOptions"
+                          [dtTrigger]="dtTriggerOperation"
+                          class="table table-striped table-no-bordered table-hover"
+                          style="width: 100%">
+                          <thead class="text-primary">
+                            <tr>
+                              <th hidden="true">id</th>
+                              <th style="width: 75%">Nom de l'opération</th>
+                              <th
+                                class="disabled-sorting text-center"
+                                style="width: 25%">
+                                Actions
+                              </th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            <tr *ngFor="let operation of operations">
+                              <td hidden="true">id</td>
+                              <td style="width: 75%">{{ operation.name }}</td>
+                              <td class="text-right" style="width: 25%">
+                                <a
+                                  (click)="getParametre(operation, true)"
+                                  class="btn btn-link btn-success btn-just-icon edit"
+                                  ><i class="material-icons">edit</i></a
+                                >
+
+                                <a
+                                  (click)="getParametre(operation, false)"
+                                  class="btn btn-link btn-danger btn-just-icon edit"
+                                  data-toggle="modal"
+                                  data-target="#deleteParametreModal"
+                                  ><i class="material-icons">delete</i>
+                                </a>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <div class="card">
+                    <div
+                      class="card-header card-header-warning card-header-icon">
+                      <div class="card-icon">
+                        <i class="material-icons">settings_applications </i>
+                      </div>
+                      <h4 class="card-title">
+                        {{ update ? 'Modifier ' : 'Ajouter' }}
+                      </h4>
+                    </div>
+                    <div class="card-body">
+                      <form class="form-horizontal" [formGroup]="parametreForm">
+                        <div class="row">
+                          <div class="col-md-12 col-9">
+                            <mat-form-field class="example-full-width">
+                              <input
+                                matInput
+                                type="text"
+                                name="parametre"
+                                formControlName="parametreName"
+                                placeholder="Entrer le nom de l'opération"
+                                required />
+                            </mat-form-field>
+                          </div>
+                        </div>
+                      </form>
+                    </div>
+                    <div class="card-footer">
+                      <div class="row">
+                        <div class="col-md-5">
+                          <button
+                            *ngIf="!update"
+                            mat-raised-button
+                            (click)="
+                              addParametre(parametreForm.value, 'operation')
+                            "
+                            class="btn btn-fill btn-warning"
+                            matTooltip="ajouter un parametre"
+                            matTooltipPosition="below"
+                            [disabled]="!parametreForm.valid">
+                            Ajouter
+                          </button>
+                          <button
+                            *ngIf="update"
+                            mat-raised-button
+                            (click)="updateParametre(parametreForm.value)"
+                            class="btn btn-fill btn-info">
+                            Modifier
+                          </button>
+                        </div>
+                        <div class="col-md-5">
+                          <button
+                            *ngIf="update"
+                            mat-raised-button
+                            (click)="annuler()"
+                            class="btn btn-fill btn-danger">
+                            Annuler
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- operation tab fin  -->
+          <!-- unite tab debut  -->
+
+          <div class="tab-pane" id="unite">
+            <div class="container-fluid">
+              <div class="row">
+                <div class="col-md-6">
+                  <div class="card">
+                    <div
+                      class="card-header card-header-icon card-header-warning">
+                      <div class="card-icon">
+                        <i class="material-icons">emoji_symbols</i>
+                      </div>
+                      <h4 class="card-title">Les unités</h4>
+                    </div>
+                    <div class="card-body">
+                      <div class="material-datatables">
+                        <table
+                          datatable
+                          [dtOptions]="dtOptions"
+                          [dtTrigger]="dtTriggerUnite"
+                          class="table table-striped table-no-bordered table-hover"
+                          style="width: 100%">
+                          <thead class="text-primary">
+                            <tr>
+                              <th hidden="true">id</th>
+                              <th style="width: 75%">Nom de l'unité</th>
+                              <th
+                                class="disabled-sorting text-center"
+                                style="width: 25%">
+                                Actions
+                              </th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            <tr *ngFor="let unite of unites">
+                              <td hidden="true">id</td>
+                              <td>{{ unite.name }}</td>
+                              <td class="text-right" style="width: 25%">
+                                <a
+                                  (click)="getParametre(unite, true)"
+                                  class="btn btn-link btn-success btn-just-icon edit"
+                                  ><i class="material-icons">edit</i></a
+                                >
+
+                                <a
+                                  (click)="getParametre(unite, false)"
+                                  class="btn btn-link btn-danger btn-just-icon edit"
+                                  data-toggle="modal"
+                                  data-target="#deleteParametreModal"
+                                  ><i class="material-icons">delete</i>
+                                </a>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <div class="card">
+                    <div
+                      class="card-header card-header-warning card-header-icon">
+                      <div class="card-icon">
+                        <i class="material-icons">settings_applications </i>
+                      </div>
+                      <h4 class="card-title">
+                        {{ update ? 'Modifier ' : 'Ajouter' }}
+                      </h4>
+                    </div>
+                    <div class="card-body">
+                      <form class="form-horizontal" [formGroup]="parametreForm">
+                        <div class="row">
+                          <div class="col-md-12 col-9">
+                            <mat-form-field class="example-full-width">
+                              <input
+                                matInput
+                                type="text"
+                                name="parametre"
+                                formControlName="parametreName"
+                                placeholder="Entrer le nom de l'opération"
+                                required />
+                            </mat-form-field>
+                          </div>
+                        </div>
+                      </form>
+                    </div>
+                    <div class="card-footer">
+                      <div class="row">
+                        <div class="col-md-5">
+                          <button
+                            *ngIf="!update"
+                            mat-raised-button
+                            (click)="addParametre(parametreForm.value, 'unite')"
+                            class="btn btn-fill btn-warning"
+                            matTooltip="ajouter une unité"
+                            matTooltipPosition="below"
+                            [disabled]="!parametreForm.valid">
+                            Ajouter
+                          </button>
+                          <button
+                            *ngIf="update"
+                            mat-raised-button
+                            (click)="updateParametre(parametreForm.value)"
+                            class="btn btn-fill btn-info">
+                            Modifier
+                          </button>
+                        </div>
+                        <div class="col-md-5">
+                          <button
+                            *ngIf="update"
+                            mat-raised-button
+                            (click)="annuler()"
+                            class="btn btn-fill btn-danger">
+                            Annuler
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- unite tab fin  -->
+          <!-- periodicite tab debut  -->
+
+          <div class="tab-pane" id="periodicite">
+            <div class="container-fluid">
+              <div class="row">
+                <div class="col-md-6">
+                  <div class="card">
+                    <div
+                      class="card-header card-header-icon card-header-warning">
+                      <div class="card-icon">
+                        <i class="material-icons">repeat</i>
+                      </div>
+                      <h4 class="card-title">Les périodicités</h4>
+                    </div>
+                    <div class="card-body">
+                      <div class="material-datatables">
+                        <table
+                          datatable
+                          [dtOptions]="dtOptions"
+                          [dtTrigger]="dtTriggerPeriodicite"
+                          class="table table-striped table-no-bordered table-hover"
+                          style="width: 100%">
+                          <thead class="text-primary">
+                            <tr>
+                              <th hidden="true">id</th>
+                              <th style="width: 75%">Nom de la périodicité</th>
+                              <th
+                                class="disabled-sorting text-center"
+                                style="width: 25%">
+                                Actions
+                              </th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            <tr *ngFor="let periodicite of periodicites">
+                              <td hidden="true">id</td>
+                              <td>{{ periodicite.name }}</td>
+                              <td class="text-right" style="width: 25%">
+                                <a
+                                  (click)="getParametre(periodicite, true)"
+                                  class="btn btn-link btn-success btn-just-icon edit"
+                                  ><i class="material-icons">edit</i></a
+                                >
+
+                                <a
+                                  (click)="getParametre(periodicite, false)"
+                                  class="btn btn-link btn-danger btn-just-icon edit"
+                                  data-toggle="modal"
+                                  data-target="#deleteParametreModal"
+                                  ><i class="material-icons">delete</i>
+                                </a>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <div class="card">
+                    <div
+                      class="card-header card-header-warning card-header-icon">
+                      <div class="card-icon">
+                        <i class="material-icons">settings_applications </i>
+                      </div>
+                      <h4 class="card-title">
+                        {{ update ? 'Modifier ' : 'Ajouter' }}
+                      </h4>
+                    </div>
+                    <div class="card-body">
+                      <form class="form-horizontal" [formGroup]="parametreForm">
+                        <div class="row">
+                          <div class="col-md-12 col-9">
+                            <mat-form-field class="example-full-width">
+                              <input
+                                matInput
+                                type="text"
+                                name="parametre"
+                                formControlName="parametreName"
+                                placeholder="Entrer le nom de la périodicité"
+                                required />
+                            </mat-form-field>
+                          </div>
+                        </div>
+                      </form>
+                    </div>
+                    <div class="card-footer">
+                      <div class="row">
+                        <div class="col-md-5">
+                          <button
+                            *ngIf="!update"
+                            mat-raised-button
+                            (click)="
+                              addParametre(parametreForm.value, 'periodicite')
+                            "
+                            class="btn btn-fill btn-warning"
+                            matTooltip="ajouter une périodicité"
+                            matTooltipPosition="below"
+                            [disabled]="!parametreForm.valid">
+                            Ajouter
+                          </button>
+                          <button
+                            *ngIf="update"
+                            mat-raised-button
+                            (click)="updateParametre(parametreForm.value)"
+                            class="btn btn-fill btn-info">
+                            Modifier
+                          </button>
+                        </div>
+                        <div class="col-md-5">
+                          <button
+                            *ngIf="update"
+                            mat-raised-button
+                            (click)="annuler()"
+                            class="btn btn-fill btn-danger">
+                            Annuler
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- periodicite tab fin  -->
+          <!-- origine tab début  -->
+
+          <div class="tab-pane active" id="origine">
+            <div class="container-fluid">
+              <div class="row">
+                <div class="col-md-6">
+                  <div class="card">
+                    <div
+                      class="card-header card-header-icon card-header-warning">
+                      <div class="card-icon">
+                        <i class="material-icons">house</i>
+                      </div>
+                      <h4 class="card-title">Les origines</h4>
+                    </div>
+                    <div class="card-body">
+                      <div class="material-datatables">
+                        <table
+                          datatable
+                          [dtOptions]="dtOptions"
+                          [dtTrigger]="dtTriggerOrigine"
+                          class="table table-striped table-no-bordered table-hover"
+                          style="width: 100%">
+                          <thead class="text-primary">
+                            <tr>
+                              <th hidden="true">id</th>
+                              <th style="width: 75%">Nom de l'origine</th>
+                              <th
+                                class="disabled-sorting text-center"
+                                style="width: 25%">
+                                Actions
+                              </th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            <tr *ngFor="let origine of origines">
+                              <td hidden="true">id</td>
+                              <td>{{ origine.name }}</td>
+                              <td class="text-right" style="width: 25%">
+                                <a
+                                  (click)="getParametre(origine, true)"
+                                  class="btn btn-link btn-success btn-just-icon edit"
+                                  ><i class="material-icons">edit</i></a
+                                >
+
+                                <a
+                                  (click)="getParametre(origine, false)"
+                                  class="btn btn-link btn-danger btn-just-icon edit"
+                                  data-toggle="modal"
+                                  data-target="#deleteParametreModal"
+                                  ><i class="material-icons">delete</i>
+                                </a>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <div class="card">
+                    <div
+                      class="card-header card-header-warning card-header-icon">
+                      <div class="card-icon">
+                        <i class="material-icons">settings_applications </i>
+                      </div>
+                      <h4 class="card-title">
+                        {{ update ? 'Modifier ' : 'Ajouter' }}
+                      </h4>
+                    </div>
+                    <div class="card-body">
+                      <form class="form-horizontal" [formGroup]="parametreForm">
+                        <div class="row">
+                          <div class="col-md-12 col-9">
+                            <mat-form-field class="example-full-width">
+                              <input
+                                matInput
+                                type="text"
+                                name="parametre"
+                                formControlName="parametreName"
+                                placeholder="Entrer le nom de l'origine"
+                                required />
+                            </mat-form-field>
+                          </div>
+                        </div>
+                      </form>
+                    </div>
+                    <div class="card-footer">
+                      <div class="row">
+                        <div class="col-md-5">
+                          <button
+                            *ngIf="!update"
+                            mat-raised-button
+                            (click)="
+                              addParametre(parametreForm.value, 'origine')
+                            "
+                            class="btn btn-fill btn-warning"
+                            matTooltip="ajouter une origine"
+                            matTooltipPosition="below"
+                            [disabled]="!parametreForm.valid">
+                            Ajouter
+                          </button>
+                          <button
+                            *ngIf="update"
+                            mat-raised-button
+                            (click)="updateParametre(parametreForm.value)"
+                            class="btn btn-fill btn-info">
+                            Modifier
+                          </button>
+                        </div>
+                        <div class="col-md-5">
+                          <button
+                            *ngIf="update"
+                            mat-raised-button
+                            (click)="annuler()"
+                            class="btn btn-fill btn-danger">
+                            Annuler
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- origine tab fin  -->
+          <!-- type indicateur tab début  -->
+
+          <div class="tab-pane" id="type-indicateur">
+            <div class="container-fluid">
+              <div class="row">
+                <div class="col-md-6">
+                  <div class="card">
+                    <div
+                      class="card-header card-header-icon card-header-warning">
+                      <div class="card-icon">
+                        <i class="material-icons">reply_all</i>
+                      </div>
+                      <h4 class="card-title">Les types d'indicateurs</h4>
+                    </div>
+                    <div class="card-body">
+                      <div class="material-datatables">
+                        <table
+                          datatable
+                          [dtOptions]="dtOptions"
+                          [dtTrigger]="dtTriggerTypeIndicateur"
+                          class="table table-striped table-no-bordered table-hover"
+                          style="width: 100%">
+                          <thead class="text-primary">
+                            <tr>
+                              <th hidden="true">id</th>
+                              <th>Nom du type d'indicateur</th>
+                              <th
+                                class="disabled-sorting text-center"
+                                style="width: 25%">
+                                Actions
+                              </th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            <tr *ngFor="let typeIndicateur of typeIndicateurs">
+                              <td hidden="true">id</td>
+                              <td>{{ typeIndicateur.name }}</td>
+                              <td class="text-right" style="width: 25%">
+                                <a
+                                  (click)="getParametre(typeIndicateur, true)"
+                                  class="btn btn-link btn-success btn-just-icon edit"
+                                  ><i class="material-icons">edit</i></a
+                                >
+
+                                <a
+                                  (click)="getParametre(typeIndicateur, false)"
+                                  class="btn btn-link btn-danger btn-just-icon edit"
+                                  data-toggle="modal"
+                                  data-target="#deleteParametreModal"
+                                  ><i class="material-icons">delete</i>
+                                </a>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <div class="card">
+                    <div
+                      class="card-header card-header-warning card-header-icon">
+                      <div class="card-icon">
+                        <i class="material-icons">settings_applications </i>
+                      </div>
+                      <h4 class="card-title">
+                        {{ update ? 'Modifier ' : 'Ajouter' }}
+                      </h4>
+                    </div>
+                    <div class="card-body">
+                      <form class="form-horizontal" [formGroup]="parametreForm">
+                        <div class="row">
+                          <div class="col-md-12 col-9">
+                            <mat-form-field class="example-full-width">
+                              <input
+                                matInput
+                                type="text"
+                                name="parametre"
+                                formControlName="parametreName"
+                                placeholder="Entrer le nom du type d'indicateur"
+                                required />
+                            </mat-form-field>
+                          </div>
+                        </div>
+                      </form>
+                    </div>
+                    <div class="card-footer">
+                      <div class="row">
+                        <div class="col-md-5">
+                          <button
+                            *ngIf="!update"
+                            mat-raised-button
+                            (click)="
+                              addParametre(
+                                parametreForm.value,
+                                'type-indicateur'
+                              )
+                            "
+                            class="btn btn-fill btn-warning"
+                            matTooltip="ajouter un type d'indicateur"
+                            matTooltipPosition="below"
+                            [disabled]="!parametreForm.valid">
+                            Ajouter
+                          </button>
+                          <button
+                            *ngIf="update"
+                            mat-raised-button
+                            (click)="updateParametre(parametreForm.value)"
+                            class="btn btn-fill btn-info">
+                            Modifier
+                          </button>
+                        </div>
+                        <div class="col-md-5">
+                          <button
+                            *ngIf="update"
+                            mat-raised-button
+                            (click)="annuler()"
+                            class="btn btn-fill btn-danger">
+                            Annuler
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- type indicateur tab fin  -->
+          <!-- sous objectif tab début  -->
+
+          <div class="tab-pane" id="sous-objectif">
+            <div class="container-fluid">
+              <div class="row">
+                <div class="col-md-6">
+                  <div class="card">
+                    <div
+                      class="card-header card-header-icon card-header-warning">
+                      <div class="card-icon">
+                        <i class="material-icons">dvr</i>
+                      </div>
+                      <h4 class="card-title">Les sous-objectifs</h4>
+                    </div>
+                    <div class="card-body">
+                      <div class="material-datatables">
+                        <table
+                          datatable
+                          [dtOptions]="dtOptions"
+                          [dtTrigger]="dtTriggerSousObjectif"
+                          class="table table-striped table-no-bordered table-hover"
+                          style="width: 100%">
+                          <thead class="text-primary">
+                            <tr>
+                              <th hidden="true">id</th>
+                              <th>Nom du sous objectif</th>
+                              <th
+                                class="disabled-sorting text-center"
+                                style="width: 25%">
+                                Actions
+                              </th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            <tr *ngFor="let sousObjectif of sousObjectifs">
+                              <td hidden="true">id</td>
+                              <td>{{ sousObjectif.name }}</td>
+                              <td class="text-right" style="width: 25%">
+                                <a
+                                  (click)="getParametre(sousObjectif, true)"
+                                  class="btn btn-link btn-success btn-just-icon edit"
+                                  ><i class="material-icons">edit</i></a
+                                >
+
+                                <a
+                                  (click)="getParametre(sousObjectif, false)"
+                                  class="btn btn-link btn-danger btn-just-icon edit"
+                                  data-toggle="modal"
+                                  data-target="#deleteParametreModal"
+                                  ><i class="material-icons">delete</i>
+                                </a>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <div class="card">
+                    <div
+                      class="card-header card-header-warning card-header-icon">
+                      <div class="card-icon">
+                        <i class="material-icons">settings_applications </i>
+                      </div>
+                      <h4 class="card-title">
+                        {{ update ? 'Modifier ' : 'Ajouter' }}
+                      </h4>
+                    </div>
+                    <div class="card-body">
+                      <form
+                        class="form-horizontal"
+                        [formGroup]="sousObjectifForm">
+                        <div class="row">
+                          <div class="col-md-12 col-9">
+                            <mat-form-field class="example-full-width">
+                              <input
+                                matInput
+                                type="text"
+                                name="parametre"
+                                formControlName="parametreName"
+                                placeholder="Entrer le nom du sous objectif"
+                                required />
+                            </mat-form-field>
+                            <ng-multiselect-dropdown
+                              [placeholder]="
+                                'Veuillez choisir l\'objectif de rattachement'
+                              "
+                              [settings]="objectifdropdownSettings"
+                              [data]="objectifs"
+                              [formControl]="
+                                sousObjectifForm.controls['objectif']
+                              "
+                              required>
+                            </ng-multiselect-dropdown>
+                          </div>
+                        </div>
+                      </form>
+                    </div>
+                    <div class="card-footer">
+                      <div class="row">
+                        <div class="col-md-5">
+                          <button
+                            *ngIf="!update"
+                            mat-raised-button
+                            (click)="
+                              addParametre(
+                                sousObjectifForm.value,
+                                'sous-objectif'
+                              )
+                            "
+                            class="btn btn-fill btn-warning"
+                            matTooltip="ajouter un sous objectif"
+                            matTooltipPosition="below"
+                            [disabled]="!sousObjectifForm.valid">
+                            Ajouter
+                          </button>
+                          <button
+                            *ngIf="update"
+                            mat-raised-button
+                            (click)="updateParametre(sousObjectifForm.value)"
+                            class="btn btn-fill btn-info">
+                            Modifier
+                          </button>
+                        </div>
+                        <div class="col-md-5">
+                          <button
+                            *ngIf="update"
+                            mat-raised-button
+                            (click)="annuler()"
+                            class="btn btn-fill btn-danger">
+                            Annuler
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- sous objectif tab fin  -->
+          <!-- objectif tab debut  -->
+
+          <div class="tab-pane" id="objectif">
+            <div class="container-fluid">
+              <div class="row">
+                <div class="col-md-6">
+                  <div class="card">
+                    <div
+                      class="card-header card-header-icon card-header-warning">
+                      <div class="card-icon">
+                        <i class="material-icons">flag</i>
+                      </div>
+                      <h4 class="card-title">Les objectifs</h4>
+                    </div>
+                    <div class="card-body">
+                      <div class="material-datatables">
+                        <table
+                          datatable
+                          [dtOptions]="dtOptions"
+                          [dtTrigger]="dtTriggerObjectif"
+                          class="table table-striped table-no-bordered table-hover"
+                          style="width: 100%">
+                          <thead class="text-primary">
+                            <tr>
+                              <th hidden="true">id</th>
+                              <th style="width: 75%">Nom de l'objectif</th>
+                              <th
+                                class="disabled-sorting text-center"
+                                style="width: 25%">
+                                Actions
+                              </th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            <tr *ngFor="let objectif of objectifs">
+                              <td hidden="true">id</td>
+                              <td style="width: 75%">{{ objectif.name }}</td>
+                              <td class="text-right" style="width: 25%">
+                                <a
+                                  (click)="getParametre(objectif, true)"
+                                  class="btn btn-link btn-success btn-just-icon edit"
+                                  ><i class="material-icons">edit</i></a
+                                >
+
+                                <a
+                                  (click)="getParametre(objectif, false)"
+                                  class="btn btn-link btn-danger btn-just-icon edit"
+                                  data-toggle="modal"
+                                  data-target="#deleteParametreModal"
+                                  ><i class="material-icons">delete</i>
+                                </a>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <div class="card">
+                    <div
+                      class="card-header card-header-warning card-header-icon">
+                      <div class="card-icon">
+                        <i class="material-icons">settings_applications </i>
+                      </div>
+                      <h4 class="card-title">
+                        {{ update ? 'Modifier ' : 'Ajouter' }}
+                      </h4>
+                    </div>
+                    <div class="card-body">
+                      <form class="form-horizontal" [formGroup]="parametreForm">
+                        <div class="row">
+                          <div class="col-md-12 col-9">
+                            <mat-form-field class="example-full-width">
+                              <input
+                                matInput
+                                type="text"
+                                name="parametre"
+                                formControlName="parametreName"
+                                placeholder="Entrer l'objectif"
+                                required />
+                            </mat-form-field>
+                          </div>
+                        </div>
+                      </form>
+                    </div>
+                    <div class="card-footer">
+                      <div class="row">
+                        <div class="col-md-5">
+                          <button
+                            *ngIf="!update"
+                            mat-raised-button
+                            (click)="
+                              addParametre(parametreForm.value, 'objectif')
+                            "
+                            class="btn btn-fill btn-warning"
+                            matTooltip="ajouter un objectif"
+                            matTooltipPosition="below"
+                            [disabled]="!parametreForm.valid">
+                            Ajouter
+                          </button>
+                          <button
+                            *ngIf="update"
+                            mat-raised-button
+                            (click)="updateParametre(parametreForm.value)"
+                            class="btn btn-fill btn-info">
+                            Modifier
+                          </button>
+                        </div>
+                        <div class="col-md-5">
+                          <button
+                            *ngIf="update"
+                            mat-raised-button
+                            (click)="annuler()"
+                            class="btn btn-fill btn-danger">
+                            Annuler
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- objectif tab fin  -->
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div
+  class="modal fade"
+  id="deleteParametreModal"
+  tabindex="-1"
+  role="dialog"
+  aria-labelledby="myModalLabel"
+  aria-hidden="true">
+  <div
+    class="modal-dialog modal-md" style="z-index: 1041">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title">Supprimer le paramètre</h4>
+      </div>
+      <div class="modal-body">          <div class="row">
+        <div class="col-md-12 text-center">
+          <p>Etes-vous sûr(e) de vouloir supprimer ce paramètre?</p>
+        </div>
+      </div>
+      </div>
+      <div class="modal-footer justify-content-center">
+        <button
+          mat-raised-button
+          type="button"
+          class="btn"
+          (click)="deleteParametre()"
+          data-dismiss="modal">
+          Supprimer
+        </button>
+        <button
+          mat-raised-button
+          type="button"
+          class="btn btn-danger"
+          data-dismiss="modal">
+          Annuler
+        </button>
+      </div>      
+    </div>
+  </div>
+</div>

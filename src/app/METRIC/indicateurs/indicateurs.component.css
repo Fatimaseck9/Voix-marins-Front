@@ -1,0 +1,82 @@
+.tab, .nav-tabs {
+  padding: 10px 20px; /* Gives some space to tab titles */
+  color: red; /*Colors the text in gray */
+}
+
+
+.breadcrumb-dark{
+background-color: black;
+
+}
+.task-header {
+background-color: #fea01b;
+padding: 0 20px;
+ height: 50px;
+}
+.fx-spacer {
+flex: 5 5 auto;
+}
+
+.mat-select-panel mat-option.mat-option {
+height: unset;
+}
+
+.mat-option-text.mat-option-text {
+white-space: normal;
+}
+  
+
+.activetab {
+  color: black; /*Colors the text in black*/
+  border-bottom: 3px solid #2d2d2d; /* Underlines the text with a bold dark border */
+}
+
+  .big-text {
+  font-size: 70px;
+  font-weight:800;
+  color: #ff6600;
+}
+
+table {
+ width: 100%;
+ padding: 10px 20px;
+}
+
+.table > thead > tr > th {
+border-bottom-width: 1px;
+font-size: 0.825rem;
+font-weight: bold;
+color: white;
+background-color:#ff6600;
+}
+
+th.mat-sort-header-sorted {
+ color: black;
+}
+
+.bouttonValid {
+ padding: 20px;
+}
+
+.table > thead > tr > th {
+  border-bottom-width: 1px;
+  font-size: 0.825rem;
+  font-weight: bold;
+}
+
+.card {
+  box-shadow: none;
+}
+.black-card {
+  background-color: black;
+}
+.nav-tabs .nav-item .nav-link {
+  background-color: black;
+}
+.nav-tabs .nav-item .nav-link.active {
+  background-color: rgba(239, 108, 0, 1);
+}
+
+#add-parametre {
+  margin-bottom: 50px;
+}

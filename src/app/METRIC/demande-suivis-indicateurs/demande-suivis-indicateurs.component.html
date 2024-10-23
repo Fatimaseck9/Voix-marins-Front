@@ -1,0 +1,399 @@
+<div class="row black-card">
+  <div class="col-md-4 text-left">
+    <nav style="--bs-breadcrumb-divider: '>'" aria-label="dark breadcrumb">
+      <ol class="breadcrumb breadcrumb-dark">
+        <li class="breadcrumb-item"><a href="metric">METRIC</a></li>
+        <li class="breadcrumb-item active text-white" aria-current="page">
+          Indicateurs Suivis
+        </li>
+      </ol>
+    </nav>
+  </div>
+  <div class="col-md-8 text-right">
+    <button
+      class="btn btn-outline-primary"
+      data-toggle="modal"
+      data-target="#demandeSuiviKPI"
+    >
+      <span><i class="material-icons">update</i> Faire une demande</span>
+    </button>
+  </div>
+</div>
+
+<!-- debut container -->
+<div class="container-fluid">
+  <div class="col-md-12">
+    <!-- Datatable Liste des Indicateurs Suivis -->
+    <div class="card">
+      <div class="card-header card-header-icon card-header-warning">
+        <div class="card-icon">
+          <i class="material-icons">assignment</i>
+        </div>
+        <div class="card-text">
+          <h4 class="card-category">Indicateurs Suivis</h4>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="material-datatables">
+          <table
+            datatable
+            [dtOptions]="dtOptions"
+            [dtTrigger]="dtTriggerAcceptee"
+            class="table table-striped table-no-bordered table-hover row-border hover"
+            style="width: 100%"
+            tableLayout="fixed"
+          >
+            <thead>
+              <tr>
+                <th style="width: 50%">Nom de l'indicateur</th>
+                <th class="text-center">Propriétaire</th>
+                <th class="text-center">Suivis depuis</th>
+                <th class="disabled-sorting text-center" style="width: 13%">
+                  Actions
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              <ng-container *ngFor="let demande of demandesAcceptees">
+                <tr>
+                  <td
+                    [routerLink]="[
+                      '/metric/indicateurs',
+                      demande.indicateur.id
+                    ]"
+                  >
+                    {{ demande.indicateur.name }}
+                  </td>
+
+                  <td
+                    class="text-center"
+                    [routerLink]="[
+                      '/metric/indicateurs',
+                      demande.indicateur.id
+                    ]"
+                  >
+                    {{ demande.structure }}
+                  </td>
+
+                  <td
+                    class="text-center"
+                    [routerLink]="[
+                      '/metric/indicateurs',
+                      demande.indicateur.id
+                    ]"
+                  >
+                    {{ demande.dateDemande | date : "dd MMMM yyyy" }}
+                  </td>
+                  <td class="text-center" style="width: 13%">
+                    <a
+                      (click)="setDemandeToManage(demande, '')"
+                      data-toggle="modal"
+                      data-target="#annulerSuivisModal"
+                      title="ne plus suivre"
+                      class="btn btn-link btn-success btn-just-icon edit"
+                      ><i class="material-icons">close </i></a
+                    >
+                  </td>
+                </tr>
+              </ng-container>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+    <!-- Datatable Liste des Demandes envoyées -->
+    <div class="card">
+      <div class="card-header card-header-icon card-header-warning">
+        <div class="card-icon">
+          <i class="material-icons">assignment</i>
+        </div>
+        <div class="card-text">
+          <h4 class="card-category">Demandes Envoyées</h4>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="material-datatables">
+          <table
+            datatable
+            [dtOptions]="dtOptions"
+            [dtTrigger]="dtTriggerEnvoie"
+            class="table table-striped table-no-bordered table-hover row-border hover"
+            style="width: 100%"
+            tableLayout="fixed"
+          >
+            <thead>
+              <tr>
+                <th style="width: 50%">Nom de l'indicateur</th>
+                <th class="text-center">Propriétaire</th>
+                <th class="text-center">Statut</th>
+                <th class="text-center">Date de la demande</th>
+              </tr>
+            </thead>
+            <tbody>
+              <ng-container *ngFor="let demande of demandesEnvoyees">
+                <tr>
+                  <td>
+                    {{ demande.indicateur.name }}
+                  </td>
+
+                  <td class="text-center">
+                    {{ demande.structure }}
+                  </td>
+
+                  <td class="text-center">
+                    {{ demande.statut }}
+                  </td>
+
+                  <td class="text-center">
+                    {{ demande.dateDemande | date : "dd MMMM yyyy" }}
+                  </td>
+                </tr>
+              </ng-container>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Datatable Liste des Demandes Reçues -->
+    <div class="card">
+      <div class="card-header card-header-icon card-header-warning">
+        <div class="card-icon">
+          <i class="material-icons">assignment</i>
+        </div>
+        <div class="card-text">
+          <h4 class="card-category">Demandes Reçues</h4>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="material-datatables">
+          <table
+            datatable
+            [dtOptions]="dtOptions"
+            [dtTrigger]="dtTriggerRecue"
+            class="table table-striped table-no-bordered table-hover row-border hover"
+            style="width: 100%"
+            tableLayout="fixed"
+          >
+            <thead>
+              <tr>
+                <th style="width: 50%">Nom de l'indicateur</th>
+                <th class="text-center">Demandeur</th>
+                <th class="text-center">Date de la demande</th>
+
+                <th class="disabled-sorting text-center" style="width: 13%">
+                  Actions
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              <ng-container *ngFor="let demande of demandesRecues">
+                <tr>
+                  <td>
+                    {{ demande.indicateur.name }}
+                  </td>
+
+                  <td class="text-center">
+                    {{ demande.structure }}
+                  </td>
+
+                  <td>
+                    {{ demande.dateDemande | date : "dd MMMM yyyy" }}
+                  </td>
+
+                  <td class="text-center" style="width: 13%">
+                    <a
+                      (click)="setDemandeToManage(demande, 'accepte')"
+                      data-toggle="modal"
+                      data-target="#statutModal"
+                      title="accepter"
+                      class="btn btn-link btn-success btn-just-icon edit"
+                      ><i class="material-icons">check </i></a
+                    >
+                    <a
+                      (click)="setDemandeToManage(demande, 'rejete')"
+                      data-toggle="modal"
+                      data-target="#statutModal"
+                      title="rejeter"
+                      class="btn btn-link btn-danger btn-just-icon delete"
+                      ><i class="material-icons">close</i></a
+                    >
+                  </td>
+                </tr>
+              </ng-container>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Classic Modal changement Statut demande -->
+  <div
+    class="modal fade col-md-12"
+    id="statutModal"
+    tabindex="-1"
+    role="dialog"
+    aria-labelledby="myModalLabel"
+    aria-hidden="true"
+  >
+    <div class="modal-dialog modal-md" style="z-index: 1041">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h4 class="modal-title">Donner suite à la demande</h4>
+        </div>
+
+        <div class="modal-footer justify-content-center">
+          <button
+            mat-raised-button
+            type="button"
+            class="btn mr-5"
+            (click)="confirmerStatut(demandeToManage)"
+            data-dismiss="modal"
+          >
+            Confirmer
+          </button>
+          <button
+            mat-raised-button
+            type="button"
+            class="btn btn-danger"
+            data-dismiss="modal"
+          >
+            Annuler
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!--  End Modal Changement statut demande -->
+
+  <!-- Classic Modal Annulation de Suivis D'indicateurs -->
+  <div
+    class="modal fade col-md-12"
+    id="annulerSuivisModal"
+    tabindex="-1"
+    role="dialog"
+    aria-labelledby="myModalLabel"
+    aria-hidden="true"
+  >
+    <div class="modal-dialog modal-md" style="z-index: 1041">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h4 class="modal-title">
+            Etes-vous sûrs de ne plus vouloir suivre cet indicateur ?
+          </h4>
+        </div>
+
+        <div class="modal-footer justify-content-center">
+          <button
+            mat-raised-button
+            type="button"
+            class="btn mr-5"
+            (click)="annulerSuiviIndicateur()"
+            data-dismiss="modal"
+          >
+            Confirmer
+          </button>
+          <button
+            mat-raised-button
+            type="button"
+            class="btn btn-danger"
+            data-dismiss="modal"
+          >
+            Annuler
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!--  End Modal Changement statut demande -->
+
+  <!-- Modal Demande Suivis KPI -->
+  <div
+    class="modal fade col-md-12"
+    id="demandeSuiviKPI"
+    tabindex="-1"
+    role="dialog"
+    aria-labelledby="myModalLabel"
+    aria-hidden="true"
+  >
+    <div class="modal-dialog modal-lg" style="z-index: 1041">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h4 class="modal-title" style="color: #ff6600">
+            Demande de suivi d'indicateurs
+          </h4>
+          <button
+            mat-button
+            type="button"
+            class="close"
+            data-dismiss="modal"
+            aria-hidden="true"
+          >
+            <i class="material-icons">clear</i>
+          </button>
+        </div>
+        <div class="modal-body">
+          <div
+            class="form-grformGroupoup bmd-form-group is-filled"
+            [formGroup]="demandeSuiviIndicateurForm"
+          >
+            <!-- <div
+              class="col-md-10 mr-auto ml-auto mb-5"
+              
+            >
+              <ng-multiselect-dropdown
+                [placeholder]="'Veuillez choisir l\'initiateur de la demande'"
+                [settings]="demandeurdropdownSettings"
+                [data]="metricUsers"
+                [formControl]="demandeSuiviIndicateurForm.controls['demandeur']"
+                (onSelect)="onDemandeurSelect($event)"
+                (onDeSelect)="onDemandeurDeSelect($event)"
+                required
+              >
+              </ng-multiselect-dropdown>
+            </div> -->
+            <div class="col-md-10 mr-auto ml-auto">
+              <ng-multiselect-dropdown
+                [placeholder]="'Indicateurs à suivre'"
+                [settings]="indicateursASuivredropdownSettings"
+                [data]="indicateursASuivre"
+                [formControl]="
+                  demandeSuiviIndicateurForm.controls['indicateurs']
+                "
+                [settings]="MultiSelectSettingsByGroup"
+                required
+                style="width: 100%"
+              >
+              </ng-multiselect-dropdown>
+            </div>
+            <br />
+          </div>
+        </div>
+        <div class="modal-footer justify-content-center">
+          <button
+            mat-raised-button
+            type="button"
+            class="btn mr-5"
+            [disabled]="!demandeSuiviIndicateurForm.valid"
+            (click)="suivreIndicateurs(demandeSuiviIndicateurForm.value)"
+            data-dismiss="modal"
+          >
+            Valider
+          </button>
+          <button
+            mat-raised-button
+            type="button"
+            class="btn btn-danger"
+            data-dismiss="modal"
+          >
+            Annuler
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!--  End demande suivi KPI-->
+
+  <!-- fin container -->
+</div>

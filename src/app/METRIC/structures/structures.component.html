@@ -1,0 +1,204 @@
+<div class="row black-card">
+  <div class="col-md-8 text-left">
+    <nav style="--bs-breadcrumb-divider: '>'" aria-label="dark breadcrumb">
+      <ol class="breadcrumb breadcrumb-dark">
+        <li class="breadcrumb-item">
+          <a routerLink="/metric/indicateurs">METRIC</a>
+        </li>
+        <li class="breadcrumb-item active text-white" aria-current="page">
+          Structures
+        </li>
+      </ol>
+    </nav>
+  </div>
+  <div class="col-md-4 text-right">
+    <button
+      class="btn btn-outline-primary"
+      data-toggle="modal"
+      data-target="#addAnimateurModal"
+    >
+      <span><i class="material-icons">update</i> Animateurs</span>
+    </button>
+    <button
+      class="btn btn-outline-primary"
+      data-toggle="modal"
+      data-target="#StructureEnMasseModal"
+    >
+      <span><i class="material-icons">update</i> Structures</span>
+    </button>
+  </div>
+</div>
+
+<div class="container-fluid">
+  <div class="col-md-12">
+    <div class="card">
+      <div class="card-header card-header-icon card-header-warning">
+        <div class="card-icon">
+          <i class="material-icons">work</i>
+        </div>
+      </div>
+      <div class="col-md-8 ml-auto mr-auto">
+        <ngx-org-chart
+          [nodes]="sonatelNodes"
+          direction="horizontal"
+          (itemClick)="goToDetails($event)"
+        >
+        </ngx-org-chart>
+      </div>
+    </div>
+
+    <div class="card" *ngFor="let externeNode of externesNodes">
+      <div class="card-header card-header-icon card-header-warning">
+        <div class="card-icon">
+          <i class="material-icons">work</i>
+        </div>
+      </div>
+      <div class="col-md-8 ml-auto mr-auto">
+        <ngx-org-chart
+          [nodes]="externeNode"
+          direction="horizontal"
+          (itemClick)="goToDetails($event)"
+        >
+        </ngx-org-chart>
+      </div>
+    </div>
+  </div>
+
+  <!-- Classic Modal Chargement Structure de DRPS-->
+  <div
+    class="modal fade col-md-12"
+    id="StructureEnMasseModal"
+    tabindex="-1"
+    role="dialog"
+    aria-labelledby="myModalLabel"
+    aria-hidden="true"
+  >
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h4 class="modal-title" style="color: rgb(255, 136, 0)">
+            Structure en masse
+          </h4>
+          <button
+            mat-button
+            type="button"
+            class="close"
+            data-dismiss="modal"
+            aria-hidden="true"
+          >
+            <i class="material-icons">clear</i>
+          </button>
+        </div>
+        <div class="modal-body">
+          <div class="row">
+            <div class="col-md-12" style="text-align: center">
+              <!-- <div>
+               <span style="cursor: pointer; color: rgb(255, 136, 0)"
+                 ><b>TemplateCouverture</b></span
+               >
+             </div> -->
+              <input
+                type="file"
+                #file
+                id="input-file-now"
+                (change)="onFileSelected($event)"
+                class="btn btn-sm"
+              />
+              <button class="btn btn-large" (click)="uploadFile()">
+                Charger
+              </button>
+              <!-- <br />
+             <hr />
+             <br /> -->
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Ajout animateur Modal -->
+  <div
+    class="modal fade col-md-12"
+    id="addAnimateurModal"
+    tabindex="-1"
+    role="dialog"
+    aria-labelledby="myModalLabel"
+    aria-hidden="true"
+  >
+    <div class="modal-dialog modal-fade">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h4 class="modal-title" style="color: #ff6600">
+            Choisir la structure à animer
+          </h4>
+          <button
+            mat-button
+            type="button"
+            class="close"
+            data-dismiss="modal"
+            aria-hidden="true"
+          >
+            <i class="material-icons">clear</i>
+          </button>
+        </div>
+        <div class="modal-body">
+          <div
+            class="form-grformGroupoup bmd-form-group is-filled"
+            [formGroup]="addAnimateurForm"
+          >
+            <div class="row mt-5">
+              <ng-multiselect-dropdown
+                [placeholder]="'Choisir la structure à animer'"
+                [settings]="structuresdropdownSettings"
+                [data]="structures"
+                [formControl]="addAnimateurForm.controls['structures']"
+                (onSelect)="onStructureSelect($event)"
+                (onDeSelect)="onStructureDeSelect($event)"
+                required
+                class="text-center"
+                style="width: 100%"
+              >
+              </ng-multiselect-dropdown>
+            </div>
+            <div class="row mt-5">
+              <ng-multiselect-dropdown
+                [placeholder]="'choisir les animateurs'"
+                [settings]="animateursdropdownSettings"
+                [data]="structureUsers"
+                [formControl]="addAnimateurForm.controls['animateurs']"
+                [disabled]="desactiverAnimateurs"
+                [settings]="MultiSelectSettingsByGroup"
+                required
+                style="width: 100%"
+              >
+              </ng-multiselect-dropdown>
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-footer justify-content-center">
+          <button
+            mat-raised-button
+            type="button"
+            class="btn btn-success mr-5"
+            [disabled]="!addAnimateurForm.valid"
+            (click)="addAnimateurs(addAnimateurForm.value)"
+            data-dismiss="modal"
+          >
+            Valider
+          </button>
+          <button
+            mat-raised-button
+            type="button"
+            class="btn btn-danger"
+            data-dismiss="modal"
+          >
+            Annuler
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!--  End Ajout animateur Modal-->
+</div>

@@ -1,0 +1,25 @@
+.breadcrumb-dark{
+    background-color: black;
+   }
+  
+   .card {
+    box-shadow: none;
+  }
+  .black-card {
+    background-color: black;
+  }
+
+  table {
+    width: 100%;
+    padding: 10px 20px;
+   }
+   
+   .table > thead > tr > th {
+   border-bottom-width: 1px;
+   font-size: 0.825rem;
+   font-weight: bold;
+   color: white;
+   background-color:#ff6600;
+   }
+
+   

@@ -1,0 +1,414 @@
+<div class="row black-card">
+  <div class="col-md-8 text-left">
+    <nav style="--bs-breadcrumb-divider: '>'" aria-label="dark breadcrumb">
+      <ol class="breadcrumb breadcrumb-dark">
+        <li class="breadcrumb-item"><a href="metric">METRIC</a></li>
+        <li class="breadcrumb-item active text-white" aria-current="page">
+          Tableaux de Bord
+        </li>
+      </ol>
+    </nav>
+  </div>
+  <div class="col-md-4 text-right">
+    <button
+      [hidden]="views[0].bool"
+      class="btn btn-outline-primary"
+      data-toggle="modal"
+      data-target="#addTbModal">
+      <span><i class="material-icons">add</i>Nouveau TB Spécial</span>
+    </button>
+  </div>
+</div>
+
+<div class="container-fluid">
+  <!-- debut tb structure drps -->
+  <div class="col-md-12">
+    <div class="card">
+      <div class="card-header card-header-primary card-header-icon">
+        <div class="card-text">
+          <h4 class="card-category">
+            {{ structureSelectionnee }}
+          </h4>
+        </div>
+        <div class="float-right mt-2">
+          <button
+            class="material-icons"
+            title="Télécharger le Reporting"
+            style="
+              color: orangered;
+              width: auto;
+              border: none;
+              background: none;
+            "
+            [hidden]="reportingNotReady"
+            (click)="downloadReporting()">
+            <mat-icon>save_alt</mat-icon>
+          </button>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="form-group bmd-form-group is-filled">
+          <form
+            class="col-lg-12 col-md-12 col-sm-12"
+            [formGroup]="updateInfoStructureForm">
+            <div class="row col-md-12  mr-auto ml-auto">
+              <div class="col-lg-3 col-md-3 col-sm-12">
+                <ng-multiselect-dropdown
+                  style="color: #ff6600; border: none; background: none"
+                  [placeholder]="'Choix structure'"
+                  [settings]="structuresdropdownSettings"
+                  [data]="userConnectedStructures"
+                  [formControl]="
+                    updateInfoStructureForm.controls['selectedStructure']
+                  "
+                  (onSelect)="onStructureSelect($event)"
+                  (onDeSelect)="onStructureDeSelect($event)"
+                  required>
+                </ng-multiselect-dropdown>
+              </div>
+
+              <div class="col-lg-3 col-md-3 col-sm-12">
+                <ng-multiselect-dropdown
+                  style="color: #ff6600; border: none; background: none"
+                  [placeholder]="'Choix origine(s)'"
+                  [settings]="originesdropdownSettings"
+                  [data]="origines"
+                  [formControl]="
+                    updateInfoStructureForm.controls['selectedOrigines']
+                  "
+                  [disabled]="structureFormFielDisabled">
+                </ng-multiselect-dropdown>
+              </div>
+
+              <div class="col-lg-2 col-md-2 col-sm-12">
+                <mat-form-field>
+                  <mat-select
+                    placeholder="année"
+                    (selectionChange)="anneeReportingChange($event.value)"
+                    formControlName="anneeReporting"
+                    [disabled]="structureFormFielDisabled">
+                    <mat-option
+                      *ngFor="let annee of anneesReporting"
+                      [value]="annee"
+                      >{{ annee }}
+                    </mat-option>
+                  </mat-select>
+                </mat-form-field>
+              </div>
+
+              <div class="col-lg-2 col-md-2 col-sm-12">
+                <mat-form-field>
+                  <mat-select
+                    placeholder="mois"
+                    (selectionChange)="moisReportingChange($event.value)"
+                    formControlName="moisReporting"
+                    [disabled]="anneeFormFielDisabled">
+                    <mat-option
+                      *ngFor="let m of moisToSelect"
+                      [value]="m.valeur"
+                      >{{ m.valeur }}</mat-option
+                    >
+                  </mat-select>
+                </mat-form-field>
+              </div>
+
+              <div class="col-lg-2 col-md-2 col-sm-12  text-center">
+                <button
+                  mat-raised-button
+                  type="button"
+                  class="btn btn-success"
+                  [disabled]="!updateInfoStructureForm.valid"
+                  (click)="generateReporting(updateInfoStructureForm.value)">
+                  Valider
+                </button>
+              </div>
+            </div>
+          </form>
+        </div>
+        <div class="row" *ngIf="!showStructureIndicateurs">
+          <div class="col-md-12">
+            <mat-progress-bar
+              color="warn"
+              mode="indeterminate">
+            </mat-progress-bar>
+           </div>
+        </div>
+        <div class="material-datatables" [hidden]="!showStructureIndicateurs">
+              <table
+                datatable
+                [dtOptions]="dtOptions"
+                [dtTrigger]="dtTriggerStructure"
+                class="table table-striped table-no-bordered table-hover"
+                style="color: #f2f2f2">
+                <thead>
+                  <tr>
+                    <th>Intitulé des indicateurs</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <ng-container
+                    *ngFor="let indicateur of structuresIndicateurs">
+                    <ng-container>
+                      <tr>
+                        <td
+                          class="text-primary"
+                          style="width: 90%"
+                          [routerLink]="['/metric/indicateurs', indicateur.id]">
+                          {{ indicateur.name }}
+                        </td>
+                      </tr>
+                    </ng-container>
+                  </ng-container>
+                </tbody>
+              </table>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- fin tb structure drps -->
+
+  <!-- début tb spéciaux -->
+  <div class="col-md-12" [hidden]="views[0].bool">
+    <div class="card">
+      <div class="card-header card-header-primary card-header-icon">
+        <div class="card-text">
+          <h4 class="card-category">Tableaux de bord spéciaux</h4>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="tab-content tab-space">
+          <div class="tab-pane active" id="link1">
+            <div class="card-body">
+              <div class="toolbar"></div>
+              <div class="material-datatables">
+                <table
+                  datatable
+                  [dtOptions]="dtOptions"
+                  [dtTrigger]="dtTriggerTb"
+                  class="table table-striped table-no-bordered table-hover"
+                  style="width: 100%"
+                  tableLayout="fixed">
+                  <thead>
+                    <tr>
+                      <th>Intitulé du Reporting</th>
+                      <th style="width: 15%" class="text-center">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <ng-container *ngFor="let tb of tbs">
+                      <ng-container>
+                        <tr>
+                          <td
+                            class="text-primary"
+                            (click)="goTbDetailPage(tb.id)">
+                            {{ tb.name }}
+                          </td>
+                          <td style="width: 15%" class="text-center">
+                            <button
+                              (click)="setTbToUpdate(tb)"
+                              data-toggle="modal"
+                              data-target="#upadeTbModal"
+                              class="btn btn-link btn-success btn-just-icon edit">
+                              <i class="material-icons">edit</i>
+                            </button>
+                            <button
+                              (click)="setTbTodelete(tb)"
+                              data-toggle="modal"
+                              data-target="#deleteModal"
+                              class="btn btn-link btn-danger btn-just-icon delete">
+                              <i class="material-icons">delete</i>
+                            </button>
+                          </td>
+                        </tr>
+                      </ng-container>
+                    </ng-container>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- fin tb spéciaux -->
+
+  <!-- debut modal ajout tb -->
+  <div class="col-md-12">
+    <!-- Classic Modal -->
+    <div
+      class="modal fade"
+      id="addTbModal"
+      tabindex="-1"
+      role="dialog"
+      aria-labelledby="myModalLabel"
+      aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h4 class="modal-title">Tableau de Bord</h4>
+            <button
+              mat-button
+              type="button"
+              class="close"
+              data-dismiss="modal"
+              aria-hidden="true">
+              <i class="material-icons">clear</i>
+            </button>
+          </div>
+          <div class="modal-body">
+            <div class="form-group bmd-form-group is-filled">
+              <form class="row" [formGroup]="addTBForm">
+                <div class="col-md-12">
+                  <mat-form-field class="example-full-width">
+                    <input
+                      matInput
+                      type="text"
+                      name="name"
+                      placeholder="Veuillez saisir le nom du tableau de bord"
+                      formControlName="name" />
+                  </mat-form-field>
+                </div>
+                <div class="col-md-12">
+                  <mat-form-field class="example-full-width">
+                    <textarea
+                      matInput
+                      type="text"
+                      name="description"
+                      placeholder="Veuillez renseigner sa description"
+                      formControlName="description"></textarea>
+                  </mat-form-field>
+                </div>
+              </form>
+            </div>
+          </div>
+          <div class="modal-footer justify-content-center">
+            <button
+              mat-raised-button
+              type="button"
+              class="btn"
+              [disabled]="!addTBForm.valid"
+              (click)="addTableauDeBord(addTBForm.value)"
+              data-dismiss="modal">
+              Valider
+            </button>
+            <button
+              mat-raised-button
+              type="button"
+              class="btn btn-danger"
+              data-dismiss="modal">
+              Annuler
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!--  End Modal -->
+  </div>
+  <!-- fin modal ajout tb -->
+
+  <!-- debut modal modification tb -->
+  <div class="col-md-12">
+    <!-- Classic Modal -->
+    <div
+      class="modal fade"
+      id="upadeTbModal"
+      tabindex="-1"
+      role="dialog"
+      aria-labelledby="myModalLabel"
+      aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h4 class="modal-title">Modifier le Tableau de Bord</h4>
+            <button
+              mat-button
+              type="button"
+              class="close"
+              data-dismiss="modal"
+              aria-hidden="true">
+              <i class="material-icons">clear</i>
+            </button>
+          </div>
+          <div class="modal-body">
+            <div class="form-group bmd-form-group is-filled">
+              <form class="row" [formGroup]="updateTBForm">
+                <div class="col-md-12">
+                  <mat-form-field class="example-full-width">
+                    <input
+                      matInput
+                      type="text"
+                      name="name"
+                      placeholder="Veuillez saisir le nom du tableau de bord"
+                      formControlName="name" />
+                  </mat-form-field>
+                </div>
+                <div class="col-md-12">
+                  <mat-form-field class="example-full-width">
+                    <textarea
+                      matInput
+                      type="text"
+                      name="description"
+                      placeholder="Veuillez renseigner sa description"
+                      formControlName="description"></textarea>
+                  </mat-form-field>
+                </div>
+              </form>
+            </div>
+          </div>
+          <div class="modal-footer justify-content-center">
+            <button
+              mat-raised-button
+              type="button"
+              class="btn"
+              [disabled]="!updateTBForm.valid"
+              (click)="updateTableauDeBord(updateTBForm.value)"
+              data-dismiss="modal">
+              Modifier
+            </button>
+            <button
+              mat-raised-button
+              type="button"
+              class="btn btn-danger"
+              data-dismiss="modal">
+              Annuler
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!--  End Modal -->
+  </div>
+  <!-- fin modal modification tb -->
+  <!-- debut modal confirmation suppression TB -->
+  <div class="col-md-12">
+    <div
+      class="modal fade"
+      id="deleteModal"
+      tabindex="-1"
+      role="dialog"
+      aria-labelledby="myModalLabel"
+      aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-body">
+            <div class="modal-footer justify-content-center" style="color: red">
+              <p>
+                La suppression de ce tableau de bord entrainera la suppression
+                de toutes ses instances
+              </p>
+              <button
+                (click)="deleteTB()"
+                class="btn btn-info"
+                data-dismiss="modal"
+                style="background-color: red">
+                Confirmer
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- fin modal confirmation suppression TB -->
+</div>
