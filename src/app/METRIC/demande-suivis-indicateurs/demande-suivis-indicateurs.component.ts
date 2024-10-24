@@ -26,12 +26,9 @@ export class DemandeSuivisIndicateursComponent implements OnInit {
   demandesEnvoyees: any;
   demandesRecues: any;
   demandesAcceptees: any;
-  demandeSuiviIndicateurForm = this.fb.group({
-    demandeur: [],
-    indicateurs: [],
-  });
+  demandeSuiviIndicateurForm: any;
   indicateursASuivredropdownSettings: any;
-  userConnected: any = this.authService.getCurrentAccount();
+  userConnected: any;
   jambarUsers = [];
   metricUsers = [];
   demandeurdropdownSettings: any;
@@ -44,7 +41,13 @@ export class DemandeSuivisIndicateursComponent implements OnInit {
     private notification: NotificationService,
     private metricService: metricService,
     private authService: AuthService
-  ) {}
+  ) {
+    this.userConnected = this.authService.getCurrentAccount();
+    this.demandeSuiviIndicateurForm = this.fb.group({
+      demandeur: [],
+      indicateurs: [],
+    });
+  }
 
   ngOnInit() {
     this.structureId = this.activatedRoute.snapshot.paramMap.get("id");
@@ -169,20 +172,20 @@ export class DemandeSuivisIndicateursComponent implements OnInit {
               }
               this.demandesEnvoyees = res.demandes;
 
-              this.dtTriggerEnvoie.next();
+              // this.dtTriggerEnvoie.next();
             } else if (envoyee == true && type == "suivis") {
               if (init == false) {
                 this.dtTriggerAcceptee = new Subject<any>();
               }
 
               this.demandesAcceptees = res.demandes;
-              this.dtTriggerAcceptee.next();
+              // this.dtTriggerAcceptee.next();
             } else {
               if (init == false) {
                 this.dtTriggerRecue = new Subject<any>();
               }
               this.demandesRecues = res.demandes;
-              this.dtTriggerRecue.next();
+              // this.dtTriggerRecue.next();
             }
 
             if (init == false) {

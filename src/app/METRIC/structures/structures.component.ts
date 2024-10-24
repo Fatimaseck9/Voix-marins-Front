@@ -1,4 +1,4 @@
-import { Component, OnInit } from "@angular/core";
+import { Component, OnInit, ViewChild } from "@angular/core";
 
 import { Router } from "@angular/router";
 
@@ -23,31 +23,62 @@ export class StructuresComponent implements OnInit {
     type: "",
     parentId: "",
   };
+  type = "OrgChart";
 
-  structures: any = [];
-  structureUsers: any = [];
+  // columnNames = ["Name", "Manager", "Tooltip"];
+  options = {
+    allowHtml: true,
+    orientation: "horizontal",
+  };
+  width = 400;
+  height = 400;
 
-  addAnimateurForm = this.fb.group({
-    structures: ["", Validators.required],
-    animateurs: [],
-  });
+  structures: any[] = [];
+  structureUsers: any[] = [];
+
+  addAnimateurForm: any;
   desactiverAnimateurs = true;
   animateursdropdownSettings: any;
   structuresdropdownSettings: any;
 
-  departementNodes: any = [];
-  poleNodes: any = [];
-  directionNodes: any = [];
+  departementNodes: any[] = [];
+  poleNodes: any[] = [];
+  directionNodes: any[] = [];
   sonatelEntrepriseNodes: any = [];
 
-  sonatelNodes: any = [];
+  sonatelNodes: any[] = [];
 
-  externesNodes: any = [];
+  externesNodes: any[] = [];
   entreprisesExternes: any = [];
 
   selectedFile: File | null;
   eventFile: any = null;
   jambarUsers = [];
+
+  // chart = {
+  //   title: "Organigramme",
+  //   type: "OrgChart",
+  //   data: [],
+  //   options: {
+  //     allowHtml: true, // Autoriser HTML pour personnaliser le style
+  //     nodeClass: "org-node", // Appliquer une classe CSS à chaque nœud
+  //     size: "large", // Option de taille pour une meilleure visibilité
+  //     orientation: "vertical",
+  //   },
+  // };
+
+  sonatelTableData: any[] = [];
+  externesTableData: any[] = [];
+
+  @ViewChild("chart", { static: false }) chart: any;
+
+  chartWrappers: { [key: string]: any } = {};
+
+  // options = {
+  //   allowHtml: true, // Permet d'ajouter du HTML pour les styles
+  //   nodeClass: "org-node", // Classe CSS pour les nœuds
+  //   orientation: "vertical", // 'vertical' ou 'horizontal'
+  // };
 
   constructor(
     private notification: NotificationService,
@@ -55,10 +86,69 @@ export class StructuresComponent implements OnInit {
     private jambarsService: BaseService,
     private metricService: metricService,
     private fb: FormBuilder
-  ) {}
+  ) {
+    this.addAnimateurForm = this.fb.group({
+      structures: ["", Validators.required],
+      animateurs: [],
+    });
+  }
+
+  onSNTChartReady(event) {
+    const chartWrapper = this.chart.wrapper;
+    const chart = chartWrapper.getChart();
+
+    google.visualization.events.addListener(chart, "select", () => {
+      const selection = chart.getSelection();
+      if (selection.length > 0) {
+        const selectedItem = selection[0];
+        const selectedRow = selectedItem.row;
+
+        if (selectedRow != null) {
+          const selectedNode = this.sonatelTableData[selectedRow];
+          console.log("Nœud sélectionné:", selectedNode);
+          this.router.navigate(["metric/structures", selectedNode[0].id]);
+        }
+      }
+    });
+  }
+
+  onExterneChartReady(event: any, index: number) {
+    const chartId = "chart_div" + index;
+    const chartElement = document.getElementById(chartId);
+
+    if (chartElement) {
+      // Récupérer chartWrapper de l'événement "ready" et le stocker
+      this.chartWrappers[chartId] = event.chartWrapper;
+
+      const chart = this.chartWrappers[chartId].getChart();
+
+      if (chart) {
+        google.visualization.events.addListener(chart, "select", () => {
+          const selection = chart.getSelection();
+          if (selection.length > 0) {
+            const selectedItem = selection[0];
+            const selectedRow = selectedItem.row;
+
+            if (selectedRow != null) {
+              const selectedNode =
+                this.externesTableData[index][selectedRow + 1]; // +1 pour ignorer les en-têtes
+              console.log(
+                "Nœud sélectionné dans " + chartId + ":",
+                selectedNode
+              );
+              // Ajoutez la logique supplémentaire en fonction du nœud sélectionné
+            }
+          }
+        });
+      } else {
+        console.error(`Le graphique n'a pas pu être récupéré pour ${chartId}`);
+      }
+    } else {
+      console.error(`L'élément avec l'ID ${chartId} n'a pas pu être trouvé`);
+    }
+  }
 
   ngOnInit() {
-    
     this.animateursdropdownSettings = {
       singleSelection: false,
       idField: "id",
@@ -82,7 +172,6 @@ export class StructuresComponent implements OnInit {
       .get("structures?filter[include][]=structuresEnfants")
       .subscribe(
         (structures: any) => {
-          
           structures.forEach((structure: any) => {
             switch (structure.type) {
               case "departement":
@@ -193,6 +282,13 @@ export class StructuresComponent implements OnInit {
             entrepriseExterneNode.push(entrepriseExterne);
             this.externesNodes.push(entrepriseExterneNode);
           });
+
+          for (const externesNode of this.externesNodes) {
+            this.generateTableData(externesNode[0], "", false);
+          }
+
+          this.generateTableData(this.sonatelNodes[0], "");
+          console.log(this.sonatelTableData);
         },
         (err) => {
           console.log(err);
@@ -235,6 +331,23 @@ export class StructuresComponent implements OnInit {
         );
       }
     );
+  }
+
+  onSelectChart(event, snt) {
+    console.log(event);
+    console.log(event.selection[0].row);
+    console.log(snt);
+    const row = event.selection[0].row;
+    let selectedNode: any;
+    if (snt) {
+      selectedNode = this.sonatelEntrepriseNodes[row];
+    } else {
+      selectedNode = this.externesTableData[row];
+    }
+    console.log(Array.isArray(this.externesTableData));
+    console.log("selectedNode");
+    console.log(selectedNode);
+    this.router.navigate(["metric/structures", selectedNode.id]);
   }
 
   goToDetails(event) {
@@ -317,7 +430,7 @@ export class StructuresComponent implements OnInit {
 
   onStructureSelect(structure) {
     this.desactiverAnimateurs = true;
-    // console.log(structure);
+
     this.metricService
       .get(`structures/${structure.id}/users`)
       .subscribe((res: any) => {
@@ -386,5 +499,54 @@ export class StructuresComponent implements OnInit {
         });
       }
     );
+  }
+
+  generateTableData(node: any, parent: string, snt = true): void {
+    const formattedNode = {
+      v: node.name,
+      f: `${node.name}<div style="color:${this.getColorForLevel(
+        node.name
+      )}">${this.getType(node.name)}</div>`,
+      id: node.id,
+      parentId: node.parentId ? node.parentId : "null",
+    };
+    if (snt) {
+      this.sonatelTableData.push([
+        formattedNode,
+        parent,
+        this.getType(node.name),
+      ]);
+    } else {
+      this.externesTableData.push([
+        [formattedNode, parent, this.getType(node.name)],
+      ]);
+    }
+
+    if (node.childs && node.childs.length > 0) {
+      node.childs.forEach((child) => this.generateTableData(child, node.name));
+    }
+  }
+
+  getType(name: string): string {
+    return "";
+  }
+
+  getColorForLevel(name: string): string {
+    switch (name) {
+      case "SNT":
+        return "red";
+      case "DRPS":
+      case "BBI":
+        return "red";
+      case "DEP":
+      case "DBF":
+      case "PPC":
+        return "blue";
+      case "DDB":
+      case "DRR":
+        return "orange";
+      default:
+        return "black";
+    }
   }
 }

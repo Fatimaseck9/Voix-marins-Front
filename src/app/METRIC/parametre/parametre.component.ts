@@ -29,14 +29,9 @@ export class ParametreComponent implements OnInit {
   parametreToUpdate: any;
   exist = false;
   // Formulaire pour ajouter une valeur à un type de paramètre donné
-  parametreForm = this.fb.group({
-    parametreName: ["", Validators.required],
-  });
+  parametreForm: any;
 
-  sousObjectifForm = this.fb.group({
-    parametreName: ["", Validators.required],
-    objectif: [],
-  });
+  sousObjectifForm: any;
 
   dtOptions: any = {};
   dtTriggerTendance: Subject<any> = new Subject<any>();
@@ -52,7 +47,15 @@ export class ParametreComponent implements OnInit {
     private fb: FormBuilder,
     private notification: NotificationService,
     private metricService: metricService
-  ) {}
+  ) {
+    this.parametreForm = this.fb.group({
+      parametreName: ["", Validators.required],
+    });
+    this.sousObjectifForm = this.fb.group({
+      parametreName: ["", Validators.required],
+      objectif: [],
+    });
+  }
 
   ngOnInit() {
     this.dtOptions = {
@@ -96,7 +99,7 @@ export class ParametreComponent implements OnInit {
     this.metricService.get("parametres?filter[where][type]=unite").subscribe(
       (unites: any[]) => {
         this.unites = unites;
-        this.dtTriggerUnite.next();
+        // this.dtTriggerUnite.next();
       },
       (err) => {
         console.log(err);
@@ -107,7 +110,7 @@ export class ParametreComponent implements OnInit {
       .subscribe(
         (operations: any[]) => {
           this.operations = operations;
-          this.dtTriggerOperation.next();
+          // this.dtTriggerOperation.next();
         },
         (err) => {
           console.log(err);
@@ -116,7 +119,7 @@ export class ParametreComponent implements OnInit {
     this.metricService.get("parametres?filter[where][type]=tendance").subscribe(
       (tendances: any[]) => {
         this.tendances = tendances;
-        this.dtTriggerTendance.next();
+        // this.dtTriggerTendance.next();
       },
       (err) => {
         console.log(err);
@@ -129,7 +132,7 @@ export class ParametreComponent implements OnInit {
       .subscribe(
         (objectifs: any[]) => {
           this.objectifs = objectifs;
-          this.dtTriggerObjectif.next();
+          // this.dtTriggerObjectif.next();
         },
         (err) => {
           console.log(err);
@@ -140,7 +143,7 @@ export class ParametreComponent implements OnInit {
       .subscribe(
         (sousObjectifs: any[]) => {
           this.sousObjectifs = sousObjectifs;
-          this.dtTriggerSousObjectif.next();
+          // this.dtTriggerSousObjectif.next();
         },
         (err) => {
           console.log(err);
@@ -149,7 +152,7 @@ export class ParametreComponent implements OnInit {
     this.metricService.get("parametres?filter[where][type]=origine").subscribe(
       (origines: any[]) => {
         this.origines = origines;
-        this.dtTriggerOrigine.next();
+        // this.dtTriggerOrigine.next();
       },
       (err) => {
         console.log(err);
@@ -160,7 +163,7 @@ export class ParametreComponent implements OnInit {
       .subscribe(
         (typeIndicateurs: any[]) => {
           this.typeIndicateurs = typeIndicateurs;
-          this.dtTriggerTypeIndicateur.next();
+          // this.dtTriggerTypeIndicateur.next();
         },
         (err) => {
           console.log(err);
@@ -171,7 +174,7 @@ export class ParametreComponent implements OnInit {
       .subscribe(
         (periodicites: any[]) => {
           this.periodicites = periodicites;
-          this.dtTriggerPeriodicite.next();
+          // this.dtTriggerPeriodicite.next();
         },
         (err) => {
           console.log(err);
@@ -247,7 +250,7 @@ export class ParametreComponent implements OnInit {
           .subscribe(
             (tendances: any[]) => {
               this.tendances = tendances;
-              this.dtTriggerTendance.next();
+              // this.dtTriggerTendance.next();
               let msg = "Opération réussie";
               this.notification.showNotification(
                 "top",
@@ -270,7 +273,7 @@ export class ParametreComponent implements OnInit {
           .subscribe(
             (unites: any[]) => {
               this.unites = unites;
-              this.dtTriggerUnite.next();
+              // this.dtTriggerUnite.next();
               let msg = "Opération réussie";
               this.notification.showNotification(
                 "top",
@@ -292,7 +295,7 @@ export class ParametreComponent implements OnInit {
           .subscribe(
             (operations: any[]) => {
               this.operations = operations;
-              this.dtTriggerOperation.next();
+              // this.dtTriggerOperation.next();
               let msg = "Opération réussie";
               this.notification.showNotification(
                 "top",
@@ -317,7 +320,7 @@ export class ParametreComponent implements OnInit {
           .subscribe(
             (objectifs: any[]) => {
               this.objectifs = objectifs;
-              this.dtTriggerObjectif.next();
+              // this.dtTriggerObjectif.next();
               let msg = "Opération réussie";
               this.notification.showNotification(
                 "top",
@@ -340,7 +343,7 @@ export class ParametreComponent implements OnInit {
           .subscribe(
             (sousObjectifs: any[]) => {
               this.sousObjectifs = sousObjectifs;
-              this.dtTriggerSousObjectif.next();
+              // this.dtTriggerSousObjectif.next();
               let msg = "Opération réussie";
               this.notification.showNotification(
                 "top",
@@ -363,7 +366,7 @@ export class ParametreComponent implements OnInit {
           .subscribe(
             (origines: any[]) => {
               this.origines = origines;
-              this.dtTriggerOrigine.next();
+              // this.dtTriggerOrigine.next();
               let msg = "Opération réussie";
               this.notification.showNotification(
                 "top",
@@ -386,7 +389,7 @@ export class ParametreComponent implements OnInit {
           .subscribe(
             (typeIndicateurs: any[]) => {
               this.typeIndicateurs = typeIndicateurs;
-              this.dtTriggerTypeIndicateur.next();
+              // this.dtTriggerTypeIndicateur.next();
               let msg = "Opération réussie";
               this.notification.showNotification(
                 "top",
@@ -409,7 +412,7 @@ export class ParametreComponent implements OnInit {
           .subscribe(
             (periodicites: any[]) => {
               this.periodicites = periodicites;
-              this.dtTriggerPeriodicite.next();
+              // this.dtTriggerPeriodicite.next();
               let msg = "Opération réussie";
               this.notification.showNotification(
                 "top",

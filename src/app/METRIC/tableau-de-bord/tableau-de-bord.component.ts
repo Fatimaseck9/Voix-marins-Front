@@ -53,7 +53,7 @@ export class TableauDeBordComponent implements OnInit {
   structuresdropdownSettings: any;
   originesdropdownSettings: any;
 
-  userConnecte: any = this.authService.getCurrentAccount();
+  userConnecte: any;
 
   dtOptions: any = {};
 
@@ -62,27 +62,10 @@ export class TableauDeBordComponent implements OnInit {
   tbToUpdate: any = {};
   dtTriggerTb: Subject<any> = new Subject();
 
-  updateInfoStructureForm = this.fb.group({
-    anneeReporting: ["", Validators.required],
-    selectedStructure: [],
-    selectedOrigines: [],
-    moisReporting: ["", Validators.required],
-  });
-  addTBForm = this.fb.group({
-    name: ["", Validators.required],
-    description: ["", Validators.required],
-  });
+  updateInfoStructureForm: any;
+  addTBForm: any;
 
-  updateTBForm = this.fb.group({
-    name: [
-      this.tbToUpdate.name ? this.tbToUpdate.name : "",
-      Validators.required,
-    ],
-    description: [
-      this.tbToUpdate.description ? this.tbToUpdate.description : "",
-      Validators.required,
-    ],
-  });
+  updateTBForm: any;
 
   userConnectedStructures: any;
   selectedStructure: any;
@@ -105,6 +88,28 @@ export class TableauDeBordComponent implements OnInit {
   ) {
     this.views.forEach((view) => {
       view.bool = this.authService.getRoleSectionView(view.id);
+    });
+
+    this.userConnecte = this.authService.getCurrentAccount();
+    this.updateInfoStructureForm = this.fb.group({
+      anneeReporting: ["", Validators.required],
+      selectedStructure: [],
+      selectedOrigines: [],
+      moisReporting: ["", Validators.required],
+    });
+    this.addTBForm = this.fb.group({
+      name: ["", Validators.required],
+      description: ["", Validators.required],
+    });
+    this.updateTBForm = this.fb.group({
+      name: [
+        this.tbToUpdate.name ? this.tbToUpdate.name : "",
+        Validators.required,
+      ],
+      description: [
+        this.tbToUpdate.description ? this.tbToUpdate.description : "",
+        Validators.required,
+      ],
     });
   }
 
@@ -253,7 +258,7 @@ export class TableauDeBordComponent implements OnInit {
       annee: this.anneeReporting,
       moisActuel: this.moisReporting,
       structureId: valeurs.selectedStructure[0].id,
-     
+
       selectedOrigines: selectedOrigines,
       userConnecteId: this.userConnecte.id,
       serverURL: this.metricService.serverURL,
@@ -264,11 +269,10 @@ export class TableauDeBordComponent implements OnInit {
     this.metricService.post(`construct-tb`, tbInfos).subscribe(
       (res: any) => {
         if (res.success) {
-      
           this.reportingNotReady = false;
         } else {
           let msg = res.message;
-          
+
           this.notification.showNotification(
             "top",
             "right",
@@ -282,7 +286,6 @@ export class TableauDeBordComponent implements OnInit {
       (err) => {
         console.log(err);
         this.reportingNotReady = true;
-        
 
         let msg = "Erreur de construction du tableau de bord";
         this.notification.showNotification(
@@ -298,28 +301,34 @@ export class TableauDeBordComponent implements OnInit {
 
   getUserConnectedData() {
     let role = "basic";
-    if (this.userConnecte.roles.includes("ROLE_METRIC_ADMIN") | this.userConnecte.roles.includes("ROLE_ADMIN") ) {
+    if (
+      this.userConnecte.roles.includes("ROLE_METRIC_ADMIN") |
+      this.userConnecte.roles.includes("ROLE_ADMIN")
+    ) {
       role = "admin";
     } else if (this.userConnecte.roles.includes("ROLE_METRIC_ANIMATEUR")) {
-      role ="animateur"
+      role = "animateur";
     }
     this.metricService
       .get(`users/${this.userConnecte.id}/${role}/structures`)
       .subscribe(
         (res: any) => {
           this.userConnectedStructures = res.structures;
-        
 
-         if(res.user){
-          if (res.user.structureAnimeeId && res.user.structureAnimeeId != "null") {
-            this.userConnecte.structureAnimeeId = res.user.structureAnimeeId;
+          if (res.user) {
+            if (
+              res.user.structureAnimeeId &&
+              res.user.structureAnimeeId != "null"
+            ) {
+              this.userConnecte.structureAnimeeId = res.user.structureAnimeeId;
+            }
           }
-          
-         }
 
-          
           let structureAnimee: any = [];
-          if (this.userConnecte.roles.includes("ROLE_METRIC_ADMIN") || this.userConnecte.roles.includes("ROLE_ADMIN")) {
+          if (
+            this.userConnecte.roles.includes("ROLE_METRIC_ADMIN") ||
+            this.userConnecte.roles.includes("ROLE_ADMIN")
+          ) {
             structureAnimee = this.userConnectedStructures.find(
               (structure) => structure.sigle == "DRPS"
             );
@@ -381,7 +390,7 @@ export class TableauDeBordComponent implements OnInit {
             this.origines = res[0].origines;
             this.structureFormFielDisabled = false;
 
-            this.dtTriggerStructure.next();
+            // this.dtTriggerStructure.next();
             this.showStructureIndicateurs = true;
           } else {
             this.showStructureIndicateurs = true;
@@ -395,7 +404,7 @@ export class TableauDeBordComponent implements OnInit {
             this.structuresIndicateurs = [];
             this.dtTriggerStructure = new Subject();
 
-            this.dtTriggerStructure.next();
+            // this.dtTriggerStructure.next();
             const msg = "Cette structure n'a pas d'indicateurs!";
             this.notification.showNotification(
               "top",
@@ -439,7 +448,7 @@ export class TableauDeBordComponent implements OnInit {
     this.metricService.get(`tableau-de-bords`).subscribe(
       (res: any) => {
         this.tbs = res;
-        this.dtTriggerTb.next();
+        // this.dtTriggerTb.next();
       },
       (err) => {
         console.log(err);

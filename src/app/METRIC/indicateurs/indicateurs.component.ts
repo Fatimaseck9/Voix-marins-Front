@@ -50,73 +50,29 @@ export class IndicateursComponent implements OnInit, OnDestroy {
   };
 
   // Pour le modal d'ajout d'un nouvel indicateur :
-  indicateurForm = this.fb.group({
-    name: ["", Validators.required],
-    description: [""],
-    loi_composition: [""],
-    formule_calcul: [""],
-    valeur_cible: [""],
-    selectedProprietaires: [],
-    selectedSuppleants: [],
-    selectedAnalystes: [],
-    selectedStructures: [],
-    selectedAnalystesStructures: [],
-    tendanceId: [""],
-    uniteId: [""],
-    operationId: [""],
-    periodiciteId: [""],
-    origineId: [""],
-    typeIndicateurId: [""],
-    sousObjectifId: [],
-    analyseRequise: [true],
-  });
+  indicateurForm: any;
 
   structures: any = [];
 
   indicateurToStop: any = undefined;
 
-  userConnected: any = this.authService.getCurrentAccount();
+  userConnected: any;
   userConnectedStructureManaged: any = [{ id: "null" }];
 
   // Pour le modal de renseignement de suivi :
-  suiviForm = this.fb.group({
-    valeur: ["", Validators.required],
-    objectifPeriodique: ["", Validators.required],
-  });
+  suiviForm: any;
 
   anneesDeReconduction = [
     { id: new Date().getFullYear() - 1, annee: new Date().getFullYear() - 1 },
     { id: new Date().getFullYear(), annee: new Date().getFullYear() },
   ];
 
-  reconductionForm = this.fb.group({
-    annees: ["", Validators.required],
-    indicateurs: [],
-  });
+  reconductionForm: any;
 
   desactiverReconduction = true;
 
   // Pour le modal de modification d'un indicateur
-  indicateurUpdateForm = this.fb.group({
-    name: [this.indicateur.name, Validators.required],
-    description: [this.indicateur.description],
-    loi_composition: [this.indicateur.loi_composition],
-    formule_calcul: [this.indicateur.formule_calcul],
-    valeur_cible: [this.indicateur.valeur_cible],
-    selectedProprietaires: [this.indicateur.selectedProprietaires],
-    selectedStructures: [this.indicateur.selectedStructures],
-    selectedAnalystesStructures: [this.indicateur.selectedAnalystesStructures],
-    selectedSuppleants: [this.indicateur.selectedSuppleants],
-    selectedAnalystes: [this.indicateur.selectedAnalystes],
-    tendanceId: [this.indicateur.tendanceId],
-    uniteId: [this.indicateur.uniteId],
-    operationId: [this.indicateur.operationId],
-    periodiciteId: [this.indicateur.periodiciteId],
-    origineId: [this.indicateur.origineId],
-    typeIndicateurId: [this.indicateur.typeIndicateurId],
-    sousObjectifId: [this.indicateur.sousObjectifId],
-    analyseRequise: [this.indicateur.analyseRequise],
-  });
+  indicateurUpdateForm: any;
 
   dtOptions: any = {};
   dtTrigger: Subject<any> = new Subject<any>();
@@ -180,180 +136,237 @@ export class IndicateursComponent implements OnInit, OnDestroy {
     this.views.forEach((view) => {
       view.bool = this.authService.getRoleSectionView(view.id);
     });
+
+    this.indicateurForm = this.fb.group({
+      name: ["", Validators.required],
+      description: [""],
+      loi_composition: [""],
+      formule_calcul: [""],
+      valeur_cible: [""],
+      selectedProprietaires: [],
+      selectedSuppleants: [],
+      selectedAnalystes: [],
+      selectedStructures: [],
+      selectedAnalystesStructures: [],
+      tendanceId: [""],
+      uniteId: [""],
+      operationId: [""],
+      periodiciteId: [""],
+      origineId: [""],
+      typeIndicateurId: [""],
+      sousObjectifId: [],
+      analyseRequise: [true],
+    });
+    this.userConnected = this.authService.getCurrentAccount();
+
+    this.suiviForm = this.fb.group({
+      valeur: ["", Validators.required],
+      objectifPeriodique: ["", Validators.required],
+    });
+
+    this.reconductionForm = this.fb.group({
+      annees: ["", Validators.required],
+      indicateurs: [],
+    });
+
+    this.indicateurUpdateForm = this.fb.group({
+      name: [this.indicateur.name, Validators.required],
+      description: [this.indicateur.description],
+      loi_composition: [this.indicateur.loi_composition],
+      formule_calcul: [this.indicateur.formule_calcul],
+      valeur_cible: [this.indicateur.valeur_cible],
+      selectedProprietaires: [this.indicateur.selectedProprietaires],
+      selectedStructures: [this.indicateur.selectedStructures],
+      selectedAnalystesStructures: [
+        this.indicateur.selectedAnalystesStructures,
+      ],
+      selectedSuppleants: [this.indicateur.selectedSuppleants],
+      selectedAnalystes: [this.indicateur.selectedAnalystes],
+      tendanceId: [this.indicateur.tendanceId],
+      uniteId: [this.indicateur.uniteId],
+      operationId: [this.indicateur.operationId],
+      periodiciteId: [this.indicateur.periodiciteId],
+      origineId: [this.indicateur.origineId],
+      typeIndicateurId: [this.indicateur.typeIndicateurId],
+      sousObjectifId: [this.indicateur.sousObjectifId],
+      analyseRequise: [this.indicateur.analyseRequise],
+    });
   }
 
   ngOnInit() {
     this.userConnected.roles = this.authService.getAccountRoles();
-    console.log(this.userConnected.roles )
-   if(!this.userConnected.roles.includes("ROLE_METRIC_ADMIN") && !this.userConnected.roles.includes("ROLE_ADMIN") && !this.userConnected.roles.includes("ROLE_METRIC_BASE")){
-    this.router.navigate(["/"])
-  
-
-   }else{
-    this.metricService
-    .get(`users?filter[where][id]=${this.userConnected.id}`)
-    .subscribe(
-      (res) => {
-        if (res.length > 0) {
-          if (
-            res[0].structureManagedId &&
-            res[0].structureManagedId != "null"
-          ) {
-            this.metricService
-              .get(
-                `structures?filter[where][id]=${res[0].structureManagedId}`
-              )
-              .subscribe(
-                (structure) =>
-                  (this.userConnectedStructureManaged = structure),
-                (err) => {
-                  console.log(err);
-                }
-              );
+    console.log(this.userConnected.roles);
+    if (
+      !this.userConnected.roles.includes("ROLE_METRIC_ADMIN") &&
+      !this.userConnected.roles.includes("ROLE_ADMIN") &&
+      !this.userConnected.roles.includes("ROLE_METRIC_BASE")
+    ) {
+      this.router.navigate(["/"]);
+    } else {
+      this.metricService
+        .get(`users?filter[where][id]=${this.userConnected.id}`)
+        .subscribe(
+          (res) => {
+            if (res.length > 0) {
+              if (
+                res[0].structureManagedId &&
+                res[0].structureManagedId != "null"
+              ) {
+                this.metricService
+                  .get(
+                    `structures?filter[where][id]=${res[0].structureManagedId}`
+                  )
+                  .subscribe(
+                    (structure) =>
+                      (this.userConnectedStructureManaged = structure),
+                    (err) => {
+                      console.log(err);
+                    }
+                  );
+              }
+            }
+          },
+          (err) => {
+            console.log(err);
           }
+        );
+
+      this.dtOptions = {
+        pagingType: "full_numbers",
+        pageLength: 10,
+        language: {
+          processing: "Traitement en cours...",
+          search: "Rechercher&nbsp;:",
+          lengthMenu: "Afficher _MENU_ &eacute;l&eacute;ments",
+          info: "Affichage des &eacute;lements _START_ &agrave; _END_ sur _TOTAL_ &eacute;l&eacute;ments",
+          infoEmpty:
+            "Affichage des &eacute;lements 0 &agrave; 0 sur 0 &eacute;l&eacute;ments",
+          infoFiltered:
+            "(filtr&eacute; de _MAX_ &eacute;l&eacute;ments au total)",
+          infoPostFix: "",
+          loadingRecords: "Chargement en cours...",
+          zeroRecords: "Aucun indicateur &agrave; afficher",
+          emptyTable: "Il n y a pas encore d'indicateur",
+          paginate: {
+            first: "Premier",
+            previous: "Pr&eacute;c&eacute;dent",
+            next: "Suivant",
+            last: "Dernier",
+          },
+          aria: {
+            sortAscending:
+              ": activer pour trier la colonne par ordre croissant",
+            sortDescending:
+              ": activer pour trier la colonne par ordre décroissant",
+          },
+        },
+        dom: "Bfrtip",
+        // Configure the buttons
+        buttons: [
+          {
+            extend: "excel",
+            text: '<i class="material-icons">save_alt</i> Export des KPIs',
+            titleAttr: "Export",
+          },
+          // {
+          //   extend: 'excel',
+          //   text: '<i class="material-icons">save_alt</i> Export des Suivis',
+          //   titleAttr: 'Suivi',
+
+          //   filename: function () {
+          //     return 'Indicateurs';
+          //   },
+          // },
+          // {
+          //   extend: 'excel',
+          //   text: '<i class="material-icons">save_alt</i> Export',
+          //   titleAttr: 'export',
+          // },
+        ],
+      };
+
+      this.proprietairedropdownSettings = {
+        singleSelection: true,
+        idField: "id",
+        textField: "nomComplet",
+        allowSearchFilter: true,
+      };
+
+      this.structuredropdownSettings = {
+        singleSelection: true,
+        idField: "id",
+        textField: "sigleComplet",
+        allowSearchFilter: true,
+      };
+
+      this.suppleantdropdownSettings = {
+        singleSelection: false,
+        idField: "id",
+        textField: "nomComplet",
+
+        allowSearchFilter: true,
+      };
+
+      this.indicateursAReconduiredropdownSettings = {
+        singleSelection: false,
+        idField: "id",
+        textField: "name",
+        selectAllText: "Selectionner tout",
+        unSelectAllText: "Deselectionner tout",
+
+        noDataAvailablePlaceholderText:
+          "Aucun indicateur à reconduire poure cette annnée",
+        allowSearchFilter: true,
+      };
+
+      this.porteurdropdownSettings = {
+        singleSelection: true,
+        idField: "id",
+        textField: "nomComplet",
+        allowSearchFilter: true,
+      };
+
+      this.sousObjectisdropdownSettings = {
+        singleSelection: true,
+        idField: "id",
+        textField: "name",
+        allowSearchFilter: true,
+      };
+
+      this.anneedropdownSettings = {
+        singleSelection: true,
+        idField: "id",
+        textField: "annee",
+        itemsShowLimit: 1,
+        allowSearchFilter: true,
+      };
+
+      this.getSuperUser();
+
+      this.jambarsService.get("Accounts", true).subscribe(
+        (res: any) => {
+          console.log(res);
+
+          res = res.forEach((element: any) => {
+            element.nomComplet =
+              element.prenom + " " + element.nom + " (" + element.email + ")";
+            this.jambarUsers.push(element);
+          });
+          this.proprietaires = this.jambarUsers;
+          this.suppleants = this.jambarUsers;
+          this.analystes = this.jambarUsers;
+
+          this.getParametres();
+
+          this.getStructures();
+        },
+        (err) => {
+          console.log(err);
+          let msg = "Vérifier votre connexion internet";
+          this.notification.showNotification("top", "right", "danger", "", msg);
         }
-      },
-      (err) => {
-        console.log(err);
-      }
-    );
-
-  this.dtOptions = {
-    pagingType: "full_numbers",
-    pageLength: 10,
-    language: {
-      processing: "Traitement en cours...",
-      search: "Rechercher&nbsp;:",
-      lengthMenu: "Afficher _MENU_ &eacute;l&eacute;ments",
-      info: "Affichage des &eacute;lements _START_ &agrave; _END_ sur _TOTAL_ &eacute;l&eacute;ments",
-      infoEmpty:
-        "Affichage des &eacute;lements 0 &agrave; 0 sur 0 &eacute;l&eacute;ments",
-      infoFiltered:
-        "(filtr&eacute; de _MAX_ &eacute;l&eacute;ments au total)",
-      infoPostFix: "",
-      loadingRecords: "Chargement en cours...",
-      zeroRecords: "Aucun indicateur &agrave; afficher",
-      emptyTable: "Il n y a pas encore d'indicateur",
-      paginate: {
-        first: "Premier",
-        previous: "Pr&eacute;c&eacute;dent",
-        next: "Suivant",
-        last: "Dernier",
-      },
-      aria: {
-        sortAscending: ": activer pour trier la colonne par ordre croissant",
-        sortDescending:
-          ": activer pour trier la colonne par ordre décroissant",
-      },
-    },
-    dom: "Bfrtip",
-    // Configure the buttons
-    buttons: [
-      {
-        extend: "excel",
-        text: '<i class="material-icons">save_alt</i> Export des KPIs',
-        titleAttr: "Export",
-      },
-      // {
-      //   extend: 'excel',
-      //   text: '<i class="material-icons">save_alt</i> Export des Suivis',
-      //   titleAttr: 'Suivi',
-
-      //   filename: function () {
-      //     return 'Indicateurs';
-      //   },
-      // },
-      // {
-      //   extend: 'excel',
-      //   text: '<i class="material-icons">save_alt</i> Export',
-      //   titleAttr: 'export',
-      // },
-    ],
-  };
-
-  this.proprietairedropdownSettings = {
-    singleSelection: true,
-    idField: "id",
-    textField: "nomComplet",
-    allowSearchFilter: true,
-  };
-
-  this.structuredropdownSettings = {
-    singleSelection: true,
-    idField: "id",
-    textField: "sigleComplet",
-    allowSearchFilter: true,
-  };
-
-  this.suppleantdropdownSettings = {
-    singleSelection: false,
-    idField: "id",
-    textField: "nomComplet",
-
-    allowSearchFilter: true,
-  };
-
-  this.indicateursAReconduiredropdownSettings = {
-    singleSelection: false,
-    idField: "id",
-    textField: "name",
-    selectAllText: "Selectionner tout",
-    unSelectAllText: "Deselectionner tout",
-
-    noDataAvailablePlaceholderText:
-      "Aucun indicateur à reconduire poure cette annnée",
-    allowSearchFilter: true,
-  };
-
-  this.porteurdropdownSettings = {
-    singleSelection: true,
-    idField: "id",
-    textField: "nomComplet",
-    allowSearchFilter: true,
-  };
-
-  this.sousObjectisdropdownSettings = {
-    singleSelection: true,
-    idField: "id",
-    textField: "name",
-    allowSearchFilter: true,
-  };
-
-  this.anneedropdownSettings = {
-    singleSelection: true,
-    idField: "id",
-    textField: "annee",
-    itemsShowLimit: 1,
-    allowSearchFilter: true,
-  };
-
-  this.getSuperUser();
-
-  this.jambarsService.get("Accounts", true).subscribe(
-    (res: any) => {
-      console.log(res)
-     
-      res = res.forEach((element: any) => {
-        element.nomComplet =
-          element.prenom + " " + element.nom + " (" + element.email + ")";
-        this.jambarUsers.push(element);
-      });
-      this.proprietaires = this.jambarUsers;
-      this.suppleants = this.jambarUsers;
-      this.analystes = this.jambarUsers;
-
-      this.getParametres();
-
-      this.getStructures();
-    },
-    (err) => {
-      console.log(err);
-      let msg = "Vérifier votre connexion internet";
-      this.notification.showNotification("top", "right", "danger", "", msg);
+      );
     }
-  )
-   }
-   
   }
 
   onAnnneReconductionSelect(anneeReconduction: any) {
@@ -390,7 +403,6 @@ export class IndicateursComponent implements OnInit, OnDestroy {
   }
 
   getAllIndicateurs(init = true) {
-    
     this.showListeIndicateur = false;
     if (init == false) {
       this.dtTrigger = new Subject<any>();
@@ -398,7 +410,10 @@ export class IndicateursComponent implements OnInit, OnDestroy {
 
     this.initialiserIndicateurForms();
     let role = "basic";
-    if (this.userConnected.roles.includes("ROLE_METRIC_ADMIN") | this.userConnected.roles.includes("ROLE_ADMIN")) {
+    if (
+      this.userConnected.roles.includes("ROLE_METRIC_ADMIN") |
+      this.userConnected.roles.includes("ROLE_ADMIN")
+    ) {
       role = "admin";
     } else if (this.userConnected.roles.includes("ROLE_METRIC_ANIMATEUR")) {
       role = "animateur";
@@ -409,7 +424,6 @@ export class IndicateursComponent implements OnInit, OnDestroy {
     this.metricService.get(endpoint).subscribe(
       (indicateurs: any) => {
         if (indicateurs.length > 0) {
-         
           indicateurs.forEach((indicateur, indicateurIndex) => {
             const proprietaires = indicateur.proprietaires;
             indicateur.proprietaires = [];
@@ -429,8 +443,6 @@ export class IndicateursComponent implements OnInit, OnDestroy {
             });
 
             const analystes = indicateur.users;
-
-          
 
             indicateur.users = [];
             analystes.forEach((element) => {
@@ -456,19 +468,19 @@ export class IndicateursComponent implements OnInit, OnDestroy {
               this.indicateurs = indicateurs;
               // console.log("all indicateurs");
               // console.log(indicateurs);
-              this.dtTrigger.next();
+              // this.dtTrigger.next();
             }
           });
         } else {
           this.showListeIndicateur = true;
           this.indicateurs = indicateurs;
 
-          this.dtTrigger.next();
+          // this.dtTrigger.next();
         }
       },
       (err) => {
         this.showListeIndicateur = true;
-        this.dtTrigger.next();
+        // this.dtTrigger.next();
         let msg = "Erreur de chargement des indicateurs";
         this.notification.showNotification(
           "top",
@@ -758,7 +770,6 @@ export class IndicateursComponent implements OnInit, OnDestroy {
           // this.getAllIndicateurs(false);
           this.metricService.reloadRoute();
           this.getStructures(false);
-          
         },
         (err) => {
           console.log(err);
@@ -1301,7 +1312,10 @@ export class IndicateursComponent implements OnInit, OnDestroy {
         switch (type) {
           case "suivis":
             let role = "basic";
-            if (this.userConnected.roles.includes("ROLE_METRIC_ADMIN")  || this.userConnected.roles.includes("ROLE_ADMIN")) {
+            if (
+              this.userConnected.roles.includes("ROLE_METRIC_ADMIN") ||
+              this.userConnected.roles.includes("ROLE_ADMIN")
+            ) {
               role = "admin";
             } else if (
               this.userConnected.roles.includes("ROLE_METRIC_ANIMATEUR")
@@ -1313,17 +1327,16 @@ export class IndicateursComponent implements OnInit, OnDestroy {
               userConnected: this.userConnected,
               role: role,
               suivisFromExcel: data,
-              superUsers: this.superUsers
+              superUsers: this.superUsers,
             };
-            console.log("dataFromExcel")
-            console.log(dataFromExcel)
+            console.log("dataFromExcel");
+            console.log(dataFromExcel);
             url = "saisies/en-masse";
             break;
           case "indicateurs":
             dataFromExcel = {
               jambarsUsers: this.jambarUsers,
               indicateursFromExcel: data,
-             
             };
             url = "indicateurs/en-masse";
             break;
@@ -1416,17 +1429,17 @@ export class IndicateursComponent implements OnInit, OnDestroy {
     );
   }
 
-  getSuperUser(){
-    this.metricService.post('list_user', new FormData().append('instance', '1079')).subscribe({
-      next: (res) => {
-        this.superUsers = res.filter((user:any) => user.id != null)
-      
-      
-      },
-      err: (err) =>{
-        console.log(err)
-      }
-    })
+  getSuperUser() {
+    this.metricService
+      .post("list_user", new FormData().append("instance", "1079"))
+      .subscribe({
+        next: (res) => {
+          this.superUsers = res.filter((user: any) => user.id != null);
+        },
+        err: (err) => {
+          console.log(err);
+        },
+      });
   }
 
   ngOnDestroy(): void {

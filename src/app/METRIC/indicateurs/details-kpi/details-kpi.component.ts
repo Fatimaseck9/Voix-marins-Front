@@ -10,15 +10,13 @@ import { FormBuilder, Validators } from "@angular/forms";
 
 import { AuthService } from "src/app/pages/auth/auth.service";
 
-
-
 @Component({
   selector: "app-details-kpi",
   templateUrl: "./details-kpi.component.html",
   styleUrls: ["./details-kpi.component.css"],
 })
 export class DetailsKpiComponent implements OnInit {
-  userConnected = this.authService.getCurrentAccount();
+  userConnected: any;
   rightToEdit: boolean;
   jambarUsers = [];
   tendances: any[];
@@ -31,12 +29,9 @@ export class DetailsKpiComponent implements OnInit {
   sousObjectifs: any[];
 
   // Pour le modal de renseignement de suivi :
-  suiviForm = this.fb.group({
-    valeur: ["", Validators.required],
-    objectifPeriodique: ["", Validators.required],
-  });
+  suiviForm: any;
 
-  dtOptions: DataTables.Settings = {};
+  dtOptions = {};
   dtTrigger: Subject<any> = new Subject<any>();
 
   indicateurDetail: any = {};
@@ -69,20 +64,7 @@ export class DetailsKpiComponent implements OnInit {
   anneesToSelect: any = [];
   selectedAnnee: any = [];
 
-  mensualisationForm = this.fb.group({
-    janvier: ["", Validators.required],
-    fevrier: ["", Validators.required],
-    mars: ["", Validators.required],
-    avril: ["", Validators.required],
-    mai: ["", Validators.required],
-    juin: ["", Validators.required],
-    juillet: ["", Validators.required],
-    aout: ["", Validators.required],
-    septembre: ["", Validators.required],
-    octobre: ["", Validators.required],
-    novembre: ["", Validators.required],
-    decembre: ["", Validators.required],
-  });
+  mensualisationForm: any;
 
   TAO: any;
 
@@ -112,9 +94,29 @@ export class DetailsKpiComponent implements OnInit {
 
     private authService: AuthService
   ) {
+    this.userConnected = this.authService.getCurrentAccount();
     this.views.forEach((view) => {
       view.bool = this.authService.getRoleSectionView(view.id);
       // console.log(view.bool);
+    });
+    this.suiviForm = this.fb.group({
+      valeur: ["", Validators.required],
+      objectifPeriodique: ["", Validators.required],
+    });
+
+    this.mensualisationForm = this.fb.group({
+      janvier: ["", Validators.required],
+      fevrier: ["", Validators.required],
+      mars: ["", Validators.required],
+      avril: ["", Validators.required],
+      mai: ["", Validators.required],
+      juin: ["", Validators.required],
+      juillet: ["", Validators.required],
+      aout: ["", Validators.required],
+      septembre: ["", Validators.required],
+      octobre: ["", Validators.required],
+      novembre: ["", Validators.required],
+      decembre: ["", Validators.required],
     });
   }
 
@@ -141,7 +143,7 @@ export class DetailsKpiComponent implements OnInit {
         (res) => {
           this.rightToEdit = res.right;
         },
-        (err) => console.log('err', err)
+        (err) => console.log("err", err)
       );
 
     this.metricService
@@ -190,7 +192,7 @@ export class DetailsKpiComponent implements OnInit {
           }
         );
 
-        this.getSuperUser()
+        this.getSuperUser();
 
         this.getSaisieIndicateurForAYear(this.year, this.indicateurDetail.id);
         this.getAnneesSuivis(this.indicateurDetail.id);
@@ -281,13 +283,10 @@ export class DetailsKpiComponent implements OnInit {
   }
 
   updateSaisie(saisieId, suiviMensuel: any) {
-  
-    
     suiviMensuel.jambarUsers = this.jambarUsers;
-    suiviMensuel.initiateurPA = this.userConnected
-    
+    suiviMensuel.initiateurPA = this.userConnected;
+
     if (suiviMensuel.valeur == "NA" || suiviMensuel.valeur == "ND") {
-      
       this.metricService
         .patch("saisies-custom-update", saisieId, suiviMensuel)
         .subscribe(
@@ -322,13 +321,12 @@ export class DetailsKpiComponent implements OnInit {
       suiviMensuel.oldAnalysePaId = this.analysePaToUpdate.id;
       suiviMensuel.TAO = this.TAO;
       suiviMensuel.auteur = this.userConnected.id;
-      this.formDataFiles.append('suiviMensuel', JSON.stringify(suiviMensuel) );
+      this.formDataFiles.append("suiviMensuel", JSON.stringify(suiviMensuel));
 
       this.metricService
         .patch("saisies/with-relation", saisieId, this.formDataFiles)
         .subscribe(
           (res: any) => {
-            
             if (res.success) {
               this.notification.showNotification(
                 "top",
@@ -338,19 +336,16 @@ export class DetailsKpiComponent implements OnInit {
                 res.message
               );
 
-              this.metricService.reloadRoute()
-                if (this.event != null) {
-                  this.event.target.value = null;
-                  this.event = null;
-                  this.formDataFiles = new FormData();
-                }
-                this.getSaisieIndicateurForAYear(
-                  this.year,
-                  this.saisieToUpdate.indicateurId
-                );
-              
-
-             
+              this.metricService.reloadRoute();
+              if (this.event != null) {
+                this.event.target.value = null;
+                this.event = null;
+                this.formDataFiles = new FormData();
+              }
+              this.getSaisieIndicateurForAYear(
+                this.year,
+                this.saisieToUpdate.indicateurId
+              );
             } else {
               this.notification.showNotification(
                 "top",
@@ -359,7 +354,7 @@ export class DetailsKpiComponent implements OnInit {
                 "METRIC",
                 res.message
               );
-              this.metricService.reloadRoute()
+              this.metricService.reloadRoute();
             }
           },
           (err) => {
@@ -372,7 +367,7 @@ export class DetailsKpiComponent implements OnInit {
               "METRIC",
               msg
             );
-            this.metricService.reloadRoute()
+            this.metricService.reloadRoute();
           }
         );
     }
@@ -558,7 +553,11 @@ export class DetailsKpiComponent implements OnInit {
               ? this.analysePaToUpdate.dateFin
               : "",
           ],
-          porteur: [this.porteurAnalyse.length != 0 && this.porteurAnalyse[0].id ? this.porteurAnalyse : ""],
+          porteur: [
+            this.porteurAnalyse.length != 0 && this.porteurAnalyse[0].id
+              ? this.porteurAnalyse
+              : "",
+          ],
         });
       } else if (parseFloat(this.TAO) >= 100) {
         this.suiviForm = this.fb.group({
@@ -666,7 +665,6 @@ export class DetailsKpiComponent implements OnInit {
       ],
     });
     this.typeEdit = typeEdit;
-  
 
     this.metricService
       .get(
@@ -679,15 +677,12 @@ export class DetailsKpiComponent implements OnInit {
             // On récupére l'analyse et le PA
 
             this.analysePaToUpdate = res[0];
-           
 
             // On récupére le porteur de l'analyse
-            
+
             this.porteurAnalyse = this.superUsers.filter(
               (user) => this.analysePaToUpdate.porteurId == user.id
             );
-
-            
           }
           this.updateSaisieForm(
             this.saisies,
@@ -996,8 +991,7 @@ export class DetailsKpiComponent implements OnInit {
     }
     if (files.length > 0) {
       for (var i = 0; i < files.length; i++) {
-        this.formDataFiles.append("files", files[i],  files[i].name);
-        
+        this.formDataFiles.append("files", files[i], files[i].name);
       }
     }
   }
@@ -1061,9 +1055,9 @@ export class DetailsKpiComponent implements OnInit {
           "right",
           "success",
           "METRIC",
-          'Opération Réussie'
+          "Opération Réussie"
         );
-        this.metricService.reloadRoute()
+        this.metricService.reloadRoute();
         // this.getSaisieIndicateurForAYear(this.year, this.indicateurId);
       },
       (err) => {
@@ -1072,11 +1066,10 @@ export class DetailsKpiComponent implements OnInit {
           "right",
           "success",
           "METRIC",
-          'Opération Echouée'
+          "Opération Echouée"
         );
         console.log(err);
         this.metricService.reloadRoute();
-       
       }
     );
   }
@@ -1088,17 +1081,18 @@ export class DetailsKpiComponent implements OnInit {
     this.metricService.downloadById(erq.id);
   }
 
-  getSuperUser(){
-    this.metricService.post('list_user', new FormData().append('instance', '1079')).subscribe({
-      next: (res) => {
-        this.superUsers = res.filter((user:any) => user.id != null)
-        this.porteurs = this.superUsers;
-       
-      },
-      err: (err) =>{
-        console.log(err)
-      }
-    })
+  getSuperUser() {
+    this.metricService
+      .post("list_user", new FormData().append("instance", "1079"))
+      .subscribe({
+        next: (res) => {
+          this.superUsers = res.filter((user: any) => user.id != null);
+          this.porteurs = this.superUsers;
+        },
+        err: (err) => {
+          console.log(err);
+        },
+      });
   }
 
   ngOnDestroy(): void {

@@ -10,7 +10,6 @@ import { DetailsStructuresComponent } from "./structures/details-structures/deta
 
 import { Routes } from "@angular/router";
 
-
 export const MetricRoute: Routes = [
   {
     //Default redirection to the first route.
@@ -26,14 +25,7 @@ export const MetricRoute: Routes = [
         path: "indicateurs",
         component: IndicateursComponent,
       },
-      // {
-      //   path: "indicateurs/add",
-      //   component: EditIndicateurComponent,
-      // },
-      // {
-      //   path: "indicateurs/edit/:id",
-      //   component: EditIndicateurComponent,
-      // },
+
       {
         path: "indicateurs/:id",
         component: DetailsKpiComponent,

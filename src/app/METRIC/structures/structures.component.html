@@ -37,29 +37,41 @@
           <i class="material-icons">work</i>
         </div>
       </div>
-      <div class="col-md-8 ml-auto mr-auto">
-        <ngx-org-chart
-          [nodes]="sonatelNodes"
-          direction="horizontal"
-          (itemClick)="goToDetails($event)"
+      <div class="col-md-8 ml-auto mr-auto scrollable-div">
+        <google-chart
+          (ready)="onSNTChartReady($event)"
+          #chart
+          [title]="'hbjnk'"
+          [type]="type"
+          [data]="sonatelTableData"
+          [options]="options"
+          [height]="height"
+          id="chart_div"
         >
-        </ngx-org-chart>
+        </google-chart>
       </div>
     </div>
 
-    <div class="card" *ngFor="let externeNode of externesNodes">
+    <div
+      class="card"
+      *ngFor="let externeTableData of externesTableData; let i = index"
+    >
       <div class="card-header card-header-icon card-header-warning">
         <div class="card-icon">
           <i class="material-icons">work</i>
         </div>
       </div>
-      <div class="col-md-8 ml-auto mr-auto">
-        <ngx-org-chart
-          [nodes]="externeNode"
-          direction="horizontal"
-          (itemClick)="goToDetails($event)"
+      <div class="col-md-8 ml-auto mr-auto scrollable-div">
+        <google-chart
+          (ready)="onExterneChartReady($event,  i)"
+          [title]="'hbjnk'"
+          [type]="type"
+          [data]="externeTableData"
+          [options]="options"
+          [height]="height"
+          id="chart_div{{ i }}"
         >
-        </ngx-org-chart>
+        </google-chart>
       </div>
     </div>
   </div>
@@ -168,7 +180,6 @@
                 [data]="structureUsers"
                 [formControl]="addAnimateurForm.controls['animateurs']"
                 [disabled]="desactiverAnimateurs"
-                [settings]="MultiSelectSettingsByGroup"
                 required
                 style="width: 100%"
               >

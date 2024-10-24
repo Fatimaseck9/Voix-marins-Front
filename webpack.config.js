@@ -25,7 +25,7 @@ module.exports = {
   experiments: {
     outputModule: true
   },
-  plugins: [
+ /*plugins: [
     // new ModuleFederationPlugin({
     //     name: "home",
     //     filename: "remoteEntry.js",
@@ -44,5 +44,21 @@ module.exports = {
         
     // }),
     // sharedMappings.getPlugin()
-  ],
+  ] */
+
+    // plugins: [
+    //   new ModuleFederationPlugin({
+    //     name: "qosUniverse",
+    //     filename: "remoteEntry.js",
+    //     exposes: {
+    //       './QosUniverseModule': './src/app/QOSUNIVERSE/qosuniverse.module.ts'
+    //     },
+    //     shared: shareAll({
+    //       singleton: true,
+    //       strictVersion: true,
+    //       requiredVersion: 'auto'
+    //     }),
+    //   }),
+    //   sharedMappings.getPlugin()
+    // ],
 };

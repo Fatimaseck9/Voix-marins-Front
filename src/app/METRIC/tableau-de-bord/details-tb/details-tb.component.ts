@@ -49,12 +49,10 @@ export class DetailsTBComponent implements OnInit {
   ];
   indicateursTb: any = [];
   indicateurIdToDelete: any;
-  addIndicateurTBRelationForm = this.fb.group({
-    selectedIndicateurs: ["", Validators.required],
-  });
+  addIndicateurTBRelationForm: any;
   indicateursdropdownSettings: any;
   jambarsUsers: any = [];
-  userConnecte: any = this.authService.getCurrentAccount();
+  userConnecte: any;
 
   reportingNotReady = true;
 
@@ -72,7 +70,11 @@ export class DetailsTBComponent implements OnInit {
   ) {}
 
   ngOnInit() {
+    this.userConnecte = this.authService.getCurrentAccount();
     this.userConnecte.roles = this.authService.getAccountRoles();
+    this.addIndicateurTBRelationForm = this.fb.group({
+      selectedIndicateurs: ["", Validators.required],
+    });
 
     this.anneeReporting = new Date().getFullYear().toString();
     this.moisReporting = this.mois.find(
@@ -258,7 +260,7 @@ export class DetailsTBComponent implements OnInit {
           // console.log("relatuin");
           // console.log(relations);
           if (relations.length == 0) {
-            this.dtTrigger.next();
+            // this.dtTrigger.next();
           }
           relations.forEach((relation, indexRelation) => {
             this.indicateursToAdd = this.indicateursToAdd.filter(
@@ -270,7 +272,7 @@ export class DetailsTBComponent implements OnInit {
                 this.indicateursTb.push(indicateurs[0]);
                 if (indexRelation == relations.length - 1) {
                   this.getAnneesReporting();
-                  this.dtTrigger.next();
+                  // this.dtTrigger.next();
                 }
               });
           });
@@ -310,7 +312,7 @@ export class DetailsTBComponent implements OnInit {
   }
   generateReporting() {
     this.reportingNotReady = true;
-    
+
     const tbInfos = {
       jambarsUsers: this.jambarsUsers,
       annee: this.anneeReporting,

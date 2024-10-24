@@ -1,4 +1,4 @@
-import { Component, OnInit } from "@angular/core";
+import { Component, OnInit, ViewChild } from "@angular/core";
 import { ActivatedRoute } from "@angular/router";
 
 import { NotificationService } from "src/app/shared/services/notifications";
@@ -26,9 +26,7 @@ export class DetailsStructuresComponent implements OnInit {
   structure: any;
 
   nodeDetails: any = [];
-  addIndicateurForm = this.fb.group({
-    usersToAdd: [],
-  });
+  addIndicateurForm: any;
 
   userErrorrs: any = [];
 
@@ -52,6 +50,17 @@ export class DetailsStructuresComponent implements OnInit {
 
   usersForms: any;
   desactiverUserAdd = true;
+  sonatelTableData: any[] = [];
+  @ViewChild("chart", { static: false }) chart: any;
+  type = "OrgChart";
+
+  // columnNames = ["Name", "Manager", "Tooltip"];
+  options = {
+    allowHtml: true,
+    orientation: "horizontal",
+  };
+  width = 400;
+  height = 400;
 
   constructor(
     private jambarsService: BaseService,
@@ -64,6 +73,10 @@ export class DetailsStructuresComponent implements OnInit {
     this.router.routeReuseStrategy.shouldReuseRoute = function () {
       return false;
     };
+
+    this.addIndicateurForm = this.fb.group({
+      usersToAdd: [],
+    });
   }
 
   ngOnInit() {
@@ -243,16 +256,17 @@ export class DetailsStructuresComponent implements OnInit {
           }
 
           this.nodeDetails.push(nodeParent);
+          this.generateTableData(this.nodeDetails[0], "");
           // console.log(this.nodeDetails);
-          this.dtTriggerCollaborateurs.next();
-          this.dtTriggerIndicateurs.next();
+          // this.dtTriggerCollaborateurs.next();
+          // this.dtTriggerIndicateurs.next();
           this.showListeIndicateur = true;
           this.showCollaborateur = true;
         },
         (error) => {
           console.log(error);
-          this.dtTriggerCollaborateurs.next();
-          this.dtTriggerIndicateurs.next();
+          // this.dtTriggerCollaborateurs.next();
+          // this.dtTriggerIndicateurs.next();
         }
       );
   }
@@ -266,6 +280,68 @@ export class DetailsStructuresComponent implements OnInit {
       "metric/structures/indicateurs-suivis",
       this.structure.id,
     ]);
+  }
+
+  onSNTChartReady(event) {
+    const chartWrapper = this.chart.wrapper;
+    const chart = chartWrapper.getChart();
+
+    google.visualization.events.addListener(chart, "select", () => {
+      const selection = chart.getSelection();
+      if (selection.length > 0) {
+        const selectedItem = selection[0];
+        const selectedRow = selectedItem.row;
+
+        if (selectedRow != null) {
+          const selectedNode = this.sonatelTableData[selectedRow];
+          console.log("Nœud sélectionné:", selectedNode);
+          this.router.navigate(["metric/structures", selectedNode[0].id]);
+        }
+      }
+    });
+  }
+  generateTableData(node: any, parent: string): void {
+    const formattedNode = {
+      v: node.name,
+      f: `${node.name}<div style="color:${this.getColorForLevel(
+        node.name
+      )}">${this.getType(node.name)}</div>`,
+      id: node.id,
+      parentId: node.parentId ? node.parentId : "null",
+    };
+
+    this.sonatelTableData.push([
+      formattedNode,
+      parent,
+      this.getType(node.name),
+    ]);
+
+    if (node.childs && node.childs.length > 0) {
+      node.childs.forEach((child) => this.generateTableData(child, node.name));
+    }
+  }
+
+  getType(name: string): string {
+    return "";
+  }
+
+  getColorForLevel(name: string): string {
+    switch (name) {
+      case "SNT":
+        return "red";
+      case "DRPS":
+      case "BBI":
+        return "red";
+      case "DEP":
+      case "DBF":
+      case "PPC":
+        return "blue";
+      case "DDB":
+      case "DRR":
+        return "orange";
+      default:
+        return "black";
+    }
   }
 
   goToParent() {
@@ -377,8 +453,8 @@ export class DetailsStructuresComponent implements OnInit {
       this.dtTriggerCollaborateurs = new Subject<any>();
       this.dtTriggerIndicateurs = new Subject<any>();
     }
-    this.dtTriggerCollaborateurs.next();
-    this.dtTriggerIndicateurs.next();
+    // this.dtTriggerCollaborateurs.next();
+    // this.dtTriggerIndicateurs.next();
   }
 
   submitUserForm() {

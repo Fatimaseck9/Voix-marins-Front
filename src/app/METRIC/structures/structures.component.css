@@ -1,10 +1,8 @@
-.breadcrumb-dark{
-  background-color: black;
- }
-
- .card {
-  box-shadow: none;
-}
-.black-card {
-  background-color: black;
+.scrollable-div {
+  max-height: 500px; /* Ajustez la hauteur maximale de votre div */
+  max-width: 100%; /* Ajustez la largeur maximale de votre div */
+  overflow-x: auto; /* Scroll horizontal si nécessaire */
+  overflow-y: auto; /* Scroll vertical si nécessaire */
+  border: 1px solid #ddd; /* Optionnel : Ajoute une bordure pour visualiser le conteneur */
+  padding: 10px; /* Optionnel : Ajoute du padding pour espacer le contenu */
 }

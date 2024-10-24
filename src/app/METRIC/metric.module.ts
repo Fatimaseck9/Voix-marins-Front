@@ -11,6 +11,7 @@ import { DataTablesModule } from "angular-datatables";
 import { ReactiveFormsModule } from "@angular/forms";
 import { NgMultiSelectDropDownModule } from "ng-multiselect-dropdown";
 
+import { NgxGraphModule } from "@swimlane/ngx-graph";
 import { TableauDeBordComponent } from "./tableau-de-bord/tableau-de-bord.component";
 import { DetailsTBComponent } from "./tableau-de-bord/details-tb/details-tb.component";
 import { StructuresComponent } from "./structures/structures.component";
@@ -23,10 +24,11 @@ import { DetailsKpiComponent } from "./indicateurs/details-kpi/details-kpi.compo
 import { DetailsStructuresComponent } from "./structures/details-structures/details-structures.component";
 import { DemandeSuivisIndicateursComponent } from "./demande-suivis-indicateurs/demande-suivis-indicateurs.component";
 
-import { EditIndicateurComponent } from "./indicateurs/edit-indicateur/edit-indicateur.component";
 import { BaseService } from "../shared/base.service";
 import { metricService } from "../shared/metricService";
 import { NotificationService } from "../shared/services/notifications";
+import { GoogleChartsModule } from 'angular-google-charts';
+
 
 @NgModule({
   declarations: [
@@ -41,7 +43,6 @@ import { NotificationService } from "../shared/services/notifications";
     FooterComponent,
     DetailsStructuresComponent,
     DemandeSuivisIndicateursComponent,
-    EditIndicateurComponent,
   ],
   imports: [
     CommonModule,
@@ -50,7 +51,8 @@ import { NotificationService } from "../shared/services/notifications";
     MaterialModule,
 
     HttpClientModule,
-
+    NgxGraphModule,
+    GoogleChartsModule,
     ReactiveFormsModule,
     NgMultiSelectDropDownModule.forRoot(),
 
