@@ -1,14 +1,36 @@
 const ModuleFederationPlugin = require("webpack/lib/container/ModuleFederationPlugin");
 const mf = require("@angular-architects/module-federation/webpack");
 const path = require("path");
-const share = mf.share;
+const shareAll = mf.shareAll;
 
 const sharedMappings = new mf.SharedMappings();
 sharedMappings.register(
   path.join(__dirname, 'tsconfig.json'),
-  [/* mapped paths to share */]);
+  ['@shared'] // Remplacer par les chemins à partager
+);
 
 module.exports = {
+  module: {
+    rules: [
+      {
+        test: /\.worker\.js$/,
+        use: { loader: 'worker-loader' }
+      },
+      {
+        test: /\.(png|jpg|gif|svg)$/,
+        use: [
+          {
+            loader: 'file-loader',
+            options: {
+              name: '[name].[ext]',
+              outputPath: 'assets/img',
+              publicPath: 'assets/img' // Assurez-vous que cela pointe correctement vers le dossier des images
+            }
+          }
+        ]
+      }
+    ]
+  },
   output: {
     uniqueName: "demo",
     publicPath: "auto",
@@ -16,7 +38,7 @@ module.exports = {
   },
   optimization: {
     runtimeChunk: false
-  },   
+  },
   resolve: {
     alias: {
       ...sharedMappings.getAliases(),
@@ -25,40 +47,26 @@ module.exports = {
   experiments: {
     outputModule: true
   },
- /*plugins: [
-    // new ModuleFederationPlugin({
-    //     name: "home",
-    //     filename: "remoteEntry.js",
-    //     exposes: {
-    //         './HomeModule': './/src/app/home/home.module.ts',
-    //     },        
-
-    //     shared: share({
-    //       "@angular/core": { singleton: true, strictVersion: true, requiredVersion: 'auto' }, 
-    //       "@angular/common": { singleton: true, strictVersion: true, requiredVersion: 'auto' }, 
-    //       "@angular/common/http": { singleton: true, strictVersion: true, requiredVersion: 'auto' }, 
-    //       "@angular/router": { singleton: true, strictVersion: true, requiredVersion: 'auto' },
-    //       "@angular/forms": { singleton: true, strictVersion: true, requiredVersion: 'auto' }, 
-    //       ...sharedMappings.getDescriptors()
-    //     })
-        
-    // }),
-    // sharedMappings.getPlugin()
-  ] */
-
-    // plugins: [
-    //   new ModuleFederationPlugin({
-    //     name: "qosUniverse",
-    //     filename: "remoteEntry.js",
-    //     exposes: {
-    //       './QosUniverseModule': './src/app/QOSUNIVERSE/qosuniverse.module.ts'
-    //     },
-    //     shared: shareAll({
-    //       singleton: true,
-    //       strictVersion: true,
-    //       requiredVersion: 'auto'
-    //     }),
-    //   }),
-    //   sharedMappings.getPlugin()
-    // ],
+  plugins: [
+    new ModuleFederationPlugin({
+      name: "metric",
+      filename: "remoteEntry.js",
+      exposes: {
+        './MetricModule': './src/app/METRIC/metric.module.ts'
+      },
+      shared: shareAll({
+        singleton: true,
+        strictVersion: true,
+        requiredVersion: 'auto'
+      }),
+    }),
+    sharedMappings.getPlugin()
+  ],
+  devServer: {
+    headers: {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, PATCH, OPTIONS",
+      "Access-Control-Allow-Headers": "X-Requested-With, content-type, Authorization"
+    }
+  }
 };

@@ -6,11 +6,10 @@ import { Router } from "@angular/router";
 export class metricService {
   //prod
   // serverURL = "https://apis.jambars.orange-sonatel.com/metric/";
- 
 
   // local
   serverURL = "http://127.0.0.1:3009/";
- 
+
   constructor(private httpClient: HttpClient, private router: Router) {}
 
   download(file) {
@@ -23,7 +22,7 @@ export class metricService {
 
   post(url, data): any {
     url = this.serverURL + url;
-    console.log(url)
+    console.log(url);
     return this.httpClient.post<any>(url, data);
   }
 
@@ -63,5 +62,10 @@ export class metricService {
     });
   }
 
-
+  loadStyle(href: string, renderer): void {
+    const link = renderer.createElement("link");
+    link.rel = "stylesheet";
+    link.href = href;
+    renderer.appendChild(document.head, link);
+  }
 }

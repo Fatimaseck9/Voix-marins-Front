@@ -1,4 +1,4 @@
-import { Component, OnInit } from "@angular/core";
+import { Component, OnInit, Renderer2 } from "@angular/core";
 
 import { NotificationService } from "src/app/shared/services/notifications";
 import { BaseService } from "src/app/shared/base.service";
@@ -8,6 +8,7 @@ import { Subject } from "rxjs";
 import { FormBuilder, Validators } from "@angular/forms";
 import { AuthService } from "src/app/pages/auth/auth.service";
 import { ActivatedRoute } from "@angular/router";
+import { environment } from "src/environments/environment";
 
 @Component({
   selector: "app-demande-suivis-indicateurs",
@@ -40,7 +41,8 @@ export class DemandeSuivisIndicateursComponent implements OnInit {
     private jambarsService: BaseService,
     private notification: NotificationService,
     private metricService: metricService,
-    private authService: AuthService
+    private authService: AuthService,
+    private renderer: Renderer2
   ) {
     this.userConnected = this.authService.getCurrentAccount();
     this.demandeSuiviIndicateurForm = this.fb.group({
@@ -50,6 +52,10 @@ export class DemandeSuivisIndicateursComponent implements OnInit {
   }
 
   ngOnInit() {
+    // this.metricService.loadStyle(
+    //   `${environment.metricPath}/METRIC/demande-suivis-indicateurs/demande-suivis-indicateurs.component.css`,
+    //   this.renderer
+    // );
     this.structureId = this.activatedRoute.snapshot.paramMap.get("id");
 
     this.dtOptions = {

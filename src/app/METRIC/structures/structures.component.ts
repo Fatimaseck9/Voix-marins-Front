@@ -105,7 +105,7 @@ export class StructuresComponent implements OnInit {
 
         if (selectedRow != null) {
           const selectedNode = this.sonatelTableData[selectedRow];
-          console.log("Nœud sélectionné:", selectedNode);
+         
           this.router.navigate(["metric/structures", selectedNode[0].id]);
         }
       }

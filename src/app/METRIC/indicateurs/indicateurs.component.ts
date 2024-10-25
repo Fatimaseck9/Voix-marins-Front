@@ -195,7 +195,7 @@ export class IndicateursComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     this.userConnected.roles = this.authService.getAccountRoles();
-    console.log(this.userConnected.roles);
+
     if (
       !this.userConnected.roles.includes("ROLE_METRIC_ADMIN") &&
       !this.userConnected.roles.includes("ROLE_ADMIN") &&
@@ -345,7 +345,7 @@ export class IndicateursComponent implements OnInit, OnDestroy {
 
       this.jambarsService.get("Accounts", true).subscribe(
         (res: any) => {
-          console.log(res);
+          
 
           res = res.forEach((element: any) => {
             element.nomComplet =
@@ -1329,8 +1329,7 @@ export class IndicateursComponent implements OnInit, OnDestroy {
               suivisFromExcel: data,
               superUsers: this.superUsers,
             };
-            console.log("dataFromExcel");
-            console.log(dataFromExcel);
+           
             url = "saisies/en-masse";
             break;
           case "indicateurs":
