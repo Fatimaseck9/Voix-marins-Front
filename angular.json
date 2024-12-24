@@ -98,6 +98,7 @@
 				"serve": {
 					"builder": "ngx-build-plus:dev-server",
 					"options": {
+						"proxyConfig": "proxy.conf.json",
 						"browserTarget": "demo:build",
 						"port": 4204,
 						"publicHost": "http://localhost:4204",

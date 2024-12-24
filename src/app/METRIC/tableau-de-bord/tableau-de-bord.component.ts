@@ -3,7 +3,7 @@ import { Component, OnInit } from "@angular/core";
 import { FormBuilder, Validators } from "@angular/forms";
 
 import { BaseService } from "src/app/shared/base.service";
-import { metricService } from "src/app/shared/metricService";
+import { metricService } from "src/app/shared/metric.Service";
 
 import { NotificationService } from "src/app/shared/services/notifications";
 import { Subject } from "rxjs";
@@ -195,18 +195,34 @@ export class TableauDeBordComponent implements OnInit {
       return item.numero < new Date().getMonth();
     });
 
-    this.jambarsService.get("/Accounts", true).subscribe(
-      (res) => {
-        res.forEach((element: any) => {
-          element.nomComplet = element.prenom + " " + element.nom;
-          this.jambarsUsers.push(element);
-        });
-        this.getUserConnectedData();
-        this.getAllTbs();
+    this.jambarsService.get("/jambars/utilisateurs", true).subscribe(
+      (res: any) => {
+        // Vérification si 'res' contient un tableau ou une clé enveloppant les données
+        const utilisateurs = Array.isArray(res) ? res : res?.data;
+    
+        if (Array.isArray(utilisateurs)) {
+          utilisateurs.forEach((element: any) => {
+            element.nomComplet = `${element.prenom} ${element.nom}`;
+            this.jambarsUsers.push(element);
+          });
+          this.getUserConnectedData();
+          this.getAllTbs();
+        } else {
+          console.error("La réponse reçue n'est pas un tableau :", res);
+          let msg =
+            "Erreur : Les données reçues des utilisateurs Jambars ne sont pas valides.";
+          this.notification.showNotification(
+            "top",
+            "right",
+            "danger",
+            "METRIC",
+            msg
+          );
+        }
       },
-      (err) => {
+      (err: any) => {
         let msg =
-          "Erreur de chargement des utilisateurs de Jambars ! Veuillez vérifier votre connexion";
+          "Erreur de chargement des utilisateurs de Jambars ! Veuillez vérifier votre connexion.";
         this.notification.showNotification(
           "top",
           "right",
@@ -214,9 +230,10 @@ export class TableauDeBordComponent implements OnInit {
           "METRIC",
           msg
         );
-        console.log(err);
+        console.error("Erreur lors de la récupération des utilisateurs :", err);
       }
     );
+    
 
     this.metricService
       .get("parametres?filter[where][type]=origine")

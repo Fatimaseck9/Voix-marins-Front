@@ -13,14 +13,14 @@ export class AuthService {
     return token && token.length > 0;
   }
 
-  setAccount(account) {
+  setAccount(account: Account) {
     this.cookieService.set('currentAccount', JSON.stringify(account), undefined, '/');
   }
 
-  getCurrentAccount() {
+  getCurrentAccount(): Account | null {
     const accountString = this.cookieService.get('currentAccount');
     try {
-      const account = JSON.parse(accountString);
+      const account: Account = JSON.parse(accountString);
       if (account && account.id) {
         return account;
       } else {
@@ -30,17 +30,6 @@ export class AuthService {
       console.error('Erreur lors de la lecture des données de compte depuis les cookies :', error);
       return null; // Retourne null en cas d'erreur de lecture des données de compte
     }
-  }
-
-  setActionGroups(actionGroup) {
-      localStorage.setItem("actionGroups",JSON.stringify(actionGroup));
-    // this.cookieService.set('actionGroups', JSON.stringify(actionGroup), undefined, '/');
-  }
-
-  getActionGroups(): any {
-    // const actionGroups = this.cookieService.get('actionGroups');
-    const actionGroups = localStorage.getItem('actionGroups');
-    return JSON.parse(actionGroups || '[]');
   }
 
   getRoleSectionView(idSection): boolean {
@@ -71,9 +60,9 @@ export class AuthService {
 
     role.forEach((r) => {
       accountRoles.push(r.name);
-      // r.sections.forEach((s) => {
-      //   accountSections.push(s.idSection);
-      // });
+      r.sections.forEach((s) => {
+        accountSections.push(s.idSection);
+      });
     });
 
     this.cookieService.set('accountRoles', JSON.stringify(accountRoles), undefined, '/');
@@ -101,7 +90,7 @@ export class AuthService {
   }
 
   redirect() {
-    this.router.navigate(['/metric/indicateurs']);
+    this.router.navigate(['/dashboard']);
   }
 
   logout() {

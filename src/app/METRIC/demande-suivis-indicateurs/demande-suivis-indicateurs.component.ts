@@ -2,7 +2,7 @@ import { Component, OnInit, Renderer2 } from "@angular/core";
 
 import { NotificationService } from "src/app/shared/services/notifications";
 import { BaseService } from "src/app/shared/base.service";
-import { metricService } from "src/app/shared/metricService";
+import { metricService } from "src/app/shared/metric.Service";
 
 import { Subject } from "rxjs";
 import { FormBuilder, Validators } from "@angular/forms";
@@ -114,7 +114,7 @@ export class DemandeSuivisIndicateursComponent implements OnInit {
       itemsShowLimit: 1,
       allowSearchFilter: true,
     };
-    this.jambarsService.get("Accounts", true).subscribe(
+    this.jambarsService.get("jambars/utilisateurs", true).subscribe(
       (res: any) => {
         res.forEach((element: any) => {
           element.nomComplet =

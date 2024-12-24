@@ -4,7 +4,7 @@ import { FormBuilder, Validators } from "@angular/forms";
 import { Subject } from "rxjs";
 import { NotificationService } from "src/app/shared/services/notifications";
 
-import { metricService } from "src/app/shared/metricService";
+import { metricService } from "src/app/shared/metric.Service";
 
 @Component({
   selector: "app-parametre",

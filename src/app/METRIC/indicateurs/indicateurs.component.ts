@@ -2,7 +2,7 @@ import { Component, OnInit, OnDestroy } from "@angular/core";
 
 import { NotificationService } from "src/app/shared/services/notifications";
 import { BaseService } from "src/app/shared/base.service";
-import { metricService } from "src/app/shared/metricService";
+import { metricService } from "src/app/shared/metric.Service";
 
 import { Subject } from "rxjs";
 import { FormBuilder, Validators } from "@angular/forms";
@@ -195,7 +195,7 @@ export class IndicateursComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     this.userConnected.roles = this.authService.getAccountRoles();
-
+console.log("USER::::"+this.userConnected.roles)
     if (
       !this.userConnected.roles.includes("ROLE_METRIC_ADMIN") &&
       !this.userConnected.roles.includes("ROLE_ADMIN") &&
@@ -343,29 +343,34 @@ export class IndicateursComponent implements OnInit, OnDestroy {
 
       this.getSuperUser();
 
-      this.jambarsService.get("Accounts", true).subscribe(
-        (res: any) => {
+          this.jambarsService.get("jambars/utilisateurs", true).subscribe(
+            (res: any) => {
+              const utilisateurs = res.data || []; // Remplacez "data" par la clé correcte
+              if (Array.isArray(utilisateurs)) {
+                utilisateurs.forEach((element: any) => {
+                  element.nomComplet =
+                    element.prenom + " " + element.nom + " (" + element.email + ")";
+                  this.jambarUsers.push(element);
+                });
           
-
-          res = res.forEach((element: any) => {
-            element.nomComplet =
-              element.prenom + " " + element.nom + " (" + element.email + ")";
-            this.jambarUsers.push(element);
-          });
-          this.proprietaires = this.jambarUsers;
-          this.suppleants = this.jambarUsers;
-          this.analystes = this.jambarUsers;
-
-          this.getParametres();
-
-          this.getStructures();
-        },
-        (err) => {
-          console.log(err);
-          let msg = "Vérifier votre connexion internet";
-          this.notification.showNotification("top", "right", "danger", "", msg);
-        }
-      );
+          
+                this.proprietaires = this.jambarUsers;
+                this.suppleants = this.jambarUsers;
+                this.analystes = this.jambarUsers;
+          
+                this.getParametres();
+                this.getStructures();
+              } else {
+                console.error("La réponse n'est pas un tableau :", utilisateurs);
+              }
+            },
+            (err) => {
+              console.log(err);
+              let msg = "Vérifiez votre connexion internet";
+              this.notification.showNotification("top", "right", "danger", "", msg);
+            }
+          );
+          
     }
   }
 
@@ -720,6 +725,7 @@ export class IndicateursComponent implements OnInit, OnDestroy {
         (structures: any[]) => {
           this.structures = structures;
           this.getAllIndicateurs(init);
+
         },
 
         (error: any) => {
@@ -1329,7 +1335,7 @@ export class IndicateursComponent implements OnInit, OnDestroy {
               suivisFromExcel: data,
               superUsers: this.superUsers,
             };
-           
+
             url = "saisies/en-masse";
             break;
           case "indicateurs":

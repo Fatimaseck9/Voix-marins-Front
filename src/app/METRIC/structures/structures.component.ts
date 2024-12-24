@@ -4,7 +4,7 @@ import { Router } from "@angular/router";
 
 import { NotificationService } from "src/app/shared/services/notifications";
 import { BaseService } from "src/app/shared/base.service";
-import { metricService } from "src/app/shared/metricService";
+import { metricService } from "src/app/shared/metric.Service";
 
 import { FormBuilder, Validators } from "@angular/forms";
 
@@ -105,7 +105,7 @@ export class StructuresComponent implements OnInit {
 
         if (selectedRow != null) {
           const selectedNode = this.sonatelTableData[selectedRow];
-         
+
           this.router.navigate(["metric/structures", selectedNode[0].id]);
         }
       }
@@ -310,18 +310,34 @@ export class StructuresComponent implements OnInit {
         console.log(err);
       }
     );
-    this.jambarsService.get("Accounts", true).subscribe(
+    this.jambarsService.get("/jambars/utilisateurs", true).subscribe(
       (res: any) => {
-        res.forEach((element: any) => {
-          element.nomComplet = element.prenom + " " + element.nom;
-          this.jambarUsers.push(element);
-        });
-
-        this.structureUsers = this.jambarUsers;
+        // Vérification si 'res' est un tableau ou contient une clé enveloppant les données
+        const utilisateurs = Array.isArray(res) ? res : res?.data;
+    
+        if (Array.isArray(utilisateurs)) {
+          utilisateurs.forEach((element: any) => {
+            element.nomComplet = `${element.prenom} ${element.nom}`;
+            this.jambarUsers.push(element);
+          });
+    
+          this.structureUsers = this.jambarUsers;
+        } else {
+          console.error("La réponse reçue n'est pas un tableau :", res);
+          const msg =
+            "Erreur : Les données reçues des utilisateurs Jambars ne sont pas valides.";
+          this.notification.showNotification(
+            "top",
+            "right",
+            "danger",
+            "METRIC",
+            msg
+          );
+        }
       },
-      (err) => {
-        console.log(err);
-        let msg = "Vérifier votre connexion internet";
+      (err: any) => {
+        console.error("Erreur lors de la récupération des utilisateurs :", err);
+        const msg = "Vérifier votre connexion internet";
         this.notification.showNotification(
           "top",
           "right",
@@ -331,6 +347,7 @@ export class StructuresComponent implements OnInit {
         );
       }
     );
+    
   }
 
   onSelectChart(event, snt) {

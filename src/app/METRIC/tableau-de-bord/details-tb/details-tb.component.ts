@@ -5,7 +5,7 @@ import { ActivatedRoute } from "@angular/router";
 import { FormBuilder, Validators } from "@angular/forms";
 
 import { BaseService } from "src/app/shared/base.service";
-import { metricService } from "src/app/shared/metricService";
+import { metricService } from "src/app/shared/metric.Service";
 
 import { Router } from "@angular/router";
 import { NotificationService } from "src/app/shared/services/notifications";

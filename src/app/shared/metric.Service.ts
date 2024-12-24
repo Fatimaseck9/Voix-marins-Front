@@ -1,14 +1,15 @@
 import { Injectable } from "@angular/core";
 import { HttpClient } from "@angular/common/http";
-import { environment } from "src/environments/environment";
 import { Router } from "@angular/router";
+import { environment } from "src/environments/environment.prod";
 @Injectable()
 export class metricService {
   //prod
   // serverURL = "https://apis.jambars.orange-sonatel.com/metric/";
 
   // local
-  serverURL = "http://127.0.0.1:3009/";
+  //serverURL = "http://127.0.0.1:3009/";
+  serverURL =environment.serverURLMETRIC;
 
   constructor(private httpClient: HttpClient, private router: Router) {}
 
@@ -23,22 +24,22 @@ export class metricService {
   post(url, data): any {
     url = this.serverURL + url;
     console.log(url);
-    return this.httpClient.post<any>(url, data);
+    return this.httpClient.post<any>(encodeURI(url), data);
   }
 
   get(url): any {
     url = this.serverURL + url;
-    return this.httpClient.get<any>(url);
+    return this.httpClient.get<any>(encodeURI(url));
   }
 
   put(url, id, data): any {
     url = this.serverURL + url + "/" + id;
-    return this.httpClient.put<any>(url, data);
-  }
+    return this.httpClient.put<any>(encodeURI(url), data);
+   }
 
   patch(url, id, data): any {
     url = this.serverURL + url + "/" + id;
-    return this.httpClient.patch<any>(url, data);
+    return this.httpClient.patch<any>(encodeURI(url), data);
   }
 
   postFile(type, file) {
@@ -47,12 +48,12 @@ export class metricService {
 
   delete(url, id): any {
     url = this.serverURL + url + "/" + id;
-    return this.httpClient.delete<any>(url);
+    return this.httpClient.delete<any>(encodeURI(url));
   }
 
   deleteFile(fileId): any {
     const url = `${this.serverURL}files/${fileId}/delete`;
-    return this.httpClient.post<any>(url, {});
+    return this.httpClient.post<any>(encodeURI(url), {});
   }
 
   reloadRoute() {

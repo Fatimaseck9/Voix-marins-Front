@@ -25,10 +25,9 @@ import { DetailsStructuresComponent } from "./structures/details-structures/deta
 import { DemandeSuivisIndicateursComponent } from "./demande-suivis-indicateurs/demande-suivis-indicateurs.component";
 
 import { BaseService } from "../shared/base.service";
-import { metricService } from "../shared/metricService";
+import { metricService } from "../shared/metric.Service";
 import { NotificationService } from "../shared/services/notifications";
-import { GoogleChartsModule } from 'angular-google-charts';
-
+import { GoogleChartsModule } from "angular-google-charts";
 
 @NgModule({
   declarations: [

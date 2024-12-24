@@ -3,13 +3,15 @@ import { HttpClient, HttpHeaders } from "@angular/common/http";
 import { Observable, throwError } from "rxjs";
 import { catchError, map } from "rxjs/operators";
 import { AuthService } from "../pages/auth/auth.service";
+import { environment } from "src/environments/environment.prod";
 
 
 @Injectable()
 export class BaseService {
 
   // serverURL = "http://10.137.16.131:3001/api/";
-  serverURL = "http://localhost:3001/api/";
+  //serverURL = "http://localhost:3001/api/";
+    serverURL =environment.serverURLjambar;
   headers = new HttpHeaders({
     "content-type": "application/json",
   });
@@ -69,7 +71,6 @@ export class BaseService {
   //       })
   //   );
   // }
-
   post(url, auth, data): Observable<any> {
     url = this.serverURL + url;
     
@@ -93,7 +94,7 @@ export class BaseService {
       // console.error('Erreur: principalId est null ou undefined');
     }
   
-    return this.http.post(url, data, { headers: this.headers }).pipe(
+    return this.http.post(encodeURI(url), data, { headers: this.headers }).pipe(
         map((res: any) => {
             // Log the response
             // console.log('Réponse de la requête :', res);
@@ -117,49 +118,49 @@ export class BaseService {
     if (auth) {
       this.updateHeaders();
     }
-    return this.http.get(url, { headers: this.headers }).pipe(
+    return this.http.get(encodeURI(url), { headers: this.headers }).pipe(
       map((res: any) => res),
       catchError((err) => {
          throw new Error(err);
       })
     );
   }
-
+ 
   delete(url, auth): Observable<any> {
     url = this.serverURL + url;
     this.basicHeader();
     if (auth) {
       this.updateHeaders();
     }
-    return this.http.delete(url, { headers: this.headers }).pipe(
+    return this.http.delete(encodeURI(url), { headers: this.headers }).pipe(
       map((res: any) => res),
       catchError((err) => {
          throw new Error(err);
       })
     );
   }
-
+ 
   put(url, auth, data): Observable<any> {
     url = this.serverURL + url;
     this.basicHeader();
     if (auth) {
       this.updateHeaders();
     }
-    return this.http.put(url, data, { headers: this.headers }).pipe(
+    return this.http.put(encodeURI(url), data, { headers: this.headers }).pipe(
       map((res: any) => res),
       catchError((err) => {
          throw new Error(err);
       })
     );
   }
-
+ 
   patch(url, auth, data): Observable<any> {
     url = this.serverURL + url;
     this.basicHeader();
     if (auth) {
       this.updateHeaders();
     }
-    return this.http.patch(url, data, { headers: this.headers }).pipe(
+    return this.http.patch(encodeURI(url), data, { headers: this.headers }).pipe(
       map((res: any) => res),
       catchError((err) => {
          throw new Error(err);
@@ -167,7 +168,11 @@ export class BaseService {
     );
   }
 
+  getSites(url){
+    return this.get("/base"+ encodeURI(url),false)  
+  }
+
   getFileRoute(url) {
-    return this.serverURL + "fileContainers/NUREXPORT/download/" + url;
+    return this.serverURL + "fileContainers/NUREXPORT/download/" + encodeURI(url);
   }
 }

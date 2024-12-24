@@ -1,7 +1,7 @@
 import { NgModule } from "@angular/core";
 import { BrowserAnimationsModule } from "@angular/platform-browser/animations";
 import { RouterModule } from "@angular/router";
-import { HttpClientModule } from "@angular/common/http";
+import { HTTP_INTERCEPTORS, HttpClientModule } from "@angular/common/http";
 import { APP_BASE_HREF } from "@angular/common";
 import { FormsModule } from "@angular/forms";
 import { CommonModule } from "@angular/common";
@@ -53,6 +53,7 @@ import { ActionGroupService } from "./pages/auth/actionGroup.service";
 import { BaseService } from "./shared/base.service";
 import { NotificationService } from "./shared/services/notifications";
 import { AuthGuard } from "./pages/auth/auth-guard.service";
+import { AuthInterceptor } from "./auth.interceptor";
 
 @NgModule({
   exports: [
@@ -115,6 +116,12 @@ export class MaterialModule {}
     AuthService,
     AuthGuard,
     ActionGroupService,
+    {
+      provide: HTTP_INTERCEPTORS,
+      useClass: AuthInterceptor,
+      multi: true,
+      // Important : Permet d'utiliser plusieurs interceptors
+    },
   ],
   bootstrap: [AppComponent],
 })

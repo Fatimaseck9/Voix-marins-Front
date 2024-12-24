@@ -3,6 +3,7 @@ import { Account } from 'src/app/models/account';
 import { BaseService } from 'src/app/shared/base.service';
 import { Router } from '@angular/router'; 
 import { AuthService } from '../auth/auth.service';
+import { SideBarService } from 'src/app/sidebar/sidebar.service';
 
 declare var $: any;
 
@@ -26,7 +27,7 @@ export class LoginComponent implements OnInit, OnDestroy {
         type: ''
     }
 
-    constructor(private router: Router, private element: ElementRef, private baseService: BaseService, private authService: AuthService) {
+    constructor(private router: Router,private sideBarService: SideBarService, private element: ElementRef, private baseService: BaseService, private authService: AuthService) {
         this.nativeElement = element.nativeElement;
         this.sidebarVisible = false;
     }
@@ -68,7 +69,7 @@ export class LoginComponent implements OnInit, OnDestroy {
     }
 
     updateLastLogin(id) {
-        this.baseService.patch('Accounts/'+id,true,{lastLogin: new Date()})
+        this.baseService.patch('jambars/utilisateurs/userId/'+id,true,{lastLogin: new Date()})
         .subscribe(
             res=>{
             }
@@ -77,45 +78,57 @@ export class LoginComponent implements OnInit, OnDestroy {
 
    
     onLogin() {
-        // console.log('Username:', this.account.username);
-        // console.log('Password:', this.account.password);
-    
-        this.baseService.post('Accounts/login?include=user', false, {username: this.account.username.toLocaleUpperCase(), password: this.account.password })
+        this.baseService.post('auth/login', false, {username: this.account.username.toLocaleUpperCase(), password: this.account.password,application:"jambars" })
         .subscribe({
             next: (res) => {
-               
-                this.user = res.user;
-                if (res.user && res.user.id) { // Vérifiez que l'objet 'user' et sa propriété 'id' ne sont pas null
+                this.user = res.data.user_info;
+                if (res.data && res.data.access_token) { // Vérifiez que l'objet 'user' et sa propriété 'id' ne sont pas null
                     if (this.account.username === this.account.password) {
-                        this.authService.setTmpToken(res.id);
+                        this.authService.setTmpToken(res.data.access_token);
                      
                     } else {
-                        this.authService.setToken(res.id);
+                        this.authService.setToken(res.data.access_token);
                        
                     }
                     // Création du compte dans les cookies
-                    this.authService.setAccount(res.user);
-                    // Obtenir les rôles du compte
+                    this.authService.setAccount({...res.data.user_info, actionGroups:undefined, roles:undefined});
+
+                    if(res.data.user_info && res.data.user_info.actionGroups){
+                        this.sideBarService.initialiseSideBar(res.data.user_info.actionGroups);
+                        // this.authService.setActionGroups(res.data.user_info.actionGroups);
+                    }
+
                     const currentAccount = this.authService.getCurrentAccount();
                     if (currentAccount && currentAccount.id) { // Vérifiez que 'currentAccount' et sa propriété 'id' ne sont pas null
-                        this.baseService.get('Accounts/' + currentAccount.id + '/roles?filter={"include":["actions","sections"]}', true)
-                        .subscribe({
-                            next: (rolesRes) => {
-                                this.authService.setAccountRoles(rolesRes);
-                                if (this.account.username === this.account.password) {
-                                    this.router.navigate(['/pages/register']);
-                                } else if (!this.user.disabled) {
-                                    this.updateLastLogin(this.user.id);
-                                    this.authService.redirect();
-                                } else {
-                                    this.message.text = 'Ce compte a été désactivé';
-                                    this.message.type = 'error';
-                                }
-                            },
-                            error: (err) => {
-                                console.error('Erreur lors de la récupération des rôles du compte :', err);
-                            }
-                        });
+                        this.authService.setAccountRoles(res.data.user_info.roles);
+                        if (this.account.username === this.account.password) {
+                            this.router.navigate(['/pages/register']);
+                        } else if (!this.user.disabled) {
+                           // this.updateLastLogin(this.user.id);
+                            this.authService.redirect();
+                        } else {
+                            this.message.text = 'Ce compte a été désactivé';
+                            this.message.type = 'error';
+                        }
+                        
+                        // this.baseService.get('Accounts/' + currentAccount.id + '/roles?filter={"include":["actions","sections"]}', true)
+                        // .subscribe({
+                        //     next: (rolesRes) => {
+                        //         this.authService.setAccountRoles(rolesRes);
+                        //         if (this.account.username === this.account.password) {
+                        //             this.router.navigate(['/pages/register']);
+                        //         } else if (!this.user.disabled) {
+                        //             this.updateLastLogin(this.user.id);
+                        //             this.authService.redirect();
+                        //         } else {
+                        //             this.message.text = 'Ce compte a été désactivé';
+                        //             this.message.type = 'error';
+                        //         }
+                        //     },
+                        //     error: (err) => {
+                        //         console.error('Erreur lors de la récupération des rôles du compte :', err);
+                        //     }
+                        // });
                     } else {
                         console.error('Erreur: Impossible de récupérer les rôles du compte, les données de compte sont invalides.');
                     }
