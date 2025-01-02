@@ -28,6 +28,9 @@ import { BaseService } from "../shared/base.service";
 import { metricService } from "../shared/metric.Service";
 import { NotificationService } from "../shared/services/notifications";
 import { GoogleChartsModule } from "angular-google-charts";
+import { AuthGuard } from "../pages/auth/auth-guard.service";
+import { ActionGroupService } from "../pages/auth/actionGroup.service";
+import { AuthService } from "../pages/auth/auth.service";
 
 @NgModule({
   declarations: [
@@ -58,6 +61,14 @@ import { GoogleChartsModule } from "angular-google-charts";
     DataTablesModule.forRoot(),
   ],
 
-  providers: [BaseService, NotificationService, metricService],
+  providers: [
+    BaseService,
+     NotificationService,
+     NotificationService,
+     BaseService,
+     AuthGuard,
+     ActionGroupService,
+     AuthService,
+     metricService],
 })
 export class MetricModule {}
