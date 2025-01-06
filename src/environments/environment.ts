@@ -5,6 +5,9 @@
 
 export const environment = {
   production: false,
+  applicationName: "METRIC",
   imagePath: "https://metric.jambars.orange-sonatel.com/assets/img/",
   metricPath: "https://metric.jambars.orange-sonatel.com/",
+  serverURLjambarlocale:"http://localhost:3001/api/",
+  serverURLMETRIClocal : "http://127.0.0.1:3009/",
 };
