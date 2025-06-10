@@ -2,6 +2,7 @@ import { Injectable } from "@angular/core";
 import { HttpClient } from "@angular/common/http";
 import { Router } from "@angular/router";
 import { environment } from "src/environments/environment.prod";
+
 @Injectable()
 export class metricService {
   //prod
@@ -9,7 +10,7 @@ export class metricService {
 
   // local
   //serverURL = "http://127.0.0.1:3009/";
-  serverURL =environment.serverURLMETRIC;
+  serverURL = environment.serverURLMETRIC;
 
   constructor(private httpClient: HttpClient, private router: Router) {}
 
@@ -23,7 +24,6 @@ export class metricService {
 
   post(url, data): any {
     url = this.serverURL + url;
-    console.log(url);
     return this.httpClient.post<any>(encodeURI(url), data);
   }
 
@@ -35,7 +35,7 @@ export class metricService {
   put(url, id, data): any {
     url = this.serverURL + url + "/" + id;
     return this.httpClient.put<any>(encodeURI(url), data);
-   }
+  }
 
   patch(url, id, data): any {
     url = this.serverURL + url + "/" + id;

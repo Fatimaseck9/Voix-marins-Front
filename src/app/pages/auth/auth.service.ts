@@ -2,38 +2,68 @@ import { Injectable } from "@angular/core";
 import { Router } from "@angular/router";
 import { Account } from "../../models/account";
 import { CookieService } from 'ngx-cookie-service';
+import { jwtDecode } from 'jwt-decode';
 
-@Injectable()
+@Injectable({
+  providedIn: 'root'
+})
 export class AuthService {
 
   constructor(private router: Router, private cookieService: CookieService) {}
 
   isLoggedIn(): boolean {
-    const token: string = this.getToken();
-    return token && token.length > 0;
+    const token = this.getToken();
+    if (!token) return false;
+
+    try {
+      const decodedToken: any = jwtDecode(token);
+      const currentTime = Date.now() / 1000;
+      
+      if (decodedToken.exp && decodedToken.exp < currentTime) {
+        console.log('Token expiré, déconnexion');
+        this.logout();
+        return false;
+      }
+      
+      return true;
+    } catch (error) {
+      console.error('Erreur lors de la vérification du token:', error);
+      this.logout();
+      return false;
+    }
   }
 
   setAccount(account) {
     this.cookieService.set('currentAccount', JSON.stringify(account), undefined, '/');
   }
 
-  getCurrentAccount() {
+  getCurrentAccount(): Account | null {
     const accountString = this.cookieService.get('currentAccount');
+    
+    // Vérification plus robuste
+    if (!accountString || accountString.trim() === '' || accountString === 'undefined' || accountString === 'null') {
+      return null;
+    }
+
     try {
-      const account = JSON.parse(accountString);
+      const account: Account = JSON.parse(accountString);
+      
       if (account && account.id) {
         return account;
       } else {
-        return null; // Retourne null si les données de compte ne sont pas valides
+        console.warn('Compte trouvé dans les cookies mais données invalides:', account);
+        return null;
       }
     } catch (error) {
       console.error('Erreur lors de la lecture des données de compte depuis les cookies :', error);
-      return null; // Retourne null en cas d'erreur de lecture des données de compte
+      // Nettoie le cookie corrompu
+      this.cookieService.delete('currentAccount', '/');
+      return null;
     }
   }
 
   setActionGroups(actionGroup) {
-      localStorage.setItem("actionGroups",JSON.stringify(actionGroup));
+    localStorage.setItem("actionGroups",JSON.stringify(actionGroup));
     // this.cookieService.set('actionGroups', JSON.stringify(actionGroup), undefined, '/');
   }
 
@@ -45,16 +75,35 @@ export class AuthService {
 
   getRoleSectionView(idSection): boolean {
     const accountSectionsString = this.cookieService.get('accountSections');
-    const accountSections = JSON.parse(accountSectionsString || '[]');
-    return !accountSections.includes(idSection);
+    
+    // Vérification avant JSON.parse
+    if (!accountSectionsString || accountSectionsString.trim() === '') {
+      return true; // ou false selon ta logique métier
+    }
+    
+    try {
+      const accountSections = JSON.parse(accountSectionsString);
+      return !accountSections.includes(idSection);
+    } catch (error) {
+      console.error('Erreur parsing accountSections:', error);
+      return true; // ou false selon ta logique métier
+    }
   }
 
   setToken(token: string) {
-    this.cookieService.set('accessToken', token, undefined, '/');
+    this.cookieService.set('access_token', token, undefined, '/');
   }
 
   getToken(): string {
-    return this.cookieService.get('accessToken');
+    return this.cookieService.get('access_token');
+  }
+
+  setRefreshToken(refreshToken: string) {
+    this.cookieService.set('refresh_token', refreshToken, undefined, '/');
+  }
+
+  getRefreshToken(): string {
+    return this.cookieService.get('refresh_token');
   }
 
   setTmpToken(token: string) {
@@ -81,23 +130,19 @@ export class AuthService {
   }
 
   getAccountRoles(): any {
-
     const accountRolesString = this.cookieService.get('accountRoles');
-    // const accountRoles = JSON.parse(accountRolesString || '[]');
-    // const accountSectionsString = this.cookieService.get('accountSections');
-    // const accountSections = JSON.parse(accountSectionsString || '[]');
-    // return { accountRoles, accountSections };
-    return JSON.parse(accountRolesString || '[]');
-  }
-
-  accountHasRole(roles: string[]): boolean {
-    let find = false;
-    let i = 0;
-    while (!find && i < roles.length) {
-      find = this.getAccountRoles().includes(roles[i]);
-      i++;
+    
+    // Vérification avant JSON.parse
+    if (!accountRolesString || accountRolesString.trim() === '') {
+      return [];
     }
-    return find;
+    
+    try {
+      return JSON.parse(accountRolesString);
+    } catch (error) {
+      console.error('Erreur parsing accountRoles:', error);
+      return [];
+    }
   }
 
   redirect() {
@@ -106,10 +151,12 @@ export class AuthService {
 
   logout() {
     this.cookieService.delete('currentAccount', '/');
-    this.cookieService.delete('accessToken', '/');
+    this.cookieService.delete('access_token', '/');
+    this.cookieService.delete('refresh_token', '/');
     this.cookieService.delete('tmpToken', '/');
     this.cookieService.delete('accountRoles', '/');
     this.cookieService.delete('accountSections', '/');
+    this.router.navigate(['/login-admin']);
   }
 
   getDe() {

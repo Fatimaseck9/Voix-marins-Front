@@ -18,7 +18,7 @@ const misc: any = {
 declare var $: any;
 @Component({
     selector: 'app-navbar-cmp',
-    templateUrl: 'navbar.component.html'
+   templateUrl: 'navbar.component.html'
 })
 
 export class NavbarComponent implements OnInit {
@@ -220,22 +220,7 @@ export class NavbarComponent implements OnInit {
     }
 
     logout() {
-        this.baseService.post("Accounts/logout", true, { accessTokenID: this.authService.getToken() })
-        .subscribe(
-            res => {
-                // Déconnexion réussie, continuer avec la déconnexion locale
-                this.authService.logout();
-                // Rediriger en rechargeant la page
-                window.location.href = '/pages/login';
-            },
-            err => {
-                // Gérer l'erreur si nécessaire
-                console.log(err);
-                // Même en cas d'erreur, continuer avec la déconnexion locale et la redirection
-                this.authService.logout();
-                window.location.href = '/pages/login';
-            }
-        );
+        this.authService.logout();
     }
     
     

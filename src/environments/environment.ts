@@ -5,9 +5,17 @@
 
 export const environment = {
   production: false,
+  // applicationName: "METRIC",
+  // imagePath: "https://metric.jambars.orange-sonatel.com/assets/img/",
+  // metricPath: "https://metric.jambars.orange-sonatel.com/",
+  // serverURLjambarlocale:"http://localhost:3001/api/",
+  // serverURLMETRIClocal : "http://127.0.0.1:3009/",
   applicationName: "METRIC",
-  imagePath: "https://metric.jambars.orange-sonatel.com/assets/img/",
-  metricPath: "https://metric.jambars.orange-sonatel.com/",
-  serverURLjambarlocale:"http://localhost:3001/api/",
-  serverURLMETRIClocal : "http://127.0.0.1:3009/",
+  imagePath: "http://localhost:3001/images/",
+  metricPath: "http://localhost:3001/metric/",
+  serverURLMETRIC: "http://localhost:3001/api/v1/",
+  serverURLjambar: "http://localhost:3001/api/v1/",
+  serverURLjambarlocale: "http://localhost:3001/api/v1/",
+  serverURLMETRIClocal: "http://localhost:3001/api/v1/",
+  apiUrl: "http://localhost:3001/api/v1"
 };

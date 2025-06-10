@@ -45,7 +45,7 @@ th.mat-sort-header-sorted {
   background-color: black;
 }
 .nav-tabs .nav-item .nav-link.active {
-  background-color: rgba(239, 108, 0, 1);
+  background-color: #2196f3;
 }
 
 #add-parametre {

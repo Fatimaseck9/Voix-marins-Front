@@ -1,0 +1,231 @@
+<div class="plainte-page container my-5">
+  <header class="glass-header">
+    <div class="header-content">
+      <div class="logo">
+        <img src="assets/img/anam.png" alt="Logo Voix des Marins">
+      </div>
+      
+      <nav class="main-nav">
+        <!-- Bouton hamburger pour mobile -->
+        <button class="hamburger" aria-label="Menu" (click)="toggleMenu()" [class.active]="menuActive">
+          <span class="hamburger-line"></span>
+          <span class="hamburger-line"></span>
+          <span class="hamburger-line"></span>
+        </button>
+                
+        <ul class="nav-list" [class.active]="menuActive">
+          <li class="nav-item">
+            <a routerLink="/marin/home" class="nav-link">
+              <i class="fas fa-home nav-icon"></i>
+              <span class="nav-text">Accueil</span>
+              <span class="nav-dot"></span>
+            </a>
+          </li>
+          <li class="nav-item">
+              <a routerLink="/marin/suivre-plaintes" class="nav-link">
+                <i class="fas fa-folder-open nav-icon"></i>
+                <span class="nav-text">Suivre Mes Plaintes </span>
+                <span class="nav-dot"></span>
+              </a>
+          <li class="nav-item">
+            <a routerLink="/marin/aide-vocale" class="nav-link">
+              <i class="fas fa-question-circle nav-icon"></i>
+              <span class="nav-text">Aide</span>
+              <span class="nav-dot"></span>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a routerLink="/marin/appeler" class="nav-link">
+              <i class="fas fa-phone-alt nav-icon"></i>
+              <span class="nav-text">Contact</span>
+              <span class="nav-dot"></span>
+            </a>
+          </li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+  
+
+    <!-- TITRE PRINCIPAL -->
+    <h2 class="page-title text-center mb-4">Soumettre une plainte</h2>
+  
+    <!-- SECTION ENREGISTREMENT VOCAL -->
+    <div class="plainte-container">
+      <p class="text-muted mb-4">
+        Enregistrez votre plainte vocalement pour une meilleure description de votre situation
+      </p>
+  
+      <!-- Bouton Démarrer -->
+      <div class="mb-4" *ngIf="!showRecorderControls && !showAudioControls">
+        <button (click)="startRecording()" class="btn btn-primary">
+          <i class="fas fa-microphone me-2"></i> Démarrer l'enregistrement
+        </button>
+      </div>
+  
+      <!-- Contrôles pendant l'enregistrement -->
+      <div *ngIf="showRecorderControls" class="recording-controls mb-4 text-center">
+        <div class="recording-status mb-3">
+          <span class="recording-dot" [class.paused]="paused"></span>
+          <span class="recording-text">
+            {{ recording ? 'Enregistrement en cours' : 'Enregistrement en pause' }}
+          </span>
+        </div>
+        <p class="recording-time">Temps d'enregistrement : {{ seconds }}s</p>
+  
+        <div class="control-buttons">
+          <button *ngIf="recording" (click)="pauseRecording()" class="btn btn-warning me-2">
+            <i class="fas fa-pause me-1"></i>Pause
+          </button>
+          <button *ngIf="paused" (click)="resumeRecording()" class="btn btn-success me-2">
+            <i class="fas fa-play me-1"></i>Reprendre
+          </button>
+          <button (click)="stopRecording()" class="btn btn-danger">
+            <i class="fas fa-stop me-1"></i>Terminer
+          </button>
+        </div>
+      </div>
+  
+      <!-- Lecture & actions après enregistrement -->
+      <div *ngIf="showAudioControls" class="audio-controls text-center mb-5">
+        <div class="audio-player mb-3">
+          <audio #audioPlayer [src]="audioUrl" controls class="w-100"></audio>
+        </div>
+        <div class="audio-actions btn-group">
+          <button (click)="replayRecording()" class="btn btn-info">
+            <i class="fas fa-redo me-1"></i>Réécouter
+          </button>
+          <button (click)="sendRecording()" class="btn btn-primary">
+            <i class="fas fa-paper-plane me-1"></i>Envoyer
+          </button>
+          <button (click)="deleteRecording()" class="btn btn-danger">
+            <i class="fas fa-trash me-1"></i>Supprimer
+          </button>
+        </div>
+      </div>
+    </div>
+  
+    <!-- FORMULAIRE ÉCRIT -->
+    <div *ngIf="showForm" class="row justify-content-center mb-5">
+      <div class="col-12 col-md-8 col-lg-6">
+        <div class="plainte-form">
+          <h3 class="mb-4">Rédiger une plainte</h3>
+          <form (ngSubmit)="submitForm()" #plainteForm="ngForm">
+            <div class="form-group">
+              <label for="titre">Titre de la plainte</label>
+              <input
+                id="titre"
+                name="titre"
+                type="text"
+                class="form-control"
+                [(ngModel)]="plainte.titre"
+                required
+              />
+            </div>
+  
+            <div class="form-group">
+              <label for="categorie">Catégorie</label>
+              <select
+                id="categorie"
+                name="categorie"
+                class="form-select"
+                [(ngModel)]="plainte.categorie"
+                required
+              >
+                <option value="">Choisissez une catégorie</option>
+                <option value="harcelement">Harcèlement</option>
+                <option value="violence">Violence physique</option>
+                <option value="nourriture">Refus de nourriture</option>
+                <option value="paiement">Problème de paiement</option>
+              </select>
+            </div>
+  
+            <div class="form-group">
+              <label for="description">Description détaillée</label>
+              <textarea
+                id="description"
+                name="description"
+                class="form-control"
+                rows="5"
+                [(ngModel)]="plainte.description"
+                required
+              ></textarea>
+            </div>
+  
+            <div class="form-group">
+              <label for="date">Date de l'incident</label>
+              <input
+                id="date"
+                name="date"
+                type="date"
+                class="form-control"
+                [(ngModel)]="plainte.date"
+                required
+              />
+            </div>
+  
+            <div class="form-actions">
+              <button
+                type="submit"
+                class="btn btn-primary"
+                [disabled]="!plainteForm.form.valid"
+              >
+                <i class="fas fa-paper-plane me-1"></i>Soumettre
+              </button>
+              <button
+                type="button"
+                class="btn btn-secondary"
+                (click)="cancelForm()"
+              >
+                <i class="fas fa-times me-1"></i>Annuler
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  
+    <!-- Bouton pour afficher le formulaire écrit -->
+    <div class="btn-action-container mb-5" *ngIf="!showForm">
+      <button (click)="toggleForm()" class="btn-action">
+        <i class="fas fa-pen"> </i>
+
+        <span style="margin-left:7px ;">Rédiger une plainte</span>
+      </button>
+    </div>
+  
+    <!-- CATÉGORIES -->
+    <!-- CATÉGORIES -->
+<h3 class="section-title text-center mb-3">Catégories de plaintes</h3>
+
+<!-- Modifiez la partie des catégories comme ceci -->
+<div class="categories-grid mb-5">
+  <div
+    class="cat-card"
+    *ngFor="let cat of categories"
+    (click)="selectCategory(cat.key)"
+    style="cursor: pointer;"
+  >
+    <img
+      [src]="'assets/img/' + cat.image"
+      [alt]="cat.label"
+      class="category-img mb-2"
+    />
+    <span>{{ cat.label }}</span>
+     <div class="liquid-effect"></div>
+  </div>
+</div>
+
+  </div>
+   <div class="ocean">
+        <div class="waves">
+          <div class="wave" id="wave-1"></div>
+          <div class="wave" id="wave-2"></div>
+          <div class="wave" id="wave-3"></div>
+          <div class="wave" id="wave-4"></div>
+          <div class="wave" id="wave-5"></div>
+        </div>
+    </div>
+
+  
+  

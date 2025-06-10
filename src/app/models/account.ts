@@ -2,6 +2,7 @@ import { Role } from "./role";
 import { Agent } from "./agent";
 
 export class Account {
+  
     constructor( 
         public id?: string,
         public disabled?: string,
@@ -15,7 +16,8 @@ export class Account {
         public email?: string,
         public roles?: Role[],
         public agentId?: string,
-        public agent?: Agent
+        public agent?: Agent,
+        public isActive?: boolean,
     ){
     }
 }

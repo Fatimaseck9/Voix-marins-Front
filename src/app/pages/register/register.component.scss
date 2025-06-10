@@ -1,0 +1,117 @@
+.register-page {
+  .card-signup {
+    border-radius: 6px;
+    box-shadow: 0 16px 24px 2px rgba(0, 0, 0, 0.14), 0 6px 30px 5px rgba(0, 0, 0, 0.12), 0 8px 10px -5px rgba(0, 0, 0, 0.2);
+    margin-bottom: 100px;
+    padding: 40px 0px;
+    margin-top: 15vh;
+  }
+}
+
+.table {
+  margin-bottom: 0;
+  
+  thead {
+    th {
+      border-top-width: 0;
+      border-bottom-width: 1px;
+      font-size: 1.0625rem;
+      font-weight: 500;
+      border-color: #ddd;
+      padding: 12px 8px;
+      vertical-align: middle;
+    }
+  }
+  
+  tbody {
+    tr {
+      td {
+        padding: 12px 8px;
+        vertical-align: middle;
+        border-color: #ddd;
+      }
+      
+      &:hover {
+        background-color: rgba(0,0,0,.075);
+      }
+    }
+  }
+}
+
+.badge {
+  padding: 5px 12px;
+  text-transform: uppercase;
+  font-size: 10px;
+  font-weight: 500;
+  
+  &.badge-success {
+    background-color: #4caf50;
+  }
+  
+  &.badge-danger {
+    background-color: #f44336;
+  }
+}
+
+.btn-link {
+  padding: 5px;
+  margin: 0 3px;
+  
+  i {
+    font-size: 18px;
+  }
+  
+  &:hover {
+    text-decoration: none;
+  }
+}
+
+.modal {
+  .modal-dialog {
+    margin-top: 100px;
+  }
+  
+  .modal-content {
+    border-radius: 6px;
+    box-shadow: 0 16px 24px 2px rgba(0, 0, 0, 0.14), 0 6px 30px 5px rgba(0, 0, 0, 0.12), 0 8px 10px -5px rgba(0, 0, 0, 0.2);
+  }
+  
+  .modal-header {
+    border-bottom: none;
+    padding: 24px 24px 0;
+    
+    .modal-title {
+      color: #3C4858;
+      margin-top: 0;
+      margin-bottom: 0;
+      line-height: 1.42857143;
+    }
+    
+    .close {
+      color: #999;
+      
+      &:hover {
+        color: #000;
+      }
+    }
+  }
+  
+  .modal-body {
+    padding: 24px;
+    
+    .form-group {
+      margin: 0 0 17px 0;
+      padding-bottom: 10px;
+      position: relative;
+      
+      .form-control {
+        margin-bottom: 0;
+      }
+    }
+  }
+  
+  .modal-footer {
+    border-top: none;
+    padding: 24px;
+  }
+} 

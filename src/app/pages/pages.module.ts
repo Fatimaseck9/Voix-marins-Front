@@ -11,21 +11,30 @@ import { RegisterComponent } from './register/register.component';
 import { PricingComponent } from './pricing/pricing.component';
 import { LockComponent } from './lock/lock.component';
 import { LoginComponent } from './login/login.component';
+import { ChangePasswordComponent } from './change-password/change-password.component';
+import { HistoriquePlainteComponent } from './historique-plainte/historique-plainte.component';
+
+
+
 
 @NgModule({
   imports: [
     CommonModule,
     RouterModule.forChild(PagesRoutes),
     FormsModule,
-    MaterialModule,
-    ReactiveFormsModule
+    ReactiveFormsModule,
+    MaterialModule
   ],
   declarations: [
     LoginComponent,
     RegisterComponent,
     PricingComponent,
     LockComponent,
-    LockComponent
+    ChangePasswordComponent,
+    HistoriquePlainteComponent
+  ],
+  providers: [
+   
   ]
 })
 

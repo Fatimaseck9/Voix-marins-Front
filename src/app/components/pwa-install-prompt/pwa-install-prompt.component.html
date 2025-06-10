@@ -1,0 +1,19 @@
+<div class="pwa-install-prompt" *ngIf="showInstallButton">
+  <div class="prompt-content">
+    <div class="prompt-header">
+      <h3>Installer l'application ?</h3>
+      <button class="close-button" (click)="showInstallButton = false">&times;</button>
+    </div>
+    <div class="prompt-body">
+      <p>Vous pouvez installer cette application pour une meilleure expérience.</p>
+    </div>
+    <div class="prompt-footer">
+      <button class="install-button" (click)="installPwa()">
+        Installer
+      </button>
+      <button class="later-button" (click)="showInstallButton = false">
+        Plus tard
+      </button>
+    </div>
+  </div>
+</div> 

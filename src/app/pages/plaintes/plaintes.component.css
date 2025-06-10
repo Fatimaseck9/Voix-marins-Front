@@ -1,0 +1,77 @@
+body {
+  background-color: #f2f6fa;
+  
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  margin: 0;
+  padding: 0;
+}
+
+.table {
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.table th, .table td {
+  vertical-align: middle;
+  padding: 1rem;
+}
+
+.audio-custom {
+  width: 180px;
+  height: 32px;
+  border-radius: 8px;
+  border: 1px solid #ced4da;
+  background-color: #ffffff;
+}
+
+.table-row:hover {
+  background-color: #e7f4ff;
+  transition: background-color 0.2s ease-in-out;
+}
+
+label.form-label {
+  font-weight: 500;
+}
+
+.form-select:focus {
+  border-color: #86b7fe;
+  box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+}
+
+button.btn:focus {
+  box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.3);
+}
+.background-image-wrapper {
+
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
+  min-height: 100vh;
+  padding-top: 40px;
+  padding-bottom: 40px;
+}
+.bg-white {
+  background-color: rgba(255, 255, 255, 0.95) !important;
+}
+
+   .bg-gradient-primary {
+  background: linear-gradient(135deg, #42a5f5, #1e88e5) !important;
+}
+.bg-gradient-success {
+  background: linear-gradient(135deg, #66bb6a, #388e3c) !important;
+}
+.bg-gradient-danger {
+  background: linear-gradient(135deg, #ef5350, #c62828) !important;
+}
+.bg-gradient-dark {
+  background: linear-gradient(135deg, #616161, #212121) !important;
+}
+
+.icon.icon-shape {
+  width: 45px;
+  height: 45px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.25rem;
+}

@@ -1,0 +1,98 @@
+<header class="glass-header">
+      <div class="header-content">
+        <!-- Logo à gauche -->
+        <div class="logo-container">
+          <img src="assets/img/anam.png" alt="Logo" class="logo">
+         
+        </div>
+        
+        <nav class="main-nav">
+          <!-- Bouton hamburger pour mobile -->
+          <button class="hamburger" aria-label="Menu" (click)="toggleMenu()" [class.active]="menuActive">
+          <span class="hamburger-line"></span>
+          <span class="hamburger-line"></span>
+          <span class="hamburger-line"></span>
+        </button>
+                  
+          <ul class="nav-list" [class.active]="menuActive">
+            <li class="nav-item">
+              <a routerLink="/marin/home" class="nav-link">
+                <i class="fas fa-home nav-icon"></i>
+                <span class="nav-text">Accueil</span>
+                <span class="nav-dot"></span>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a routerLink="/marin/suivre-plaintes" class="nav-link">
+                <i class="fas fa-folder-open nav-icon"></i>
+                <span class="nav-text">Suivre Mes Plaintes </span>
+                <span class="nav-dot"></span>
+              </a>
+            <li class="nav-item">
+              <a routerLink="/marin/aide-vocale" class="nav-link">
+                <i class="fas fa-question-circle nav-icon"></i>
+                <span class="nav-text">Aide</span>
+                <span class="nav-dot"></span>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a routerLink="/marin/appeler" class="nav-link">
+                <i class="fas fa-phone-alt nav-icon"></i>
+                <span class="nav-text">Contact</span>
+                <span class="nav-dot"></span>
+              </a>
+            </li>
+          </ul>
+        </nav>
+      </div>
+      
+    </header>
+<div class="voice-help-container">
+  
+    <div class="voice-header">
+      <h1><i class="fas fa-headset"></i> Aide Vocale</h1>
+      <p>Écoutez le guide complet du fonctionnement de l'application</p>
+    </div>
+  
+    <div class="voice-player-card">
+      <div class="voice-icon">
+        <i class="fas fa-assistive-listening-systems"></i>
+      </div>
+      
+      <h3>Guide d'utilisation complet</h3>
+      <p class="duration">Durée : 2min 45s</p>
+      
+      <audio #voiceGuide controls controlsList="nodownload">
+        <source src="assets/audio/guide-utilisation.mp3" type="audio/mpeg">
+        Votre navigateur ne supporte pas l'élément audio.
+      </audio>
+      
+      <div class="playback-controls">
+        <button (click)="playPause()" class="control-btn play-btn">
+          <i class="fas" [ngClass]="{'fa-play': !isPlaying, 'fa-pause': isPlaying}"></i>
+          {{ isPlaying ? 'Pause' : 'Lecture' }}
+        </button>
+        <button (click)="restart()" class="control-btn restart-btn">
+          <i class="fas fa-redo"></i> Recommencer
+        </button>
+      </div>
+    </div>
+  
+    
+    
+  </div>
+  <div class="ocean">
+        <div class="waves">
+          <div class="wave" id="wave-1"></div>
+          <div class="wave" id="wave-2"></div>
+          <div class="wave" id="wave-3"></div>
+          <div class="wave" id="wave-4"></div>
+          <div class="wave" id="wave-5"></div>
+        </div>
+        <div class="continuité">
+
+        </div>
+
+
+      </div>
+      

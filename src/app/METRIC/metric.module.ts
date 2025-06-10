@@ -28,7 +28,7 @@ import { BaseService } from "../shared/base.service";
 import { metricService } from "../shared/metric.Service";
 import { NotificationService } from "../shared/services/notifications";
 import { GoogleChartsModule } from "angular-google-charts";
-import { AuthGuard } from "../pages/auth/auth-guard.service";
+
 import { ActionGroupService } from "../pages/auth/actionGroup.service";
 import { AuthService } from "../pages/auth/auth.service";
 
@@ -66,7 +66,7 @@ import { AuthService } from "../pages/auth/auth.service";
      NotificationService,
      NotificationService,
      BaseService,
-     AuthGuard,
+    //  AuthGuard,
      ActionGroupService,
      AuthService,
      metricService],

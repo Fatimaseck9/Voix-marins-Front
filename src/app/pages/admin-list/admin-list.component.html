@@ -1,0 +1,70 @@
+<div class="container mt-4">
+  <h2>Liste des Administrateurs</h2>
+  <div *ngIf="admins.length === 0" class="alert alert-info">
+    Aucun administrateur trouvé
+  </div>
+  <table class="table table-bordered" *ngIf="admins.length > 0">
+    <thead>
+      <tr>
+        <th>Nom</th>
+        <th>Email</th>
+        <th>Rôle</th>
+        <th>Statut</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let admin of admins">
+        <td>{{ admin.name }}</td>
+        <td>{{ admin.email }}</td>
+        <td>{{ admin.role }}</td>
+        <td>
+          <span [ngClass]="{ 'text-success': admin.isActive, 'text-danger': !admin.isActive }">
+            {{ admin.isActive ? 'Actif' : 'Inactif' }}
+          </span>
+        </td>
+        <td>
+          <button class="btn btn-warning btn-sm me-2" (click)="toggleStatus(admin.id)">
+            {{ admin.isActive ? 'Désactiver' : 'Activer' }}
+          </button>
+          <button class="btn btn-info btn-sm me-2" (click)="updateAdmin(admin.id, admin.name)">Modifier</button>
+          <button class="btn btn-danger btn-sm" (click)="deleteAdmin(admin.id)">Supprimer</button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<style>
+.me-2 {
+  margin-right: 0.5rem;
+}
+
+.btn-sm {
+  padding: 0.25rem 0.5rem;
+  font-size: 0.875rem;
+  line-height: 1.5;
+  border-radius: 0.2rem;
+}
+
+.text-success {
+  color: #28a745;
+}
+
+.text-danger {
+  color: #dc3545;
+}
+
+.alert {
+  padding: 1rem;
+  margin-bottom: 1rem;
+  border: 1px solid transparent;
+  border-radius: 0.25rem;
+}
+
+.alert-info {
+  color: #0c5460;
+  background-color: #d1ecf1;
+  border-color: #bee5eb;
+}
+</style>

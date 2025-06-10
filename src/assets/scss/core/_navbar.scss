@@ -1,24 +1,46 @@
 .navbar {
     border: 0;
-    border-radius: $border-radius-base;
-    padding: 0.625rem 0;
+    border-radius: 0;
+    padding: 1rem;
     margin-bottom: 20px;
-    @include navbar-colors($white-color, $navbar-color);
+    background-color: #ffffff !important;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
 
     &.fixed-top{
         border-radius: 0;
     }
 
+    &.navbar-white {
+        background-color: #ffffff !important;
+        color: #1e88e5;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+
+        .navbar-brand,
+        .navbar-nav .nav-link,
+        .navbar-toggler .navbar-toggler-icon {
+            color: #1e88e5;
+        }
+
+        .navbar-toggler-icon {
+            background-color: #1e88e5;
+        }
+    }
+
     .navbar-nav{
         .nav-item .nav-link{
             position: relative;
-            color: inherit;
-            padding: $padding-general-x;
-            font-weight: $font-weight-default;
-            font-size: $mdb-btn-font-size-base;
-            text-transform: uppercase;
-            border-radius: $border-radius-base;
-            line-height: 20px;
+            display: flex;
+            align-items: center;
+            color: #1e88e5;
+            padding: 0.9375rem;
+            font-weight: 500;
+            font-size: 0.875rem;
+            border-radius: 6px;
+            transition: all 0.3s ease;
+
+            &:hover {
+                background: rgba(30, 136, 229, 0.1);
+            }
 
             &:not(.btn-just-icon) .fa{
                 position: relative;
@@ -58,6 +80,16 @@
                     border-radius: 50%;
                 }
             }
+
+            .material-icons {
+                font-size: 1.25rem;
+                margin-right: 0.5rem;
+                color: #1e88e5;
+            }
+
+            span {
+                color: #1e88e5;
+            }
         }
 
         .dropdown-menu-right{
@@ -80,19 +112,37 @@
         margin-bottom: 0;
     }
 
-    .navbar-toggler{
+    .navbar-toggler {
+        padding: 0.25rem 0.75rem;
+        font-size: 1.25rem;
+        line-height: 1;
+        background-color: transparent;
+        border: 1px solid transparent;
+        border-radius: 0.25rem;
         cursor: pointer;
 
-        .navbar-toggler-icon{
+        .navbar-toggler-icon {
             width: 22px;
             height: 2px;
-            vertical-align: middle;
-            outline: 0;
+            background-color: #1e88e5;
             display: block;
             border-radius: 1px;
+            position: relative;
+            margin: 6px auto;
+            transition: all 300ms ease;
+        }
 
-            & + .navbar-toggler-icon{
-                margin-top: 4px;
+        &.toggled {
+            .navbar-toggler-icon {
+                &:first-child {
+                    transform: translateY(6px) rotate(45deg);
+                }
+                &:nth-child(2) {
+                    opacity: 0;
+                }
+                &:last-child {
+                    transform: translateY(-8px) rotate(-45deg);
+                }
             }
         }
     }
@@ -104,21 +154,26 @@
         z-index: 1029;
     }
 
-    .navbar-wrapper{
-        display: inline-flex;
+    .navbar-wrapper {
+        display: flex;
         align-items: center;
+        padding: 0.5rem 1rem;
+        border-radius: 8px;
+        background: #ffffff;
+        transition: all 0.3s ease;
     }
 
-    // give correct size to ripple container
     .navbar-brand {
         position: relative;
-        color: inherit;
+        color: #1e88e5;
         height: 50px;
-        font-size: $navbar-brand-font-size - 0.125;
+        font-size: 1.125rem;
         line-height: 30px;
-        padding: $padding-general-y 0;
-        font-weight: 300;
+        padding: 0.625rem 0;
+        font-weight: 600;
         margin-left: 1rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
     }
 
     &.bg-primary{

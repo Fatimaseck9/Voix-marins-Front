@@ -26,7 +26,8 @@
 						],
 						"assets": [
 							"src/favicon.ico",
-							"src/assets"
+							"src/assets",
+							"src/manifest.webmanifest"
 						],
 						"styles": [
 							"node_modules/perfect-scrollbar/css/perfect-scrollbar.css",
@@ -70,11 +71,12 @@
 								  },
 							  {
 								  "type": "anyComponentStyle",
-								  "maximumWarning": "2kb",
-								  "maximumError": "4kb"
+								  "maximumWarning": "12kb",
+								  "maximumError": "15kb"
 							  }
 							  ],
 							"outputHashing": "all",
+							"serviceWorker": true,
 							"extraWebpackConfig": "webpack.prod.config.js"
 						},
 						"development": {
@@ -161,7 +163,8 @@
 						],
 						"assets": [
 							"src/favicon.ico",
-							"src/assets"
+							"src/assets",
+							"src/manifest.webmanifest" 
 						]
 					}
 				},
@@ -206,9 +209,9 @@
 				}
 			}
 		}
-	},
-	"defaultProject": "demo",
-	"cli": {
-		"analytics": false
-	}
+  },
+  "cli": {
+    "analytics": "af531d74-cd82-42f9-8827-6fefc1dff026"
+  }
+	
 }

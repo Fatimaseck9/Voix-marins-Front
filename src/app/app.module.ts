@@ -3,8 +3,9 @@ import { BrowserAnimationsModule } from "@angular/platform-browser/animations";
 import { RouterModule } from "@angular/router";
 import { HTTP_INTERCEPTORS, HttpClientModule } from "@angular/common/http";
 import { APP_BASE_HREF } from "@angular/common";
-import { FormsModule } from "@angular/forms";
+import { FormsModule, ReactiveFormsModule } from "@angular/forms";
 import { CommonModule } from "@angular/common";
+import { BrowserModule } from '@angular/platform-browser';
 
 import { MatNativeDateModule } from "@angular/material/core";
 import { MatButtonModule } from "@angular/material/button";
@@ -51,9 +52,19 @@ import { AppRoutes } from "./app.routing";
 import { AuthService } from "./pages/auth/auth.service";
 import { ActionGroupService } from "./pages/auth/actionGroup.service";
 import { BaseService } from "./shared/base.service";
-import { NotificationService } from "./shared/services/notifications";
-import { AuthGuard } from "./pages/auth/auth-guard.service";
+
+
 import { AuthInterceptor } from "./auth.interceptor";
+import { SideBarService } from "./sidebar/sidebar.service";
+import { PlaintesComponent } from "./pages/plaintes/plaintes.component";
+import { TableauDeBordComponent } from './tableau-de-bord/tableau-de-bord.component';
+import { HomeMarinComponent } from "./pages-client/home-marin/home-marin.component";
+import { PwaInstallPromptComponent } from "./components/pwa-install-prompt/pwa-install-prompt.component";
+
+import { environment } from '../environments/environment';
+import { ServiceWorkerModule } from "@angular/service-worker";
+import { AdminListComponent } from "./pages/admin-list/admin-list.component";
+
 
 @NgModule({
   exports: [
@@ -89,33 +100,47 @@ import { AuthInterceptor } from "./auth.interceptor";
     MatNativeDateModule,
     MatFormFieldModule,
   ],
+  declarations: [
+   
+  
+    TableauDeBordComponent,
+    AdminListComponent,
+  ],
 })
 export class MaterialModule {}
 
 @NgModule({
   imports: [
-    CommonModule,
+    BrowserModule,
     BrowserAnimationsModule,
     FormsModule,
+    ReactiveFormsModule,
     RouterModule.forRoot(AppRoutes),
     HttpClientModule,
-
+    CommonModule,
     MaterialModule,
     SidebarModule,
     NavbarModule,
     FooterModule,
     FixedpluginModule,
+    HomeMarinComponent,
+    ServiceWorkerModule.register('ngsw-worker.js', {
+      enabled: true,
+      registrationStrategy: 'registerWhenStable:30000'
+    }),
+    PwaInstallPromptComponent
   ],
-  declarations: [AppComponent, AdminLayoutComponent, AuthLayoutComponent],
+  declarations: [AppComponent, AdminLayoutComponent, AuthLayoutComponent,PlaintesComponent],
   providers: [
     MatNativeDateModule,
     AuthService,
     ActionGroupService,
     BaseService,
-    NotificationService,
+  
     AuthService,
-    AuthGuard,
-    ActionGroupService,
+    SideBarService,
+    // AuthGuard,
+   
     {
       provide: HTTP_INTERCEPTORS,
       useClass: AuthInterceptor,

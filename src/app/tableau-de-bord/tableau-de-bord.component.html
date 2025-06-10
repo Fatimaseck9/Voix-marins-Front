@@ -1,0 +1,114 @@
+<!-- tableau-de-bord.component.html -->
+<div class="main-content">
+  <div class="container-fluid">
+    <div class="row">
+      <div class="col-12">
+        <div class="card">
+          <div class="card-header card-header-primary">
+  <div class="header-content">
+              <h2 class="card-title">Tableau de Bord</h2>
+    <div class="period-filter">
+                <button class="btn btn-period" 
+              [class.active]="selectedPeriod === 'month'" 
+                        (click)="setPeriod('month')"
+                        data-period="month">
+                  <span>Mois</span>
+      </button>
+                <button class="btn btn-period" 
+              [class.active]="selectedPeriod === 'quarter'" 
+                        (click)="setPeriod('quarter')"
+                        data-period="quarter">
+                  <span>Trimestre</span>
+      </button>
+                <button class="btn btn-period" 
+              [class.active]="selectedPeriod === 'year'" 
+                        (click)="setPeriod('year')"
+                        data-period="year">
+                  <span>Année</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+          <div class="card-body">
+<!-- Grille des statuts -->
+<div class="status-grid">
+  <div class="status-card waiting">
+    <div class="status-info">
+      <h3>En attente</h3>
+      <p class="status-count">{{nombreEnAttente}}</p>
+      <div class="status-progress">
+        <div class="progress-bar">
+          <div class="progress-fill" 
+               [style.width]="(nombreEnAttente/nombreTotal * 100) + '%'"></div>
+        </div>
+        <span class="progress-text">{{(nombreEnAttente/nombreTotal * 100).toFixed(1)}}%</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="status-card processing">
+    <div class="status-info">
+      <h3>En traitement</h3>
+      <p class="status-count">{{nombreEnTraitement}}</p>
+      <div class="status-progress">
+        <div class="progress-bar">
+          <div class="progress-fill" 
+               [style.width]="(nombreEnTraitement/nombreTotal * 100) + '%'"></div>
+        </div>
+        <span class="progress-text">{{(nombreEnTraitement/nombreTotal * 100).toFixed(1)}}%</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="status-card resolved">
+    <div class="status-info">
+      <h3>Résolues</h3>
+      <p class="status-count">{{nombreResolue}}</p>
+      <div class="status-progress">
+        <div class="progress-bar">
+          <div class="progress-fill" 
+               [style.width]="(nombreResolue/nombreTotal * 100) + '%'"></div>
+        </div>
+        <span class="progress-text">{{(nombreResolue/nombreTotal * 100).toFixed(1)}}%</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Grille des graphiques -->
+<div class="charts-grid">
+  <!-- Diagramme circulaire -->
+  <div class="chart-card">
+    <div class="chart-header">
+                  <h3><i class="material-icons">pie_chart</i> Répartition par Catégorie</h3>
+    </div>
+    <div class="chart-body">
+      <canvas #categoriesChart></canvas>
+    </div>
+  </div>
+
+  <!-- Évolution -->
+  <div class="chart-card">
+    <div class="chart-header">
+                  <h3><i class="material-icons">trending_up</i> Évolution des Plaintes</h3>
+    </div>
+    <div class="chart-body">
+      <canvas #evolutionChart></canvas>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Loader -->
+<div class="loader-overlay" *ngIf="loading">
+  <div class="loader">
+    <i class="material-icons spin">refresh</i>
+    <span>Chargement des données...</span>
+  </div>
+</div>

@@ -12,31 +12,55 @@ export class AuthService {
     const token: string = this.getToken();
     return token && token.length > 0;
   }
-
-  setAccount(account: Account) {
+setAccount(account: Account) {
+  if (account && account.id) {
     this.cookieService.set('currentAccount', JSON.stringify(account), undefined, '/');
+  } else {
+    console.warn("Tentative d'enregistrement d'un compte invalide dans les cookies : ", account);
+  }
+}
+
+
+ getCurrentAccount(): Account | null {
+  const accountString = this.cookieService.get('currentAccount');
+  
+  // Vérification plus robuste
+  if (!accountString || accountString.trim() === '' || accountString === 'undefined' || accountString === 'null') {
+    return null;
   }
 
-  getCurrentAccount(): Account | null {
-    const accountString = this.cookieService.get('currentAccount');
-    try {
-      const account: Account = JSON.parse(accountString);
-      if (account && account.id) {
-        return account;
-      } else {
-        return null; // Retourne null si les données de compte ne sont pas valides
-      }
-    } catch (error) {
-      console.error('Erreur lors de la lecture des données de compte depuis les cookies :', error);
-      return null; // Retourne null en cas d'erreur de lecture des données de compte
+  try {
+    const account: Account = JSON.parse(accountString);
+    
+    if (account && account.id) {
+      return account;
+    } else {
+      console.warn('Compte trouvé dans les cookies mais données invalides:', account);
+      return null;
     }
+  } catch (error) {
+    console.error('Erreur lors de la lecture des données de compte depuis les cookies :', error);
+    // Nettoie le cookie corrompu
+    this.cookieService.delete('currentAccount', '/');
+    return null;
   }
-
+}
   getRoleSectionView(idSection): boolean {
-    const accountSectionsString = this.cookieService.get('accountSections');
-    const accountSections = JSON.parse(accountSectionsString || '[]');
-    return !accountSections.includes(idSection);
+  const accountSectionsString = this.cookieService.get('accountSections');
+  
+  // Vérification avant JSON.parse
+  if (!accountSectionsString || accountSectionsString.trim() === '') {
+    return true; // ou false selon ta logique métier
   }
+  
+  try {
+    const accountSections = JSON.parse(accountSectionsString);
+    return !accountSections.includes(idSection);
+  } catch (error) {
+    console.error('Erreur parsing accountSections:', error);
+    return true; // ou false selon ta logique métier
+  }
+}
 
   setToken(token: string) {
     this.cookieService.set('accessToken', token, undefined, '/');
@@ -68,27 +92,21 @@ export class AuthService {
     this.cookieService.set('accountRoles', JSON.stringify(accountRoles), undefined, '/');
     this.cookieService.set('accountSections', JSON.stringify(accountSections), undefined, '/');
   }
-
-  getAccountRoles(): any {
-
-    const accountRolesString = this.cookieService.get('accountRoles');
-    // const accountRoles = JSON.parse(accountRolesString || '[]');
-    // const accountSectionsString = this.cookieService.get('accountSections');
-    // const accountSections = JSON.parse(accountSectionsString || '[]');
-    // return { accountRoles, accountSections };
-    return JSON.parse(accountRolesString || '[]');
+getAccountRoles(): any {
+  const accountRolesString = this.cookieService.get('accountRoles');
+  
+  // Vérification avant JSON.parse
+  if (!accountRolesString || accountRolesString.trim() === '') {
+    return [];
   }
-
-  accountHasRole(roles: string[]): boolean {
-    let find = false;
-    let i = 0;
-    while (!find && i < roles.length) {
-      find = this.getAccountRoles().includes(roles[i]);
-      i++;
-    }
-    return find;
+  
+  try {
+    return JSON.parse(accountRolesString);
+  } catch (error) {
+    console.error('Erreur parsing accountRoles:', error);
+    return [];
   }
-
+}
   redirect() {
     this.router.navigate(['/dashboard']);
   }

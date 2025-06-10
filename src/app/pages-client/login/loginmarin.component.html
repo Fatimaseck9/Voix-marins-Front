@@ -1,0 +1,35 @@
+<div class="app-background">
+  <div class="login-container">
+<h2>
+  <img src="https://cdn-icons-png.flaticon.com/512/747/747376.png" alt="Ancre" style="width: 24px; vertical-align: middle; margin-right: 8px;">
+  Connexion Marin
+</h2>
+    <!-- Formulaire étape 1 -->
+    <form *ngIf="step === 1" (ngSubmit)="requestLogin()">
+      <div class="input-group">
+        <span class="input-icon">📱</span>
+        <input type="text" id="numero" [(ngModel)]="numero" name="numero" required placeholder="Numéro de téléphone">
+      </div>
+      <button type="submit">📨 Envoyer le code</button>
+    </form>
+
+    <!-- Formulaire étape 2 -->
+    <form *ngIf="step === 2" (ngSubmit)="verifyCode()">
+      <div class="input-group">
+        <span class="input-icon">🔐</span>
+        <input type="text" id="code" [(ngModel)]="code" name="code" required placeholder="Code de connexion">
+      </div>
+      <button type="submit">✅ Se connecter</button>
+    </form>
+
+    <!-- Message d'alerte -->
+    <div *ngIf="message"
+         [ngClass]="{ 
+           'alert': true, 
+           'alert-success': isSuccess, 
+           'alert-error': !isSuccess 
+         }">
+      {{ message }}
+    </div>
+  </div>
+</div>

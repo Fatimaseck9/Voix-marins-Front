@@ -34,7 +34,7 @@ white-space: normal;
   .big-text {
   font-size: 70px;
   font-weight:800;
-  color: #ff6600;
+  color: #2196f3;
 }
 
 table {
@@ -47,7 +47,7 @@ border-bottom-width: 1px;
 font-size: 0.825rem;
 font-weight: bold;
 color: white;
-background-color:#ff6600;
+background-color:#2196f3;
 }
 
 th.mat-sort-header-sorted {
@@ -74,7 +74,7 @@ th.mat-sort-header-sorted {
   background-color: black;
 }
 .nav-tabs .nav-item .nav-link.active {
-  background-color: rgba(239, 108, 0, 1);
+  background-color: #2196f3;
 }
 
 #add-parametre {

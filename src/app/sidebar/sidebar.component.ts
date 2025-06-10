@@ -27,7 +27,39 @@ export interface ChildrenItems {
     ab: string;
     type?: string;
 }
-export let ROUTES = [];
+export let ROUTES: RouteInfo[] = [
+  {
+    path: '/admin/tableau-bord',
+    title: 'Tableau de bord',
+    visible: true,
+    type: 'link',
+    icontype: 'dashboard'
+  },
+  {
+    path: '/admin/plaintes',
+    title: 'Plaintes',
+    visible: true,
+    type: 'link',
+    icontype: 'report_problem'
+  },
+  //{
+   // path: '/admin/register',
+    //title: 'Inscription admin',
+   // visible: true,
+    //type: 'link',
+    //icontype: 'person'
+  //},
+
+ // {
+    //path: '/admin/admin-list',
+    //title: 'Liste des administrateurs',
+    //visible: true,
+    //type: 'link',
+    //icontype: 'people' // Choisis une icône Material appropriée
+ // }
+  
+];
+
 @Component({
     selector: 'app-sidebar-cmp',
     templateUrl: 'sidebar.component.html',
@@ -42,7 +74,9 @@ export class SidebarComponent implements OnInit {
     async ngOnInit() {
         this.account = this.authService.getCurrentAccount();
         if (this.authService.isLoggedIn()) {
-            this.menuItems = await this.sideBarService.initialiseSideBar()
+            //this.menuItems = await this.sideBarService.initialiseSideBar()
+            this.menuItems = ROUTES.filter(menuItem => menuItem.visible);
+
         }
     }
 
@@ -51,7 +85,7 @@ export class SidebarComponent implements OnInit {
             .subscribe(
                 res => {
                     // redirect to login
-                    this.router.navigate(['/pages/login']);
+                    this.router.navigate(['/login']);
                 },
                 err => {
                     console.log(err);

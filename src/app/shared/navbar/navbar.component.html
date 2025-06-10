@@ -1,4 +1,4 @@
-<nav #navbar class="navbar navbar-expand-lg navbar-transparent  navbar-absolute">
+<nav #navbar class="navbar navbar-expand-lg navbar-white navbar-absolute">
   <div class="container-fluid">
     <div class="navbar-wrapper">
       <div class="navbar-minimize">
@@ -7,7 +7,7 @@
           <i class="material-icons design_bullet-list-67 visible-on-sidebar-mini">view_list</i>
         </button>
       </div>
-      <a class="navbar-brand" href="#"> JAMBARS DRPS</a>
+      <a class="navbar-brand" href="#"> ANAM</a>
     </div>
     <button mat-button class="navbar-toggler btn-no-ripple" type="button" (click)="sidebarToggle()">
       <span class="sr-only">Toggle navigation</span>
@@ -16,28 +16,20 @@
       <span class="navbar-toggler-icon icon-bar"></span>
     </button>
     <div class="collapse navbar-collapse justify-content-end" id="navigation">
-      
       <ul class="navbar-nav">
+        <!-- Afficher l'email de l'utilisateur connecté -->
         <li class="nav-item">
-          <a class="nav-link" href="#pablo">
-            <i class="material-icons">dashboard</i>
-            <p>
-              <span class="d-lg-none d-md-block">Stats</span>
-            </p>
+          <a class="nav-link">
+            <i class="material-icons">person</i>
+            <span>{{ account?.email }}</span>
           </a>
         </li>
-        
-        <li class="nav-item dropdown">
-          <a class="nav-link" href="#" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-            <i class="material-icons">person</i>
-            <p>
-              <span class="d-lg-none d-md-block">Compte</span>
-            </p>
+        <!-- Bouton de déconnexion -->
+        <li class="nav-item">
+          <a class="nav-link" href="javascript:void(0)" (click)="logout()">
+            <i class="material-icons">exit_to_app</i>
+            <span>Déconnexion</span>
           </a>
-          <div *ngIf="account && account.username" style="text-align: center" class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdownMenuLink">
-            <p style="padding-top: 8px;">{{account.username}}</p><hr>
-            <a routerLink="" class="dropdown-item" (click)="logout()">Déconnexion</a>
-          </div>
         </li>
       </ul>
     </div>

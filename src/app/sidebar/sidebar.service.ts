@@ -27,6 +27,13 @@ export class SideBarService {
                 icontype: 'dashboard',
                 visible: true,
             },
+            // {
+    //path: '/register',
+    //title: 'register',
+    //visible: true,
+   // type: 'link',
+    //icontype: 'report_problem' // ou tout autre icône Material Icons
+ // },
         ];
         if (!actionGroups) {
             actionGroups =  await this.getActionGroups()
@@ -55,6 +62,7 @@ export class SideBarService {
                 "jambars/utilisateurs/username/" + this.authService.getCurrentAccount().username,
                 false
             )
+            
         );
         return response.data.actionGroups;
     }

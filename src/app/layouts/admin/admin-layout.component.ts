@@ -15,6 +15,8 @@ declare const $: any;
 })
 
 export class AdminLayoutComponent implements OnInit, AfterViewInit {
+ 
+
     public navItems: NavItem[];
     private _router: Subscription;
     private lastPoppedUrl: string;

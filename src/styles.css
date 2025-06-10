@@ -1,1 +1,14 @@
 /* You can add global styles to this file, and also import other style files */
+
+/* Add this fix for Bootstrap custom-file-input language pseudo-class */
+.custom-file-input[lang] ~ .custom-file-label::after {
+  content: "Browse";
+}
+
+.custom-file-input[lang="fr"] ~ .custom-file-label::after {
+  content: "Parcourir";
+}
+
+.custom-file-input[lang="es"] ~ .custom-file-label::after {
+  content: "Elegir";
+}

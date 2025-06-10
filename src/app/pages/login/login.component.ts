@@ -4,6 +4,7 @@ import { BaseService } from 'src/app/shared/base.service';
 import { Router } from '@angular/router'; 
 import { AuthService } from '../auth/auth.service';
 import { SideBarService } from 'src/app/sidebar/sidebar.service';
+import { jwtDecode } from 'jwt-decode';
 
 declare var $: any;
 
@@ -12,7 +13,6 @@ declare var $: any;
     templateUrl: './login.component.html',
     styleUrls: ['./login.component.css']
 })
-
 export class LoginComponent implements OnInit, OnDestroy {
     test: Date = new Date();
     private toggleButton: any;
@@ -27,120 +27,127 @@ export class LoginComponent implements OnInit, OnDestroy {
         type: ''
     }
 
-    constructor(private router: Router,private sideBarService: SideBarService, private element: ElementRef, private baseService: BaseService, private authService: AuthService) {
+    constructor(
+        private router: Router,
+        private sideBarService: SideBarService,
+        private element: ElementRef,
+        private baseService: BaseService,
+        private authService: AuthService
+    ) {
         this.nativeElement = element.nativeElement;
         this.sidebarVisible = false;
+
+        // Vérifier si l'utilisateur est déjà connecté
+        if (this.authService.isLoggedIn()) {
+            this.redirectBasedOnUserStatus();
+        }
+    }
+
+    private redirectBasedOnUserStatus(): void {
+        const token = this.authService.getToken();
+        if (!token) return;
+
+        try {
+            const decodedToken: any = jwtDecode(token);
+            
+            if (decodedToken.isActive) {
+                console.log('Compte actif, redirection vers le tableau de bord');
+                this.router.navigate(['/admin/tableau-bord']);
+            } else {
+                console.log('Compte inactif, redirection vers le changement de mot de passe');
+                this.router.navigate(['/change-password']);
+            }
+        } catch (error) {
+            console.error('Erreur lors de la redirection:', error);
+            this.authService.logout();
+        }
     }
 
     ngOnInit() {
-        var navbar : HTMLElement = this.element.nativeElement;
+        const navbar: HTMLElement = this.element.nativeElement;
         this.toggleButton = navbar.getElementsByClassName('navbar-toggle')[0];
         const body = document.getElementsByTagName('body')[0];
         body.classList.add('login-page');
         body.classList.add('off-canvas-sidebar');
         const card = document.getElementsByClassName('card')[0];
-        setTimeout(function() {
-            // after 1000 ms we add the class animated to the login/register card
+        setTimeout(function () {
             card.classList.remove('card-hidden');
         }, 700);
     }
 
     sidebarToggle() {
-        var toggleButton = this.toggleButton;
-        var body = document.getElementsByTagName('body')[0];
-        var sidebar = document.getElementsByClassName('navbar-collapse')[0];
-        if (this.sidebarVisible == false) {
-            setTimeout(function() {
-                toggleButton.classList.add('toggled');
+        const body = document.getElementsByTagName('body')[0];
+        if (!this.sidebarVisible) {
+            setTimeout(() => {
+                this.toggleButton.classList.add('toggled');
             }, 500);
             body.classList.add('nav-open');
             this.sidebarVisible = true;
         } else {
             this.toggleButton.classList.remove('toggled');
-            this.sidebarVisible = false;
             body.classList.remove('nav-open');
+            this.sidebarVisible = false;
         }
     }
 
-    ngOnDestroy(){
-      const body = document.getElementsByTagName('body')[0];
-      body.classList.remove('login-page');
-      body.classList.remove('off-canvas-sidebar');
+    ngOnDestroy() {
+        const body = document.getElementsByTagName('body')[0];
+        body.classList.remove('login-page');
+        body.classList.remove('off-canvas-sidebar');
     }
 
-    updateLastLogin(id) {
-        this.baseService.patch('jambars/utilisateurs/userId/'+id,true,{lastLogin: new Date()})
-        .subscribe(
-            res=>{
-            }
-        )
-    }
-
-   
     onLogin() {
-        this.baseService.post('auth/login', false, {username: this.account.username.toLocaleUpperCase(), password: this.account.password,application:"jambars" })
-        .subscribe({
+        this.baseService.post('auth/login', false, {
+            email: this.account.email,
+            password: this.account.password,
+            application: "jambars"
+        }).subscribe({
             next: (res) => {
-                this.user = res.data.user_info;
-                if (res.data && res.data.access_token) { // Vérifiez que l'objet 'user' et sa propriété 'id' ne sont pas null
-                    if (this.account.username === this.account.password) {
-                        this.authService.setTmpToken(res.data.access_token);
-                     
-                    } else {
-                        this.authService.setToken(res.data.access_token);
-                       
-                    }
-                    // Création du compte dans les cookies
-                    this.authService.setAccount({...res.data.user_info, actionGroups:undefined, roles:undefined});
+                if (res && res.data && res.data.access_token && res.data.refresh_token) {
+                    const decodedToken: any = jwtDecode(res.data.access_token);
 
-                    if(res.data.user_info && res.data.user_info.actionGroups){
-                        this.sideBarService.initialiseSideBar(res.data.user_info.actionGroups);
-                        // this.authService.setActionGroups(res.data.user_info.actionGroups);
-                    }
+                    const user = {
+                        id: decodedToken.sub || null,
+                        email: decodedToken.email || this.account.email,
+                        roles: decodedToken.role ? [decodedToken.role] : [],
+                        isActive: decodedToken.isActive
+                    };
 
-                    const currentAccount = this.authService.getCurrentAccount();
-                    if (currentAccount && currentAccount.id) { // Vérifiez que 'currentAccount' et sa propriété 'id' ne sont pas null
-                        this.authService.setAccountRoles(res.data.user_info.roles);
-                        if (this.account.username === this.account.password) {
-                            this.router.navigate(['/pages/register']);
-                        } else if (!this.user.disabled) {
-                           // this.updateLastLogin(this.user.id);
-                            this.authService.redirect();
-                        } else {
-                            this.message.text = 'Ce compte a été désactivé';
-                            this.message.type = 'error';
-                        }
-                        
-                        // this.baseService.get('Accounts/' + currentAccount.id + '/roles?filter={"include":["actions","sections"]}', true)
-                        // .subscribe({
-                        //     next: (rolesRes) => {
-                        //         this.authService.setAccountRoles(rolesRes);
-                        //         if (this.account.username === this.account.password) {
-                        //             this.router.navigate(['/pages/register']);
-                        //         } else if (!this.user.disabled) {
-                        //             this.updateLastLogin(this.user.id);
-                        //             this.authService.redirect();
-                        //         } else {
-                        //             this.message.text = 'Ce compte a été désactivé';
-                        //             this.message.type = 'error';
-                        //         }
-                        //     },
-                        //     error: (err) => {
-                        //         console.error('Erreur lors de la récupération des rôles du compte :', err);
-                        //     }
-                        // });
+                    // Mettre à jour les tokens via AuthService
+                    this.authService.setToken(res.data.access_token);
+                    this.authService.setRefreshToken(res.data.refresh_token);
+
+                    // Mettre à jour le service d'authentification
+                    this.authService.setAccount(user);
+
+                    // Redirection basée sur isActive du token
+                    if (user.isActive) {
+                        console.log('Compte actif, redirection vers le tableau de bord');
+                        this.router.navigate(['/admin/tableau-bord']).then(() => {
+                            console.log('Navigation terminée');
+                            // Attendre un peu pour s'assurer que les services sont initialisés
+                            setTimeout(async () => {
+                                // Réinitialiser le sidebar
+                                await this.sideBarService.initialiseSideBar();
+                            }, 100);
+                        }).catch(err => {
+                            console.error('Erreur de navigation:', err);
+                        });
                     } else {
-                        console.error('Erreur: Impossible de récupérer les rôles du compte, les données de compte sont invalides.');
+                        console.log('Compte inactif, redirection vers le changement de mot de passe');
+                        this.router.navigate(['/change-password']);
                     }
                 } else {
-                    console.error('Erreur: Impossible de récupérer les rôles du compte, les données de l\'utilisateur sont invalides.');
+                    this.message.text = 'Une erreur est survenue, veuillez réessayer.';
+                    this.message.type = 'error';
+                    console.error('Réponse API invalide:', res);
                 }
             },
             error: (err) => {
-                this.message.text = 'Identifiants incorrects';
+                this.message.text = err.error?.message || 'Identifiants incorrects';
                 this.message.type = 'error';
+                console.error('Erreur de connexion:', err);
             }
         });
     }
-  
 }

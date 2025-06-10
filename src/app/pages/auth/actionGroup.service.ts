@@ -6,7 +6,9 @@ import { BaseService } from 'src/app/shared/base.service';
 import { ActionGroup } from 'src/app/models/actionGroup';
 import { AuthService } from './auth.service';
 
-@Injectable()
+@Injectable({
+  providedIn: 'root' // ✅ Ajouté pour résoudre l'erreur d'injection
+})
 export class ActionGroupService {
 
   actionsGroup: ActionGroup[] = [];

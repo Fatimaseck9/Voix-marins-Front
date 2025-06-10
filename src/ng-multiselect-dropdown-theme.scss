@@ -21,9 +21,9 @@
 }
 
 .multiselect-dropdown .dropdown-btn .selected-item {
-  border: 1px solid #ff6600 !important;
+  border: 1px solid #2196f3 !important;
   margin-right: 4px;
-  background: #ff6600 !important;
+  background: #2196f3 !important;
   padding: 0px 5px;
   color: #fff;
   border-radius: 2px;
@@ -116,7 +116,7 @@
 
 .multiselect-item-checkbox input[type="checkbox"]:focus + div:before,
 .multiselect-item-checkbox input[type="checkbox"]:hover + div:before {
-  border-color: #ff6600 !important;
+  border-color: #2196f3 !important;
   background-color: #f2f2f2;
 }
 
@@ -137,14 +137,14 @@
 .multiselect-item-checkbox input[type="checkbox"] + div:before {
   box-sizing: content-box;
   content: "";
-  color: #ff6600 !important;
+  color: #2196f3 !important;
   position: absolute;
   top: 50%;
   left: 0;
   width: 14px;
   height: 14px;
   margin-top: -9px;
-  border: 2px solid #ff6600 !important;
+  border: 2px solid #2196f3 !important;
   text-align: center;
   transition: all 0.4s ease;
 }
@@ -152,7 +152,7 @@
 .multiselect-item-checkbox input[type="checkbox"] + div:after {
   box-sizing: content-box;
   content: "";
-  background-color: #ff6600 !important;
+  background-color: #2196f3 !important;
   position: absolute;
   top: 50%;
   left: 4px;
@@ -201,11 +201,11 @@
 
 .multiselect-item-checkbox input[type="checkbox"]:checked + div:before {
   animation: borderscale 200ms ease-in;
-  background: #ff6600 !important;
+  background: #2196f3 !important;
 }
 
 @keyframes borderscale {
   50% {
-    box-shadow: 0 0 0 2px #ff6600 !important;
+    box-shadow: 0 0 0 2px #2196f3 !important;
   }
 }

@@ -2,177 +2,121 @@ import { Injectable } from "@angular/core";
 import { HttpClient, HttpHeaders } from "@angular/common/http";
 import { Observable, throwError } from "rxjs";
 import { catchError, map } from "rxjs/operators";
-import { AuthService } from "../pages/auth/auth.service";
 import { environment } from "src/environments/environment.prod";
+import { CookieService } from 'ngx-cookie-service';
 
-
-@Injectable()
+@Injectable({
+  providedIn: 'root'
+})
 export class BaseService {
-
-  // serverURL = "http://10.137.16.131:3001/api/";
-  //serverURL = "http://localhost:3001/api/";
-    serverURL =environment.serverURLjambar;
-  headers = new HttpHeaders({
-    "content-type": "application/json",
+  private serverURL = environment.serverURLjambar;
+  private defaultHeaders = new HttpHeaders({
+    "Content-Type": "application/json"
   });
 
-  constructor(private http: HttpClient, private authService: AuthService) {}
+  constructor(
+    private http: HttpClient,
+    private cookieService: CookieService
+  ) {}
 
-  updateHeaders() {
-    this.headers = this.headers.delete("Authorization");
-    this.headers = this.headers.append("Authorization", this.authService.getToken());
-  }
-  
-  basicHeader() {
-    this.headers = this.headers.delete("username");
-    this.headers = this.headers.append("username", this.authService.getCurrentAccount().username);
+  private getAuthHeaders(): HttpHeaders {
+    const token = this.cookieService.get('access_token');
+    if (!token) {
+      return this.defaultHeaders;
+    }
+    return this.defaultHeaders.set('Authorization', `Bearer ${token}`);
   }
 
-  getJSTAPI(): Observable<any> {
-    return this.http.get("https://jstmagal22.herokuapp.com/api/jsts").pipe(
+  post(url: string, auth: boolean, data: any, customHeaders?: HttpHeaders): Observable<any> {
+    const fullUrl = this.serverURL + url;
+    let headers = customHeaders || (auth ? this.getAuthHeaders() : this.defaultHeaders);
+
+    if (!headers.has('Content-Type')) {
+      headers = headers.set('Content-Type', 'application/json');
+    }
+
+    return this.http.post(encodeURI(fullUrl), data, { headers }).pipe(
       map((res: any) => res),
-      catchError((err) => {
-        throw new Error(err);
+      catchError((error) => {
+        console.error('Erreur HTTP:', error);
+        if (error.status === 401) {
+          this.cookieService.delete('access_token');
+          window.location.href = '/login';
+        }
+        return throwError(() => error);
       })
     );
   }
 
-  // post(url, auth, data): Observable<any> {
-  //   url = this.serverURL + url;
-    
-  //   // Ajouter un log pour afficher l'URL complète
-  //   console.log('URL de la requête :', url);
-  
-  //   if (this.authService.getCurrentAccount()) {
-  //       this.basicHeader();
-  //       // Ajouter un log pour indiquer que les en-têtes de base sont configurés
-  //       console.log('En-têtes de base configurés.');
-  //   }
-    
-  //   if (auth) {
-  //       this.updateHeaders();
-  //       // Ajouter un log pour indiquer que les en-têtes sont mis à jour
-  //       console.log('En-têtes mis à jour.');
-  //   }
-  
-  //   // Ajouter un log pour afficher les données envoyées
-  //   console.log('Données envoyées :', data);
-  
-  //   return this.http.post(url, data, { headers: this.headers }).pipe(
-  //       map((res: any) => {
-  //           // Ajouter un log pour afficher la réponse
-  //           console.log('Réponse de la requête :', res);
-  //           return res; // Retourner la réponse de la requête
-  //       }),
-  //       catchError((err) => {
-  //           // Ajouter un log pour afficher les erreurs
-  //           console.error('Erreur dans la requête HTTP :', err);
-  //           throw new Error(err);
-  //       })
-  //   );
-  // }
-  post(url, auth, data): Observable<any> {
-    url = this.serverURL + url;
-    
-    // console.log('URL de la requête :', url);
-  
-    if (this.authService.getCurrentAccount()) {
-        this.basicHeader();
-        // console.log('En-têtes de base configurés.');
-    }
-    
-    if (auth) {
-        this.updateHeaders();
-        // console.log('En-têtes mis à jour.');
-    }
-  
-    // Log the data before sending the request
-    // console.log('Données envoyées :', data);
-    
-    // Vérifier si principalId est défini et n'est pas NaN
-    if (!data.principalId) {
-      // console.error('Erreur: principalId est null ou undefined');
-    }
-  
-    return this.http.post(encodeURI(url), data, { headers: this.headers }).pipe(
-        map((res: any) => {
-            // Log the response
-            // console.log('Réponse de la requête :', res);
-            return res;
-        }),
-        catchError((err) => {
-            // Log the errors
-            console.error('Erreur dans la requête HTTP :', err);
-            throw new Error(err);
-        })
-    );
-}
+  get(url: string, auth: boolean): Observable<any> {
+    const fullUrl = this.serverURL + url;
+    const headers = auth ? this.getAuthHeaders() : this.defaultHeaders;
 
-  
-
-
-
-  get(url, auth): Observable<any> {
-    url = this.serverURL + url;
-    this.basicHeader();
-    if (auth) {
-      this.updateHeaders();
-    }
-    return this.http.get(encodeURI(url), { headers: this.headers }).pipe(
+    return this.http.get(encodeURI(fullUrl), { headers }).pipe(
       map((res: any) => res),
-      catchError((err) => {
-         throw new Error(err);
-      })
-    );
-  }
- 
-  delete(url, auth): Observable<any> {
-    url = this.serverURL + url;
-    this.basicHeader();
-    if (auth) {
-      this.updateHeaders();
-    }
-    return this.http.delete(encodeURI(url), { headers: this.headers }).pipe(
-      map((res: any) => res),
-      catchError((err) => {
-         throw new Error(err);
-      })
-    );
-  }
- 
-  put(url, auth, data): Observable<any> {
-    url = this.serverURL + url;
-    this.basicHeader();
-    if (auth) {
-      this.updateHeaders();
-    }
-    return this.http.put(encodeURI(url), data, { headers: this.headers }).pipe(
-      map((res: any) => res),
-      catchError((err) => {
-         throw new Error(err);
-      })
-    );
-  }
- 
-  patch(url, auth, data): Observable<any> {
-    url = this.serverURL + url;
-    this.basicHeader();
-    if (auth) {
-      this.updateHeaders();
-    }
-    return this.http.patch(encodeURI(url), data, { headers: this.headers }).pipe(
-      map((res: any) => res),
-      catchError((err) => {
-         throw new Error(err);
+      catchError((error) => {
+        if (error.status === 401) {
+          this.cookieService.delete('access_token');
+          window.location.href = '/login';
+        }
+        return throwError(() => error);
       })
     );
   }
 
-  getSites(url){
-    return this.get("/base"+ encodeURI(url),false)  
+  delete(url: string, auth: boolean): Observable<any> {
+    const fullUrl = this.serverURL + url;
+    const headers = auth ? this.getAuthHeaders() : this.defaultHeaders;
+
+    return this.http.delete(encodeURI(fullUrl), { headers }).pipe(
+      map((res: any) => res),
+      catchError((error) => {
+        if (error.status === 401) {
+          this.cookieService.delete('access_token');
+          window.location.href = '/login';
+        }
+        return throwError(() => error);
+      })
+    );
   }
 
-  getFileRoute(url) {
+  put(url: string, auth: boolean, data: any): Observable<any> {
+    const fullUrl = this.serverURL + url;
+    const headers = auth ? this.getAuthHeaders() : this.defaultHeaders;
+
+    return this.http.put(encodeURI(fullUrl), data, { headers }).pipe(
+      map((res: any) => res),
+      catchError((error) => {
+        if (error.status === 401) {
+          this.cookieService.delete('access_token');
+          window.location.href = '/login';
+        }
+        return throwError(() => error);
+      })
+    );
+  }
+
+  patch(url: string, auth: boolean, data: any): Observable<any> {
+    const fullUrl = this.serverURL + url;
+    const headers = auth ? this.getAuthHeaders() : this.defaultHeaders;
+
+    return this.http.patch(encodeURI(fullUrl), data, { headers }).pipe(
+      map((res: any) => res),
+      catchError((error) => {
+        if (error.status === 401) {
+          this.cookieService.delete('access_token');
+          window.location.href = '/login';
+        }
+        return throwError(() => error);
+      })
+    );
+  }
+
+  getSites(url: string) {
+    return this.get("/base" + encodeURI(url), false);
+  }
+
+  getFileRoute(url: string) {
     return this.serverURL + "fileContainers/NUREXPORT/download/" + encodeURI(url);
   }
 }
