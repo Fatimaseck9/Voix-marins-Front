@@ -3,7 +3,10 @@
   <div class="header-content">
     <!-- Logo à gauche -->
     <div class="logo-container">
-      <img src="assets/img/anam.png" alt="Logo" class="logo">
+      <a routerLink="/marin/home">
+  <img src="assets/img/anam.png" alt="Logo" class="logo">
+</a>
+      
     </div>
     
     <nav class="main-nav">
@@ -42,6 +45,13 @@
             <span class="nav-text">Contact</span>
             <span class="nav-dot"></span>
           </a>
+        </li>
+        <li class="nav-item">
+          <button class="nav-link logout-nav-btn" (click)="logout()" title="Se déconnecter">
+            <i class="fas fa-sign-out-alt nav-icon"></i>
+            <span class="nav-text">Déconnexion</span>
+            <span class="nav-dot"></span>
+          </button>
         </li>
       </ul>
     </nav>
@@ -113,7 +123,7 @@
       <i class="far fa-folder-open display-4 text-muted mb-3"></i>
       <h3 class="h4">Aucune plainte enregistrée</h3>
       <p class="text-muted mb-4">Vous n'avez soumis aucune plainte pour le moment.</p>
-      <a routerLink="marin/Plainte" class="btn btn-primary px-4" style="text-decoration: white;">
+      <a routerLink="/marin/plainte" class="btn btn-primary px-4" style="text-decoration: white;">
        <span style="color: white;"> <i class="fas fa-plus "></i> Déposer une plainte</span> 
       </a>
     </div>

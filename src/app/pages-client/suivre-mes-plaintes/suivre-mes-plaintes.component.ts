@@ -31,7 +31,8 @@ export class SuivreMesPlaintesComponent implements OnInit {
   menuActive = false;
   plaintes: Plainte[] = [];
   isBrowser: boolean;
-  private apiUrl = 'http://localhost:3001/plaintes';
+  //private apiUrl = 'http://localhost:3001/plaintes';
+  private apiUrl ='https://ce1e-154-124-68-191.ngrok-free.app/plaintes';
 
   constructor(
     @Inject(PLATFORM_ID) private platformId: Object,
@@ -48,7 +49,10 @@ export class SuivreMesPlaintesComponent implements OnInit {
     }
   }
 
-  readonly backendBaseUrl = 'http://localhost:3001';
+  //readonly backendBaseUrl = 'http://localhost:3001';
+  
+  readonly backendBaseUrl = 'https://ce1e-154-124-68-191.ngrok-free.app';
+
  async loadPlaintes() {
   try {
     // Vérifier si l'utilisateur est connecté
@@ -71,7 +75,8 @@ export class SuivreMesPlaintesComponent implements OnInit {
     // Configurez les en-têtes avec le token d'authentification
     const headers = new HttpHeaders({
       'Authorization': `Bearer ${token}`,
-      'Content-Type': 'application/json'
+      'Content-Type': 'application/json',
+      'ngrok-skip-browser-warning': 'true'
     });
 
 
@@ -98,7 +103,8 @@ export class SuivreMesPlaintesComponent implements OnInit {
         const token = await firstValueFrom(this.authService.getToken());
         const headers = new HttpHeaders({
           'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
+          'ngrok-skip-browser-warning': 'true'
         });
 
         // 2. Utiliser l'endpoint /plaintes/:id avec DELETE et les en-têtes
@@ -131,6 +137,11 @@ export class SuivreMesPlaintesComponent implements OnInit {
 
   toggleMenu() {
     this.menuActive = !this.menuActive;
+  }
+
+  logout() {
+    this.authService.logout();
+    // La redirection sera gérée par le service AuthService
   }
 
   @HostListener('window:resize', ['$event'])

@@ -1,6 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, ElementRef, HostListener, ViewChild } from '@angular/core';
 import { RouterModule } from '@angular/router';
+import { AuthService } from 'src/app/servicesclient/auth.service';
 
 @Component({
   selector: 'app-aide-vocale',
@@ -12,6 +13,8 @@ import { RouterModule } from '@angular/router';
 export class AideVocaleComponent {
   @ViewChild('voiceGuide') audioPlayer!: ElementRef<HTMLAudioElement>;
   isPlaying = false;
+
+  constructor(private authService: AuthService) {}
 
   playPause() {
     if (this.audioPlayer.nativeElement.paused) {
@@ -51,6 +54,12 @@ export class AideVocaleComponent {
   toggleMenu() {
     this.menuActive = !this.menuActive;
   }
+
+  logout() {
+    this.authService.logout();
+    // La redirection sera gérée par le service AuthService
+  }
+
   @HostListener('window:resize', ['$event'])
 onResize(event: Event) {
   if (window.innerWidth > 768 && this.menuActive) {

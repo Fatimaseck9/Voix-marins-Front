@@ -2,9 +2,11 @@
       <div class="header-content">
         <!-- Logo à gauche -->
         <div class="logo-container">
+           <a routerLink="/marin/home">
           <img src="assets/img/anam.png" alt="Logo" class="logo">
-         
+         </a>
         </div>
+        
         
         <nav class="main-nav">
           <!-- Bouton hamburger pour mobile -->
@@ -23,15 +25,16 @@
               </a>
             </li>
             <li class="nav-item">
+              <a routerLink="/marin/plainte" class="nav-link">
+                <i class="fas fa-plus-circle nav-icon"></i>
+                <span class="nav-text">Faire Plainte</span>
+                <span class="nav-dot"></span>
+              </a>
+            </li>
+            <li class="nav-item">
               <a routerLink="/marin/suivre-plaintes" class="nav-link">
                 <i class="fas fa-folder-open nav-icon"></i>
                 <span class="nav-text">Suivre Mes Plaintes </span>
-                <span class="nav-dot"></span>
-              </a>
-            <li class="nav-item">
-              <a routerLink="/marin/aide-vocale" class="nav-link">
-                <i class="fas fa-question-circle nav-icon"></i>
-                <span class="nav-text">Aide</span>
                 <span class="nav-dot"></span>
               </a>
             </li>
@@ -41,6 +44,13 @@
                 <span class="nav-text">Contact</span>
                 <span class="nav-dot"></span>
               </a>
+            </li>
+            <li class="nav-item">
+              <button class="nav-link logout-nav-btn" (click)="logout()" title="Se déconnecter">
+                <i class="fas fa-sign-out-alt nav-icon"></i>
+                <span class="nav-text">Déconnexion</span>
+                <span class="nav-dot"></span>
+              </button>
             </li>
           </ul>
         </nav>

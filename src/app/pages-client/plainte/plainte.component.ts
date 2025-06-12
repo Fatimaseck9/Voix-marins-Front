@@ -65,7 +65,8 @@ export class PlainteComponent {
     { key: 'paiement', label: 'Problème de paiement', image: 'paiement.jpeg' }
   ];
  
-  private apiUrl = 'http://localhost:3001/plaintes';
+  //private apiUrl = 'http://localhost:3001/plaintes';
+   private apiUrl = 'https://ce1e-154-124-68-191.ngrok-free.app/plaintes';
  
   constructor(
     @Inject(PLATFORM_ID) private platformId: Object,
@@ -97,17 +98,24 @@ export class PlainteComponent {
         return;
       }
  
+      console.log('Chargement des catégories avec authentification...');
+      
       const headers = new HttpHeaders({
         'Authorization': `Bearer ${token}`,
+        'ngrok-skip-browser-warning': 'true'
       });
  
       const categories = await firstValueFrom(this.http.get<any[]>(`${this.apiUrl}/categories`, { headers }));
+      
+      console.log('Catégories reçues:', categories);
+      
       if (categories && categories.length > 0) {
         this.categories = categories.map(cat => ({
           key: cat.key,
           label: cat.label,
           image: `${cat.key}.jpeg`.toLowerCase()
         }));
+        console.log('Catégories traitées:', this.categories);
       }
     } catch (error) {
       console.error('Erreur lors du chargement des catégories:', error);
@@ -122,6 +130,11 @@ export class PlainteComponent {
   toggleMenu() {
     this.menuActive = !this.menuActive;
   }
+
+  logout() {
+    this.authService.logout();
+    // La redirection sera gérée par le service AuthService
+  }
  
   @HostListener('window:resize', ['$event'])
   onResize(event: Event) {
@@ -131,28 +144,158 @@ export class PlainteComponent {
     }
   }
  
+  // Vérifier les permissions microphone
+  async checkMicrophonePermission(): Promise<boolean> {
+    try {
+      if (!navigator.permissions) {
+        return true; // Si l'API permissions n'est pas disponible, on essaie quand même
+      }
+      
+      const permission = await navigator.permissions.query({ name: 'microphone' as PermissionName });
+      return permission.state === 'granted';
+    } catch (error) {
+      console.log('Permission API non disponible:', error);
+      return true; // On essaie quand même
+    }
+  }
+ 
+  // Tester le microphone (spécialement pour mobile)
+  async testMicrophone() {
+    try {
+      Swal.fire({
+        title: 'Test du microphone',
+        text: 'Test de l\'accès au microphone en cours...',
+        allowOutsideClick: false,
+        didOpen: () => Swal.showLoading()
+      });
+
+      const stream = await navigator.mediaDevices.getUserMedia({ 
+        audio: {
+          echoCancellation: true,
+          noiseSuppression: true,
+          autoGainControl: true
+        }
+      });
+
+      // Test réussi, arrêter le stream
+      stream.getTracks().forEach(track => track.stop());
+
+      Swal.fire({
+        title: '✅ Microphone fonctionnel !',
+        text: 'Votre microphone fonctionne correctement. Vous pouvez maintenant enregistrer votre plainte.',
+        icon: 'success',
+        confirmButtonText: 'Parfait !',
+        timer: 3000
+      });
+
+    } catch (error: any) {
+      console.error('Test microphone échoué:', error);
+      
+      let errorMessage = 'Impossible d\'accéder au microphone.';
+      let instructions = '';
+      
+      if (error.name === 'NotAllowedError') {
+        errorMessage = 'L\'accès au microphone a été refusé.';
+        instructions = 'Veuillez :\n1. Recharger la page\n2. Cliquer sur "Autoriser" quand le navigateur demande l\'accès\n3. Réessayer';
+      } else if (error.name === 'NotFoundError') {
+        errorMessage = 'Aucun microphone détecté.';
+        instructions = 'Vérifiez que votre appareil dispose d\'un microphone.';
+      } else if (error.name === 'NotSupportedError') {
+        errorMessage = 'Votre navigateur ne supporte pas l\'enregistrement.';
+        instructions = 'Essayez avec Chrome, Firefox ou Safari.';
+      }
+
+      Swal.fire({
+        title: '❌ Test échoué',
+        text: errorMessage + '\n\n' + instructions,
+        icon: 'error',
+        confirmButtonText: 'Compris',
+        footer: 'Conseil : Rechargez la page et autorisez l\'accès au microphone'
+      });
+    }
+  }
+ 
+  // Démarrer l'enregistrement avec vérifications préalables
   async startRecording() {
     try {
-      this.stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      // Vérification des permissions en premier
+      const hasPermission = await this.checkMicrophonePermission();
+      if (!hasPermission) {
+        Swal.fire({
+          title: 'Permission requise',
+          text: 'Cette application a besoin d\'accéder à votre microphone pour enregistrer votre plainte.',
+          icon: 'info',
+          confirmButtonText: 'Autoriser l\'accès'
+        });
+      }
+
+      // Vérifier si getUserMedia est disponible
+      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+        throw new Error('getUserMedia not supported');
+      }
+
+      // Configuration audio avec fallback pour mobile
+      const audioConstraints = {
+        audio: {
+          echoCancellation: true,
+          noiseSuppression: true,
+          autoGainControl: true,
+          sampleRate: 44100
+        }
+      };
+
+      this.stream = await navigator.mediaDevices.getUserMedia(audioConstraints);
       this.prepareRecorderUI();
- 
+
+      // Vérifier les formats supportés par l'appareil
+      let mimeType = 'audio/webm;codecs=opus';
+      if (!MediaRecorder.isTypeSupported(mimeType)) {
+        mimeType = 'audio/webm';
+        if (!MediaRecorder.isTypeSupported(mimeType)) {
+          mimeType = 'audio/mp4';
+          if (!MediaRecorder.isTypeSupported(mimeType)) {
+            mimeType = 'audio/wav';
+          }
+        }
+      }
+
       this.mediaRecorder = new MediaRecorder(this.stream, {
-        mimeType: 'audio/webm;codecs=opus'
+        mimeType: mimeType
       });
- 
+
       this.mediaRecorder.ondataavailable = (event: BlobEvent) => {
         if (event.data.size > 0) this.audioChunks.push(event.data);
       };
- 
+
       this.mediaRecorder.addEventListener('stop', () => this.finalizeRecording());
       this.mediaRecorder.start(1000);
       this.startTimer();
-    } catch (error) {
+    } catch (error: any) {
       console.error('Erreur microphone:', error);
+      
+      let errorMessage = 'Veuillez autoriser l\'accès au microphone';
+      let errorTitle = 'Microphone inaccessible';
+      
+      if (error.name === 'NotAllowedError' || error.name === 'PermissionDeniedError') {
+        errorMessage = 'L\'accès au microphone a été refusé. Veuillez:\n1. Autoriser l\'accès au microphone dans les paramètres de votre navigateur\n2. Recharger la page\n3. Essayer à nouveau';
+        errorTitle = 'Permission refusée';
+      } else if (error.name === 'NotFoundError' || error.name === 'DevicesNotFoundError') {
+        errorMessage = 'Aucun microphone détecté. Vérifiez que votre appareil dispose d\'un microphone fonctionnel.';
+        errorTitle = 'Microphone non trouvé';
+      } else if (error.name === 'NotSupportedError') {
+        errorMessage = 'Votre navigateur ne supporte pas l\'enregistrement audio. Essayez avec Chrome, Firefox ou Safari.';
+        errorTitle = 'Navigateur non supporté';
+      } else if (error.name === 'NotSecureError' || error.message.includes('secure')) {
+        errorMessage = 'L\'enregistrement audio nécessite une connexion sécurisée (HTTPS). Vérifiez votre connexion.';
+        errorTitle = 'Connexion non sécurisée';
+      }
+
       Swal.fire({
-        title: 'Microphone inaccessible',
-        text: 'Veuillez autoriser l\'accès au microphone',
-        icon: 'error'
+        title: errorTitle,
+        text: errorMessage,
+        icon: 'error',
+        confirmButtonText: 'Compris',
+        footer: 'Astuce: Essayez de recharger la page et d\'autoriser l\'accès au microphone'
       });
     }
   }

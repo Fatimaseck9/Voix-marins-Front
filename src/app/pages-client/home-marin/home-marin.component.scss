@@ -527,3 +527,26 @@ body {
     padding: 1rem;
   }
 }
+
+
+
+.logout-container {
+  margin-left: auto; /* pousse le bouton à droite */
+  display: flex;
+  align-items: center;
+}
+
+.logout-button {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 5px;
+  background-color: #e74c3c;
+  color: white;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.logout-button:hover {
+  background-color: #c0392b;
+}

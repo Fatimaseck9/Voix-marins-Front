@@ -3,10 +3,11 @@
   <div class="header-content">
     <!-- Logo à gauche -->
     <div class="logo-container" >
+       
+       <a routerLink="/marin/home">
       <img src="assets/img/anam.png" alt="Logo" class="logo">
-        <div class="logo-decoration"></div>
+      </a>
     </div>
-    
     <nav class="main-nav">
       <!-- Bouton hamburger pour mobile -->
       <button class="hamburger" aria-label="Menu" (click)="toggleMenu()" [class.active]="menuActive">
@@ -20,6 +21,13 @@
           <a routerLink="/marin/home" class="nav-link">
             <i class="fas fa-home nav-icon"></i>
             <span class="nav-text">Accueil</span>
+            <span class="nav-dot"></span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a routerLink="/marin/plainte" class="nav-link">
+            <i class="fas fa-plus-circle nav-icon"></i>
+            <span class="nav-text">Faire Plainte</span>
             <span class="nav-dot"></span>
           </a>
         </li>
@@ -38,11 +46,11 @@
           </a>
         </li>
         <li class="nav-item">
-          <a routerLink="/marin/appeler" class="nav-link">
-            <i class="fas fa-phone-alt nav-icon"></i>
-            <span class="nav-text">Contact</span>
+          <button class="nav-link logout-nav-btn" (click)="logout()" title="Se déconnecter">
+            <i class="fas fa-sign-out-alt nav-icon"></i>
+            <span class="nav-text">Déconnexion</span>
             <span class="nav-dot"></span>
-          </a>
+          </button>
         </li>
       </ul>
     </nav>

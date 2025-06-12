@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { AuthService } from './auth.service';
 
@@ -7,7 +7,9 @@ import { AuthService } from './auth.service';
   providedIn: 'root'
 })
 export class PlainteService {
-  private apiUrl = 'http://localhost:3001/plaintes';
+  private apiUrl = 'https://ce1e-154-124-68-191.ngrok-free.app/plaintes';
+  
+ // private apiUrl = 'http://localhost:3001/plaintes';
   
   categories = [
     { key: 'harcelement', label: 'Harcèlement', image: 'Harcélement.jpeg' },
@@ -21,18 +23,48 @@ export class PlainteService {
     private authService: AuthService
   ) {}
 
+
+    // Helper pour générer les headers avec le token
+  private getAuthHeaders(): HttpHeaders {
+    const token = this.authService.getToken(); // on suppose que ton AuthService a une méthode getToken()
+    return new HttpHeaders({
+      'Authorization': `Bearer ${token}`,
+      'Content-Type': 'application/json',
+      'ngrok-skip-browser-warning': 'true' 
+    });
+  }
+
   // CORRECTION : Utiliser l'API au lieu du localStorage
   submitPlainte(plainteData: any): Observable<any> {
+
     // L'intercepteur ajoutera automatiquement le token
-    return this.http.post(`${this.apiUrl}/form`, plainteData);
+     const headers = this.getAuthHeaders();
+    return this.http.post(`${this.apiUrl}/form`, plainteData, { headers });
+   
   }
 
   getPlaintes(): Observable<any> {
-    return this.http.get(`${this.apiUrl}`);
+    const headers = this.getAuthHeaders();
+    return this.http.get(`${this.apiUrl}`, { headers });
+
+  }
+  supprimerPlainte(id: string): Observable<any> {
+    const headers = this.getAuthHeaders();
+    return this.http.delete(`${this.apiUrl}/${id}`, { headers });
   }
 
-  supprimerPlainte(id: string): Observable<any> {
-    return this.http.delete(`${this.apiUrl}/${id}`);
+  getCategories(): Observable<any> {
+    const headers = this.getAuthHeaders();
+    return this.http.get(`${this.apiUrl}/categories`, { headers });
+  }
+
+  // Méthode temporaire pour tester sans authentification
+  getCategoriesPublic(): Observable<any> {
+    const headers = new HttpHeaders({
+      'Content-Type': 'application/json',
+      'ngrok-skip-browser-warning': 'true' 
+    });
+    return this.http.get(`${this.apiUrl}/categories`, { headers });
   }
 
   getCategoryImage(categoryKey: string): string {

@@ -1,6 +1,7 @@
 import { Component, HostListener, Inject, PLATFORM_ID } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
+import { AuthService } from 'src/app/servicesclient/auth.service';
 
 @Component({
   selector: 'app-appeler-anam',
@@ -14,7 +15,10 @@ export class AppelerAnamComponent {
   isMobile = false;
   phoneNumber = '+221338699999';
 
-  constructor(@Inject(PLATFORM_ID) private platformId: Object) {
+  constructor(
+    @Inject(PLATFORM_ID) private platformId: Object,
+    private authService: AuthService
+  ) {
     if (isPlatformBrowser(this.platformId)) {
       this.checkDevice();
     }
@@ -36,6 +40,11 @@ export class AppelerAnamComponent {
 
   toggleMenu() {
     this.menuActive = !this.menuActive;
+  }
+
+  logout() {
+    this.authService.logout();
+    // La redirection sera gérée par le service AuthService
   }
 
   @HostListener('window:resize', ['$event'])

@@ -9,7 +9,8 @@ import { Router } from '@angular/router';
   providedIn: 'root'
 })
 export class AuthService {
-  private baseUrl = 'http://localhost:3001/auth';
+private baseUrl = 'https://ce1e-154-124-68-191.ngrok-free.app/auth';
+  //private baseUrl = 'http://localhost:3001/auth';
   private currentUserSubject = new BehaviorSubject<any>(null);
   private refreshInProgress = false;
 
@@ -236,5 +237,8 @@ isTokenExpired(token: string): boolean {
   if (!user) return null;
   return user.sub || user.id || user.userId || null;
 }
+
+
+
 
 }

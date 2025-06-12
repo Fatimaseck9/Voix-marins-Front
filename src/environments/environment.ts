@@ -17,5 +17,6 @@ export const environment = {
   serverURLjambar: "http://localhost:3001/api/v1/",
   serverURLjambarlocale: "http://localhost:3001/api/v1/",
   serverURLMETRIClocal: "http://localhost:3001/api/v1/",
-  apiUrl: "http://localhost:3001/api/v1"
+  //apiUrl: "http://localhost:3001/api/v1"
+  apiUrl: "https://7a28-41-83-96-192.ngrok-free.app"
 };

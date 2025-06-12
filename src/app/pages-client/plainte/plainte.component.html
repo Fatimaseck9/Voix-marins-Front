@@ -2,7 +2,9 @@
   <header class="glass-header">
     <div class="header-content">
       <div class="logo">
-        <img src="assets/img/anam.png" alt="Logo Voix des Marins">
+        <a routerLink="/marin/home">
+  <img src="assets/img/anam.png" alt="Logo Voix des Marins">
+</a>
       </div>
       
       <nav class="main-nav">
@@ -27,6 +29,7 @@
                 <span class="nav-text">Suivre Mes Plaintes </span>
                 <span class="nav-dot"></span>
               </a>
+          </li>
           <li class="nav-item">
             <a routerLink="/marin/aide-vocale" class="nav-link">
               <i class="fas fa-question-circle nav-icon"></i>
@@ -40,6 +43,13 @@
               <span class="nav-text">Contact</span>
               <span class="nav-dot"></span>
             </a>
+          </li>
+          <li class="nav-item">
+            <button class="nav-link logout-nav-btn" (click)="logout()" title="Se déconnecter">
+              <i class="fas fa-sign-out-alt nav-icon"></i>
+              <span class="nav-text">Déconnexion</span>
+              <span class="nav-dot"></span>
+            </button>
           </li>
         </ul>
       </nav>
@@ -55,12 +65,28 @@
       <p class="text-muted mb-4">
         Enregistrez votre plainte vocalement pour une meilleure description de votre situation
       </p>
+
+      <!-- Instructions pour mobile -->
+      <div class="mobile-instructions alert alert-info d-md-none mb-4">
+        <h6><i class="fas fa-info-circle me-2"></i>Instructions pour l'enregistrement :</h6>
+        <ul class="mb-0">
+          <li>Autorisez l'accès au microphone quand votre navigateur le demande</li>
+          <li>Tenez votre téléphone près de votre bouche</li>
+          <li>Parlez clairement dans un environnement calme</li>
+          <li>Si l'accès est refusé, rechargez la page et réessayez</li>
+        </ul>
+      </div>
   
       <!-- Bouton Démarrer -->
       <div class="mb-4" *ngIf="!showRecorderControls && !showAudioControls">
-        <button (click)="startRecording()" class="btn btn-primary">
-          <i class="fas fa-microphone me-2"></i> Démarrer l'enregistrement
-        </button>
+        <div class="d-flex flex-column flex-md-row gap-2 justify-content-center">
+          <button (click)="startRecording()" class="btn btn-primary">
+            <i class="fas fa-microphone me-2"></i> Démarrer l'enregistrement
+          </button>
+          <button (click)="testMicrophone()" class="btn btn-outline-info d-md-none">
+            <i class="fas fa-volume-up me-2"></i> Tester le microphone
+          </button>
+        </div>
       </div>
   
       <!-- Contrôles pendant l'enregistrement -->
