@@ -31,7 +31,7 @@ export class SuivreMesPlaintesComponent implements OnInit {
   menuActive = false;
   plaintes: Plainte[] = [];
   isBrowser: boolean;
-  private apiUrl = 'voix-marins-backend-production.up.railway.app/plaintes';
+  private apiUrl = 'https://voix-marins-backend-production.up.railway.app/plaintes';
  // private apiUrl ='https://ce1e-154-124-68-191.ngrok-free.app/plaintes';
  // private apiUrl = 'http://10.100.200.20:3001/plaintes';
 
@@ -50,7 +50,7 @@ export class SuivreMesPlaintesComponent implements OnInit {
     }
   }
 
-  readonly backendBaseUrl = 'voix-marins-backend-production.up.railway.app/';
+  readonly backendBaseUrl = 'https://voix-marins-backend-production.up.railway.app/';
   
   //readonly backendBaseUrl = 'https://ce1e-154-124-68-191.ngrok-free.app';
    //readonly backendBaseUrl ='http://10.100.200.20:3001';
