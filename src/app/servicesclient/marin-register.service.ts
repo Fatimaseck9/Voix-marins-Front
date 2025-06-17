@@ -6,7 +6,7 @@ import { Observable } from 'rxjs';
   providedIn: 'root'
 })
 export class MarinRegisterService {
-  private apiUrl = 'http://localhost:3001/marins/register';
+  private apiUrl = 'https://voix-marins-backend-1.onrender.com/marins/register';
 
   constructor(private http: HttpClient) {}
 
