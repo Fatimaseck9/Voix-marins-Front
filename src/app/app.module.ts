@@ -66,6 +66,7 @@ import { ServiceWorkerModule } from "@angular/service-worker";
 import { AdminListComponent } from "./pages/admin-list/admin-list.component";
 
 
+
 @NgModule({
   exports: [
     MatAutocompleteModule,
@@ -105,6 +106,7 @@ import { AdminListComponent } from "./pages/admin-list/admin-list.component";
   
     TableauDeBordComponent,
     AdminListComponent,
+   
   ],
 })
 export class MaterialModule {}

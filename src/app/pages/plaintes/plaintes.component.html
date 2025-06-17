@@ -931,13 +931,6 @@ body {
             </div>
         </div>
 
-        <div class="alert-toast" [class.show]="showAlert">
-  <div class="alert-content">
-    {{ alertMessage }}
-    <button class="alert-close" (click)="showAlert = false">&times;</button>
-  </div>
-</div>
-
     </div>
 
     <!-- Modal d'édition -->
@@ -953,7 +946,9 @@ body {
         <div class="modal-body">
             <div class="form-group">
                 <label>Statut</label>
-                <select [(ngModel)]="selectedPlainte.statut" class="form-select">
+                <select [(ngModel)]="selectedPlainte.statut" 
+                        (ngModelChange)="onStatutChange($event)"
+                        class="form-select">
                     <option value="En attente">En attente</option>
                     <option value="En traitement">En traitement</option>
                     <option value="Resolue">Resolue</option>
@@ -976,67 +971,73 @@ body {
                 
                 <!-- Toolbar de formatage -->
                 <div class="editor-toolbar" style="margin-bottom: 10px; padding: 8px; border: 1px solid #ddd; border-radius: 4px; background: #f8f9fa;">
-                    <div class="toolbar-group" style="display: inline-flex; gap: 5px; margin-right: 15px;">
-                        <button type="button" class="btn-format" (click)="formatBold()" title="Gras">
-                            <strong>B</strong>
-                        </button>
-                        <button type="button" class="btn-format" (click)="formatItalic()" title="Italique">
-                            <em>I</em>
-                        </button>
-                        <button type="button" class="btn-format" (click)="formatUnderline()" title="Souligné">
-                            <u>U</u>
-                        </button>
-                        <button type="button" class="btn-format" (click)="formatStrikethrough()" title="Barré">
-                            <s>S</s>
-                        </button>
-                    </div>
-                    
-                    <div class="toolbar-group" style="display: inline-flex; gap: 5px; margin-right: 15px;">
-                        <button type="button" class="btn-format" (click)="insertUnorderedList()" title="Liste à puces">
-                            • Liste
-                        </button>
-                        <button type="button" class="btn-format" (click)="insertOrderedList()" title="Liste numérotée">
-                            1. Liste
-                        </button>
-                    </div>
-                    
-                    <div class="toolbar-group" style="display: inline-flex; gap: 5px;">
-                        <button type="button" class="btn-format" (click)="formatColor('#ff0000')" title="Texte rouge" style="color: red;">
-                            A
-                        </button>
-                        <button type="button" class="btn-format" (click)="formatColor('#0000ff')" title="Texte bleu" style="color: blue;">
-                            A
-                        </button>
-                        <button type="button" class="btn-format" (click)="formatHighlight('#ffff00')" title="Surligner" style="background-color: yellow;">
-                            H
-                        </button>
-                    </div>
+                  <div class="toolbar-group" style="display: inline-flex; gap: 5px; margin-right: 15px;">
+                    <button type="button" class="btn-format" (click)="formatBold()" title="Gras">
+                      <strong>B</strong>
+                    </button>
+                    <button type="button" class="btn-format" (click)="formatItalic()" title="Italique">
+                      <em>I</em>
+                    </button>
+                    <button type="button" class="btn-format" (click)="formatUnderline()" title="Souligné">
+                      <u>U</u>
+                    </button>
+                    <button type="button" class="btn-format" (click)="formatStrikethrough()" title="Barré">
+                      <s>S</s>
+                    </button>
+                  </div>
+                  
+                  <div class="toolbar-group" style="display: inline-flex; gap: 5px; margin-right: 15px;">
+                    <button type="button" class="btn-format" (click)="insertUnorderedList()" title="Liste à puces">
+                      • Liste
+                    </button>
+                    <button type="button" class="btn-format" (click)="insertOrderedList()" title="Liste numérotée">
+                      1. Liste
+                    </button>
+                  </div>
+                  
+                  <div class="toolbar-group" style="display: inline-flex; gap: 5px;">
+                    <button type="button" class="btn-format" (click)="formatColor('#ff0000')" title="Texte rouge" style="color: red;">
+                      A
+                    </button>
+                    <button type="button" class="btn-format" (click)="formatColor('#0000ff')" title="Texte bleu" style="color: blue;">
+                      A
+                    </button>
+                    <button type="button" class="btn-format" (click)="formatHighlight('#ffff00')" title="Surligner" style="background-color: yellow;">
+                      H
+                    </button>
+                  </div>
+
+                  <!-- Bouton PV -->
+                  <div class="toolbar-group" style="display: inline-flex; gap: 5px; margin-left: 15px; border-left: 1px solid #ddd; padding-left: 15px;">
+                    <button type="button" 
+                            class="btn-format" 
+                            (click)="ajouterPV()" 
+                            title="Ajouter PV" 
+                            [style.background-color]="selectedPlainte?.statut === 'Resolue' ? '#4CAF50' : '#cccccc'"
+                            [style.cursor]="selectedPlainte?.statut === 'Resolue' ? 'pointer' : 'not-allowed'"
+                            [disabled]="selectedPlainte?.statut !== 'Resolue'">
+                      <i class="fas fa-file-upload"></i> PV
+                    </button>
+                  </div>
                 </div>
 
-                <!-- Éditeur riche -->
-                <div 
-                    #richEditor
-  class="rich-editor" 
-  contenteditable="true" 
-  (input)="onEditorContentChange($event)"
-  (focus)="$event.target.style.outline = '2px solid #007bff'"
-  (blur)="$event.target.style.outline = 'none'"
-  dir="ltr"
-                    style="
-                        border: 1px solid #ccc; 
-                        padding: 12px; 
-                        min-height: 120px; 
-                        background: white; 
-                        border-radius: 4px;
-                        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-                        font-size: 14px;
-                        line-height: 1.5;
-                    ">
+                <!-- Éditeur riche et PV -->
+                <div class="d-flex gap-3 align-items-start">
+                  <div class="flex-grow-1">
+                    <div #richEditor class="rich-editor" contenteditable="true" 
+                      (input)="onEditorContentChange($event)"
+                      (focus)="$event.target.style.outline = '2px solid #007bff'"
+                      (blur)="$event.target.style.outline = 'none'"
+                      dir="ltr"
+                      style="border: 1px solid #ccc; padding: 12px; min-height: 120px; background: white; border-radius: 4px; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; font-size: 14px; line-height: 1.5;">
+                    </div>
+                  </div>
                 </div>
-                
-                <small class="form-text text-muted" style="margin-top: 5px; display: block;">
-                    Utilisez les boutons ci-dessus pour formater votre texte. Vous pouvez également utiliser les raccourcis clavier : Ctrl+B (gras), Ctrl+I (italique), Ctrl+U (souligné).
-                </small>
+
+                <!-- Alerte de succès après l'upload -->
+                <div *ngIf="showAlert" class="alert alert-success mt-2 mb-2" role="alert">
+                  {{ alertMessage }}
+                </div>
             </div>
 
             <div class="form-group">
@@ -1045,13 +1046,56 @@ body {
                     {{ selectedPlainte.description }}
                 </p>
             </div>
-        </div>
-            <div class="modal-footer">
-                <button class="btn-annuler" (click)="fermerModal()">Annuler</button>
-                <button class="btn-sauvegarder" (click)="sauvegarderModifications()">Sauvegarder</button>
+
+            <div class="row">
+              <div class="col-md-6">
+                <div class="mb-3">
+                  <label class="form-label text-success">
+                    <i class="fas fa-file-alt me-1"></i> PV joint
+                  </label>
+                  <ng-container *ngIf="selectedPlainte">
+                    <div *ngIf="selectedPlainte.statut === 'Resolue' && selectedPlainte.pvUrl" class="d-flex align-items-center gap-2">
+                      <span class="text-muted">
+                        <i class="fas fa-file-alt me-1"></i>
+                        {{ getFileName(selectedPlainte.pvUrl) }}
+                      </span>
+                      <button class="btn btn-sm btn-danger" (click)="supprimerPV()">
+                        <i class="fas fa-times"></i>
+                      </button>
+                    </div>
+                    <div *ngIf="selectedPlainte.statut !== 'Resolue' || !selectedPlainte.pvUrl" class="text-muted">
+                      <i class="fas fa-info-circle me-1"></i>
+                      Aucun PV joint
+                    </div>
+                  </ng-container>
+                </div>
+              </div>
+            </div>
+
+            <!-- Boutons d'action -->
+            <div class="mt-3 pt-3 border-top">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div *ngIf="!canModifyPlainte(selectedPlainte)" class="text-warning">
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        Cette plainte a été résolue par un autre admin. Vous ne pouvez pas la modifier.
+                    </div>
+                    <button class="btn-sauvegarder" 
+                            (click)="updatePlainte()" 
+                            [disabled]="!canModifyPlainte(selectedPlainte)">
+                        <i class="fas fa-save me-2"></i>Sauvegarder
+                    </button>
+                </div>
             </div>
         </div>
     </div>
 
-</body>
-</html>
+<!-- Alerte de succès après sauvegarde -->
+<div *ngIf="showSaveAlert" class="alert alert-success alert-dismissible fade show position-fixed top-0 end-0 m-3" 
+     role="alert" style="z-index: 1060;">
+    <div class="d-flex align-items-center">
+        <i class="fas fa-check-circle me-2"></i>
+        <strong>Succès !</strong> La plainte a été mise à jour avec succès.
+    </div>
+    <button type="button" class="btn-close" (click)="showSaveAlert = false" aria-label="Close"></button>
+</div>
+

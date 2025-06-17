@@ -1,0 +1,171 @@
+/* Styles généraux */
+.container-fluid {
+    padding: 2rem;
+}
+
+/* En-tête */
+.card-header h3 {
+    color: #344767;
+    font-weight: 600;
+}
+
+/* Filtres */
+.input-group {
+    margin-bottom: 1rem;
+}
+
+.input-group-text {
+    background-color: #f8f9fa;
+    border-right: none;
+}
+
+.form-control, .form-select {
+    border-left: none;
+}
+
+.form-control:focus, .form-select:focus {
+    box-shadow: none;
+    border-color: #dee2e6;
+}
+
+/* Tableau */
+.table {
+    margin-bottom: 0;
+}
+
+.table th {
+    font-weight: 600;
+    color: #344767;
+    border-bottom: 2px solid #e9ecef;
+}
+
+.table td {
+    vertical-align: middle;
+}
+
+/* Badges de catégorie */
+.badge {
+    padding: 0.5em 0.75em;
+    font-weight: 500;
+}
+
+.badge-harcelement {
+    background-color: #e74c3c;
+    color: white;
+}
+
+.badge-violence {
+    background-color: #c0392b;
+    color: white;
+}
+
+.badge-nourriture {
+    background-color: #f39c12;
+    color: white;
+}
+
+.badge-paiement {
+    background-color: #3498db;
+    color: white;
+}
+
+/* Boutons d'action */
+.btn-group {
+    gap: 0.5rem;
+}
+
+.btn-sm {
+    padding: 0.25rem 0.5rem;
+}
+
+/* Modal */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1050;
+}
+
+.modal-container {
+    background: white;
+    border-radius: 8px;
+    width: 90%;
+    max-width: 800px;
+    max-height: 90vh;
+    overflow-y: auto;
+}
+
+.modal-header {
+    padding: 1rem;
+    border-bottom: 1px solid #dee2e6;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.modal-header h3 {
+    margin: 0;
+    color: #344767;
+    font-size: 1.25rem;
+}
+
+.modal-body {
+    padding: 1.5rem;
+}
+
+.modal-footer {
+    padding: 1rem;
+    border-top: 1px solid #dee2e6;
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.5rem;
+}
+
+/* Détails de la plainte */
+.description-box {
+    background-color: #f8f9fa;
+    padding: 1rem;
+    border-radius: 4px;
+    margin-bottom: 1rem;
+}
+
+.resolution-details {
+    background-color: #f8f9fa;
+    padding: 1rem;
+    border-radius: 4px;
+    margin-top: 0.5rem;
+}
+
+/* Message vide */
+.text-muted {
+    color: #6c757d !important;
+}
+
+.text-muted i {
+    display: block;
+    margin-bottom: 0.5rem;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .container-fluid {
+        padding: 1rem;
+    }
+
+    .modal-container {
+        width: 95%;
+        margin: 1rem;
+    }
+
+    .btn-group {
+        flex-direction: column;
+    }
+}
+
+

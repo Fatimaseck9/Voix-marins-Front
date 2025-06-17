@@ -174,3 +174,28 @@ button:active {
     font-size: 1.4rem;
   }
 }
+
+/* Style pour le lien d'inscription */
+.signup-link {
+  text-align: center;
+  margin-top: 1.5rem;
+  padding-top: 1rem;
+  border-top: 1px solid #e0e0e0;
+}
+
+.signup-link p {
+  color: #666;
+  font-size: 0.95rem;
+}
+
+.signup-link a {
+  color: #007bff;
+  text-decoration: none;
+  font-weight: 600;
+  transition: color 0.3s ease;
+}
+
+.signup-link a:hover {
+  color: #0056b3;
+  text-decoration: underline;
+}

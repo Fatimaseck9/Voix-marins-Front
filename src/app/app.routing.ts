@@ -18,6 +18,7 @@ import { LoginMarinComponent } from "./pages-client/login/loginmarin.component";
 import { MarinAuthGuard } from "./servicesclient/marin-auth.guard";
 import { AdminAuthGuard } from "./pages/auth/admin-auth.guard";
 import { AdminListComponent } from "./pages/admin-list/admin-list.component";
+import { PlaintesResoluesComponent } from './pages/plaintes-resolues/plaintes-resolues.component';
 
 
 
@@ -94,24 +95,23 @@ export const AppRoutes: Routes = [
         path: "metric",
         loadChildren: () => import("./METRIC/metric.module").then(m => m.MetricModule)
       },
-             {
-  path: 'plaintes',
-  component: PlaintesComponent // ← le composant qui affichera les plaintes
-},
-
-     
-
-            {
-  path: 'tableau-bord',
-  component: TableauDeBordComponent 
-},
- { 
+      {
+        path: 'plaintes',
+        component: PlaintesComponent
+      },
+      {
+        path: 'plaintesresolues',
+        component: PlaintesResoluesComponent
+      },
+      {
+        path: 'tableau-bord',
+        component: TableauDeBordComponent 
+      },
+      { 
         path: "register", 
         component: RegisterComponent 
       },
-      { path: 'admin-list', component: AdminListComponent },
-
-    
+      { path: 'admin-list', component: AdminListComponent }
     ]
   },
 

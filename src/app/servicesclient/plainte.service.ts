@@ -7,9 +7,10 @@ import { AuthService } from './auth.service';
   providedIn: 'root'
 })
 export class PlainteService {
-  private apiUrl = 'https://ce1e-154-124-68-191.ngrok-free.app/plaintes';
+ // private apiUrl = 'https://ce1e-154-124-68-191.ngrok-free.app/plaintes';
+   private apiUrl = 'http://10.100.200.20:3001/plaintes';
   
- // private apiUrl = 'http://localhost:3001/plaintes';
+  //private apiUrl = 'http://localhost:3001/plaintes';
   
   categories = [
     { key: 'harcelement', label: 'Harcèlement', image: 'Harcélement.jpeg' },

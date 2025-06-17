@@ -13,9 +13,7 @@ import { LockComponent } from './lock/lock.component';
 import { LoginComponent } from './login/login.component';
 import { ChangePasswordComponent } from './change-password/change-password.component';
 import { HistoriquePlainteComponent } from './historique-plainte/historique-plainte.component';
-
-
-
+import { PlaintesResoluesComponent } from './plaintes-resolues/plaintes-resolues.component';
 
 @NgModule({
   imports: [
@@ -31,7 +29,9 @@ import { HistoriquePlainteComponent } from './historique-plainte/historique-plai
     PricingComponent,
     LockComponent,
     ChangePasswordComponent,
-    HistoriquePlainteComponent
+    HistoriquePlainteComponent,
+    PlaintesResoluesComponent,
+   
   ],
   providers: [
    

@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+    <title>Admin - Plaintes Résolues</title>
+    <style>
+        .page-container {
+            background-color: #f8f9fa;
+            min-height: 100vh;
+            padding: 2rem;
+            padding-top: 5rem;
+        }
+
+        .content-card {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.05);
+            margin-bottom: 2rem;
+            padding: 2rem 0;
+            margin-top: 2rem;
+        }
+
+        .page-title {
+            color: #2c3e50;
+            font-weight: 600;
+            margin: 0;
+            padding: 0;
+            font-size: 1.75rem;
+        }
+
+        .search-section {
+            background: white;
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.05);
+        }
+
+        .table-container {
+            background: white;
+            border-radius: 10px;
+            padding: 1.5rem;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.05);
+        }
+
+        .table thead th {
+            background-color: #f8f9fa;
+            border-bottom: 2px solid #dee2e6;
+            color: #495057;
+            font-weight: 600;
+        }
+
+        .table tbody tr:hover {
+            background-color: #f8f9fa;
+        }
+
+        .badge {
+            padding: 0.5em 0.8em;
+            font-weight: 500;
+        }
+
+        .details-content {
+            max-width: 300px;
+            max-height: 100px;
+            overflow-y: auto;
+            padding: 0.5rem;
+            background: #f8f9fa;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            line-height: 1.4;
+        }
+
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1050;
+        }
+
+        .modal-container {
+            background: white;
+            border-radius: 10px;
+            width: 90%;
+            max-width: 800px;
+            max-height: 90vh;
+            overflow-y: auto;
+            position: relative;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .modal-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid #dee2e6;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-body {
+            padding: 1.5rem;
+        }
+
+        .modal-footer {
+            padding: 1.5rem;
+            border-top: 1px solid #dee2e6;
+            display: flex;
+            justify-content: flex-end;
+        }
+
+        .btn-close {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            padding: 0.5rem;
+        }
+
+        .glass-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+        }
+    </style>
+</head>
+
+<div class="page-container">
+    <!-- En-tête avec titre -->
+    <div class="content-card">
+        <div class="container-fluid">
+            <h3 class="page-title text-center">
+                        <i class="fas fa-check-circle text-success me-2"></i>
+                        Plaintes Résolues
+                    </h3>
+        </div>
+    </div>
+
+    <!-- Filtres et recherche -->
+    <div class="search-section">
+        <div class="container-fluid">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="input-group">
+                                <span class="input-group-text">
+                                    <i class="fas fa-search"></i>
+                                </span>
+                                <input type="text" 
+                                       class="form-control" 
+                                       placeholder="Rechercher une plainte..."
+                                       [(ngModel)]="searchTerm"
+                                       (input)="filterPlaintes()">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="input-group">
+                                <span class="input-group-text">
+                                    <i class="fas fa-filter"></i>
+                                </span>
+                                <select class="form-select" 
+                                        [(ngModel)]="selectedCategorie"
+                                        (change)="filterPlaintes()">
+                                    <option value="">Toutes les catégories</option>
+                                    <option value="harcelement">Harcèlement</option>
+                                    <option value="violence">Violence physique</option>
+                                    <option value="nourriture">Refus de nourriture</option>
+                                    <option value="paiement">Problème de paiement</option>
+                                </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Liste des plaintes -->
+    <div class="table-container">
+        <div class="container-fluid">
+                    <div class="table-responsive">
+                <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Titre</th>
+                                    <th>Catégorie</th>
+                                    <th>Détails de la résolution</th>
+                                    <th>PV</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr *ngFor="let plainte of filteredPlaintes">
+                                    <td>{{ plainte.dateCreation | date:'dd/MM/yyyy' }}</td>
+                                    <td>{{ plainte.titre }}</td>
+                                    <td>
+                                        <span class="badge" [ngClass]="getCategoryClass(plainte.categorie)">
+                                            {{ getCategoryLabel(plainte.categorie) }}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <div class="details-content" [innerHTML]="plainte.detailsplainte || 'Non renseigné'"></div>
+                                    </td>
+                                    <td>
+                                        <div *ngIf="plainte.pvUrl" class="d-flex align-items-center gap-2">
+                                            <i class="fas fa-file-alt text-primary"></i>
+                                            <span class="text-muted">{{ getFileName(plainte.pvUrl) }}</span>
+                                        </div>
+                                        <span *ngIf="!plainte.pvUrl" class="text-muted">
+                                            <i class="fas fa-times-circle text-danger"></i>
+                                            Aucun PV
+                                        </span>
+                                    </td>
+                                    <td>
+                                            <button class="btn btn-sm btn-info" 
+                                                    (click)="voirDetails(plainte)"
+                                                    title="Voir les détails">
+                                                <i class="fas fa-eye"></i>
+                                            </button>
+                                    </td>
+                                </tr>
+                                <tr *ngIf="filteredPlaintes.length === 0">
+                                    <td colspan="6" class="text-center py-4">
+                                        <div class="text-muted">
+                                            <i class="fas fa-inbox fa-2x mb-3"></i>
+                                            <p>Aucune plainte résolue trouvée</p>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de détails -->
+<div *ngIf="showModal" class="modal-overlay">
+    <div class="modal-container glass-card">
+        <div class="modal-header">
+            <h3>
+                <i class="fas fa-info-circle text-primary me-2"></i>
+                Détails de la plainte résolue
+            </h3>
+            <button class="btn-close" (click)="fermerModal()">&times;</button>
+        </div>
+        
+        <div class="modal-body" *ngIf="selectedPlainte">
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <div class="card h-100">
+                        <div class="card-header bg-light">
+                            <h6 class="mb-0">
+                                <i class="fas fa-info-circle text-primary me-2"></i>
+                                Informations de la plainte
+                            </h6>
+                        </div>
+                        <div class="card-body">
+                    <p><strong>Titre:</strong> {{ selectedPlainte.titre }}</p>
+                    <p><strong>Catégorie:</strong> {{ getCategoryLabel(selectedPlainte.categorie) }}</p>
+                    <p><strong>Date de création:</strong> {{ selectedPlainte.dateCreation | date:'dd/MM/yyyy' }}</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card h-100">
+                        <div class="card-header bg-light">
+                            <h6 class="mb-0">
+                                <i class="fas fa-align-left text-primary me-2"></i>
+                                Description originale
+                            </h6>
+                        </div>
+                        <div class="card-body">
+                    <p class="description-box">{{ selectedPlainte.description }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row mt-3">
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-header bg-light">
+                            <h6 class="mb-0">
+                                <i class="fas fa-check-circle text-primary me-2"></i>
+                                Détails de la résolution
+                            </h6>
+                        </div>
+                        <div class="card-body">
+                    <div class="resolution-details" [innerHTML]="selectedPlainte.detailsplainte || 'Non renseigné'"></div>
+                            
+                            <!-- Informations de l'admin qui a résolu la plainte -->
+                            <div class="mt-3 pt-3 border-top">
+                                <p class="mb-1"><strong>Résolu par:</strong></p>
+                                <div class="d-flex align-items-center">
+                                    <i class="fas fa-user-shield text-primary me-2"></i>
+                                    <div>
+                                        <p class="mb-0">
+                                            {{ selectedPlainte.resolvedBy?.name || 'Admin #' + selectedPlainte.resolvedBy?.id }}
+                                        </p>
+                                        <small class="text-muted">
+                                            {{ selectedPlainte.resolvedBy?.email || 'Email non disponible' }}
+                                        </small>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Date de résolution -->
+                            <div class="mt-2">
+                                <small class="text-muted">
+                                    <i class="fas fa-calendar-alt me-1"></i>
+                                    Résolu le: {{ selectedPlainte.dateResolution | date:'dd/MM/yyyy' || 'Date non disponible' }}
+                                </small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row mt-3" *ngIf="selectedPlainte.pvUrl">
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-header bg-light">
+                            <h6 class="mb-0">
+                                <i class="fas fa-file-alt text-primary me-2"></i>
+                                Procès-Verbal
+                            </h6>
+                        </div>
+                        <div class="card-body">
+                    <div class="d-flex align-items-center gap-2">
+                        <i class="fas fa-file-alt text-primary"></i>
+                        <span>{{ getFileName(selectedPlainte.pvUrl) }}</span>
+                        <button class="btn btn-sm btn-success ms-2" (click)="telechargerPV(selectedPlainte)">
+                            <i class="fas fa-download me-1"></i>
+                            Télécharger
+                        </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" (click)="fermerModal()">
+                <i class="fas fa-times me-1"></i>
+                Fermer
+            </button>
+        </div>
+    </div>
+</div>

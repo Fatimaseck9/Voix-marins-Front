@@ -31,8 +31,9 @@ export class SuivreMesPlaintesComponent implements OnInit {
   menuActive = false;
   plaintes: Plainte[] = [];
   isBrowser: boolean;
-  //private apiUrl = 'http://localhost:3001/plaintes';
-  private apiUrl ='https://ce1e-154-124-68-191.ngrok-free.app/plaintes';
+  private apiUrl = 'http://localhost:3001/plaintes';
+ // private apiUrl ='https://ce1e-154-124-68-191.ngrok-free.app/plaintes';
+ // private apiUrl = 'http://10.100.200.20:3001/plaintes';
 
   constructor(
     @Inject(PLATFORM_ID) private platformId: Object,
@@ -49,9 +50,10 @@ export class SuivreMesPlaintesComponent implements OnInit {
     }
   }
 
-  //readonly backendBaseUrl = 'http://localhost:3001';
+  readonly backendBaseUrl = 'http://localhost:3001';
   
-  readonly backendBaseUrl = 'https://ce1e-154-124-68-191.ngrok-free.app';
+  //readonly backendBaseUrl = 'https://ce1e-154-124-68-191.ngrok-free.app';
+   //readonly backendBaseUrl ='http://10.100.200.20:3001';
 
  async loadPlaintes() {
   try {

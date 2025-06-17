@@ -42,6 +42,13 @@ export let ROUTES: RouteInfo[] = [
     type: 'link',
     icontype: 'report_problem'
   },
+  {
+    path: '/admin/plaintesresolues',
+    title: 'Plaintes Résolues',
+    visible: true,
+    type: 'link',
+    icontype: 'check_circle'
+  },
   //{
    // path: '/admin/register',
     //title: 'Inscription admin',

@@ -2,6 +2,13 @@ import { Component, OnInit, ViewChild, ElementRef, AfterViewInit } from '@angula
 import { PlainteService } from 'src/app/services/plainte.service';
 import { AngularEditorConfig } from '@kolkov/angular-editor';
 import { DomSanitizer } from '@angular/platform-browser';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { firstValueFrom } from 'rxjs';
+import Swal from 'sweetalert2';
+import { jwtDecode } from 'jwt-decode';
+import { AuthService } from 'src/app/services/auth.service';
+import { CookieService } from 'ngx-cookie-service';
+import { Observable, tap, catchError, throwError } from 'rxjs';
 
 @Component({
   selector: 'app-plaintes',
@@ -13,7 +20,6 @@ export class PlaintesComponent implements OnInit, AfterViewInit {
   @ViewChild('richEditor', { static: false }) richEditor!: ElementRef;
 
   plaintes: any[] = [];
-  http: any;
   selectedStatut: string = '';
   selectedCategorie: string = '';
   searchTerm: string = '';
@@ -21,9 +27,13 @@ export class PlaintesComponent implements OnInit, AfterViewInit {
   isEditModalOpen: boolean = false;
   showAlert: boolean = false;
   alertMessage: string = '';
+  showModal = false;
+  showSaveAlert = false;
   
   // Variable pour éviter les mises à jour en boucle
   private isUpdatingContent: boolean = false;
+
+  selectedFile: File | null = null;
 
   editorConfig: AngularEditorConfig = {
     editable: true,
@@ -53,7 +63,10 @@ export class PlaintesComponent implements OnInit, AfterViewInit {
 
   constructor(
     private plainteService: PlainteService,
-    private sanitizer: DomSanitizer
+    private sanitizer: DomSanitizer,
+    private http: HttpClient,
+    private authService: AuthService,
+    private cookieService: CookieService
   ) {}
 
   ngOnInit(): void {
@@ -109,9 +122,10 @@ export class PlaintesComponent implements OnInit, AfterViewInit {
   }
 
   getFullAudioUrl(relativeUrl: string): string {
-  const fullUrl = `http://localhost:3001${relativeUrl}`;
-  console.log('Audio URL:', fullUrl);
-  return fullUrl;
+    if (!relativeUrl) return '';
+    // Assurez-vous que l'URL ne commence pas déjà par http
+    if (relativeUrl.startsWith('http')) return relativeUrl;
+    return `http://localhost:3001${relativeUrl.startsWith('/') ? '' : '/'}${relativeUrl}`;
 }
 
   traiterPlainte(plainte: any) {
@@ -168,10 +182,15 @@ export class PlaintesComponent implements OnInit, AfterViewInit {
   }
 
   ouvrirModalEdition(plainte: any) {
+    // Créer une copie de la plainte
     this.selectedPlainte = {
       ...plainte,
-      detailsplainte: plainte.detailsplainte || ''
+      detailsplainte: plainte.detailsplainte || '',
+      // Ne garder le PV que si le statut est "Resolue"
+      pvUrl: plainte.statut === 'Resolue' ? plainte.pvUrl : null
     };
+    
+    console.log('Modal ouvert avec plainte:', this.selectedPlainte);
     this.isEditModalOpen = true;
     
     // Attendre que le DOM soit mis à jour avant d'initialiser l'éditeur
@@ -190,29 +209,253 @@ export class PlaintesComponent implements OnInit, AfterViewInit {
     this.isUpdatingContent = false;
   }
 
-  sauvegarderModifications(): void {
-    const updateData = {
-      statut: this.selectedPlainte.statut,
-      categorie: this.selectedPlainte.categorie,
+  onFileSelected(event: any) {
+    const file = event.target.files[0];
+    if (file) {
+      // Vérifier le type de fichier
+      const allowedTypes = ['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
+      if (!allowedTypes.includes(file.type)) {
+        alert('Format de fichier non supporté. Veuillez utiliser PDF, DOC ou DOCX.');
+        return;
+      }
+      
+      // Vérifier la taille du fichier (max 5MB)
+      if (file.size > 5 * 1024 * 1024) {
+        alert('Le fichier est trop volumineux. Taille maximale : 5MB');
+        return;
+      }
+
+      this.selectedFile = file;
+    }
+  }
+
+  async ajouterPV() {
+    // Vérifier si le statut est "Resolue"
+    if (this.selectedPlainte?.statut !== 'Resolue') {
+      Swal.fire({
+        icon: 'warning',
+        title: 'Action non autorisée',
+        text: 'Le PV ne peut être ajouté que lorsque le statut est "Résolue".',
+        confirmButtonText: 'OK'
+      });
+      return;
+    }
+
+    // Créer un input file caché
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = '.pdf,.doc,.docx';
+    input.style.display = 'none';
+    document.body.appendChild(input);
+
+    // Gérer la sélection du fichier
+    input.onchange = async (event: any) => {
+      const file = event.target.files[0];
+      if (file) {
+        // Vérifier le type de fichier
+        const allowedTypes = ['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
+        if (!allowedTypes.includes(file.type)) {
+          Swal.fire({
+            icon: 'error',
+            title: 'Format non supporté',
+            text: 'Veuillez utiliser PDF, DOC ou DOCX.',
+            confirmButtonText: 'OK'
+          });
+          return;
+        }
+        
+        // Vérifier la taille du fichier (max 5MB)
+        if (file.size > 5 * 1024 * 1024) {
+          Swal.fire({
+            icon: 'error',
+            title: 'Fichier trop volumineux',
+            text: 'Taille maximale : 5MB',
+            confirmButtonText: 'OK'
+          });
+          return;
+        }
+
+        try {
+          // Uploader le fichier
+          const response = await firstValueFrom(
+            this.plainteService.uploadPV(this.selectedPlainte.id, file)
+          );
+
+          if (response && response.pvUrl) {
+            // Mettre à jour l'URL du PV dans la plainte
+            this.selectedPlainte.pvUrl = response.pvUrl;
+            
+            // Forcer la mise à jour de l'affichage
+            this.selectedPlainte = { ...this.selectedPlainte };
+            
+            // Afficher un message de succès
+            Swal.fire({
+              icon: 'success',
+              title: 'Succès !',
+              text: 'PV uploadé avec succès !',
+              timer: 2000,
+              showConfirmButton: false
+            });
+          }
+        } catch (error) {
+          console.error('Erreur lors de l\'upload du PV:', error);
+          Swal.fire({
+            icon: 'error',
+            title: 'Erreur',
+            text: 'Erreur lors de l\'upload du PV. Veuillez réessayer.',
+            confirmButtonText: 'OK'
+          });
+        }
+      }
+      // Nettoyer
+      document.body.removeChild(input);
+    };
+
+    // Déclencher le sélecteur de fichier
+    input.click();
+  }
+
+  // Vérifier si l'admin actuel est celui qui a résolu la plainte
+  isCurrentAdminResolver(plainte: any): boolean {
+    const currentAdmin = this.getCurrentAdmin();
+    console.log('Admin actuel:', currentAdmin);
+    console.log('Admin qui a résolu:', plainte.resolvedBy);
+    
+    if (!currentAdmin || !plainte.resolvedBy) return false;
+    
+    // Si l'email n'est pas défini dans resolvedBy, on ne peut pas comparer
+    if (!plainte.resolvedBy.email) {
+      console.log('Email non défini dans resolvedBy');
+      return false;
+    }
+    
+    const currentEmail = currentAdmin.email.toLowerCase();
+    const resolverEmail = plainte.resolvedBy.email.toLowerCase();
+    
+    console.log('Comparaison des emails:', {
+      currentEmail,
+      resolverEmail,
+      match: currentEmail === resolverEmail
+    });
+    
+    return currentEmail === resolverEmail;
+  }
+
+  // Obtenir les informations de l'admin actuel
+  getCurrentAdmin(): any {
+    const token = this.cookieService.get('access_token');
+    if (token) {
+      try {
+        const decodedToken = jwtDecode(token);
+        console.log('Token décodé:', decodedToken);
+        
+        if (decodedToken && typeof decodedToken === 'object') {
+          const admin = {
+            id: decodedToken['sub'],
+            name: decodedToken['name'],
+            email: decodedToken['email'],
+            role: decodedToken['role']
+          };
+          console.log('Admin extrait:', admin);
+          return admin;
+        }
+      } catch (error) {
+        console.error('Erreur lors du décodage du token:', error);
+      }
+    }
+    return null;
+  }
+
+  // Vérifier si une plainte peut être modifiée
+  canModifyPlainte(plainte: any): boolean {
+    if (!plainte) return false;
+    
+    // Si la plainte n'est pas résolue, n'importe quel admin peut la modifier
+    if (plainte.statut !== 'Resolue') return true;
+    
+    // Si la plainte est résolue mais n'a pas d'admin assigné, n'importe quel admin peut la modifier
+    if (!plainte.resolvedBy) return true;
+    
+    // Si la plainte est résolue, seul l'admin qui l'a résolue peut la modifier
+    const currentAdminId = this.authService.getCurrentAdminId();
+    const resolvedById = typeof plainte.resolvedBy === 'object' ? plainte.resolvedBy.id : plainte.resolvedBy;
+    
+    console.log('Current Admin ID:', currentAdminId);
+    console.log('Resolved By ID:', resolvedById);
+    console.log('Can modify:', currentAdminId === resolvedById);
+    
+    return currentAdminId === resolvedById;
+  }
+
+  sauvegarderModifications() {
+    if (!this.selectedPlainte) return;
+          
+    // Vérifier si la plainte peut être modifiée
+    if (!this.canModifyPlainte(this.selectedPlainte)) {
+          Swal.fire({
+        icon: 'error',
+        title: 'Modification impossible',
+        text: 'Cette plainte a été résolue par un autre administrateur. Vous ne pouvez pas la modifier.',
+        confirmButtonText: 'OK'
+      });
+      return;
+    }
+
+      const updateData = {
+          statut: this.selectedPlainte.statut,
+          categorie: this.selectedPlainte.categorie,
       detailsplainte: this.selectedPlainte.detailsplainte
     };
 
-    this.plainteService.updatePlainte(this.selectedPlainte.id, updateData).subscribe({
-      next: (updated: any) => {
-        this.alertMessage = 'Plainte mise à jour avec succès !';
-        this.showAlert = true;
-        this.rechargerPlaintes();
-        
-        setTimeout(() => this.showAlert = false, 3000);
-        this.fermerModal();
-      },
-      error: (err) => {
-        this.alertMessage = 'Erreur lors de la mise à jour : ' + err.message;
-        this.showAlert = true;
-        setTimeout(() => this.showAlert = false, 5000);
+    // Si le statut est "Resolue", ajouter les informations de l'admin
+    if (updateData.statut === 'Resolue') {
+      const admin = this.getCurrentAdmin();
+      console.log('Admin actuel lors de la résolution:', admin);
+      
+      if (admin) {
+        updateData['resolvedBy'] = {
+          name: admin.name,
+          email: admin.email,
+          role: admin.role
+        };
+        updateData['dateResolution'] = new Date().toISOString();
+        console.log('Données de résolution:', updateData);
+      } else {
+        console.error('Impossible de récupérer les informations de l\'admin');
+        Swal.fire({
+          icon: 'error',
+          title: 'Erreur',
+          text: 'Impossible de récupérer les informations de l\'administrateur.',
+          confirmButtonText: 'OK'
+        });
+        return;
       }
+    }
+
+    this.plainteService.updatePlainte(this.selectedPlainte.id, updateData).subscribe({
+      next: (response) => {
+        console.log('Réponse du serveur:', response);
+        Swal.fire({
+          icon: 'success',
+          title: 'Succès',
+          text: 'La plainte a été mise à jour avec succès.',
+          confirmButtonText: 'OK'
+        });
+        this.fermerModal();
+      this.rechargerPlaintes();
+      },
+      error: (error) => {
+        console.error('Erreur lors de la mise à jour:', error);
+      Swal.fire({
+        icon: 'error',
+        title: 'Erreur',
+          text: 'Une erreur est survenue lors de la mise à jour de la plainte.',
+        confirmButtonText: 'OK'
+      });
+    }
     });
   }
+
 get nombreEnAttente(): number {
   return this.plaintes.filter(p => p.statut === 'En attente').length;
 }
@@ -228,7 +471,6 @@ get nombreResolue(): number {
 get nombreTotal(): number {
   return this.plaintes.length;
 }
-
 
   sanitizeHtml(html: string) {
     return this.sanitizer.bypassSecurityTrustHtml(html);
@@ -292,7 +534,6 @@ get nombreTotal(): number {
   }
 }
 
-
   // Méthodes spécifiques pour chaque type de formatage
   formatBold() {
     this.applyFormat('bold');
@@ -324,5 +565,267 @@ get nombreTotal(): number {
 
   formatHighlight(color: string) {
     this.applyFormat('backColor', color);
+  }
+
+  // Ajouter un getter pour le statut
+  get selectedPlainteStatut(): string {
+    return this.selectedPlainte?.statut || '';
+  }
+
+  // Ajouter un setter pour le statut
+  set selectedPlainteStatut(value: string) {
+  if (!this.selectedPlainte) return;
+
+  const ancienStatut = this.selectedPlainte.statut;
+  const pvExiste = !!this.selectedPlainte.pvUrl;
+
+    // Si on passe d'un statut "Resolue" à un autre statut et qu'un PV existe
+    if (ancienStatut === 'Resolue' && value !== 'Resolue' && pvExiste) {
+      // Supprimer le PV immédiatement
+      this.plainteService.deletePV(this.selectedPlainte.id).subscribe({
+        next: async () => {
+          // Mettre à jour l'état local
+          this.selectedPlainte.pvUrl = null;
+  this.selectedPlainte.statut = value;
+
+          // Mettre à jour la base de données
+          try {
+            await firstValueFrom(
+              this.plainteService.updatePlainte(this.selectedPlainte.id, {
+                statut: value,
+                categorie: this.selectedPlainte.categorie,
+                detailsplainte: this.selectedPlainte.detailsplainte,
+                pvUrl: null
+              })
+            );
+            
+            // Forcer la mise à jour de l'affichage
+            this.selectedPlainte = { ...this.selectedPlainte };
+            
+            // Recharger les plaintes
+            this.rechargerPlaintes();
+
+        Swal.fire({
+          icon: 'info',
+              title: 'PV supprimé',
+          text: 'Le PV a été supprimé car le statut a changé.',
+          timer: 2000,
+          showConfirmButton: false
+        });
+          } catch (error) {
+            console.error('Erreur lors de la mise à jour:', error);
+            // En cas d'erreur, on revient au statut précédent
+            this.selectedPlainte.statut = ancienStatut;
+            this.selectedPlainte = { ...this.selectedPlainte };
+          }
+      },
+      error: (err) => {
+          console.error('Erreur lors de la suppression du PV:', err);
+          // En cas d'erreur, on revient au statut précédent
+          this.selectedPlainte.statut = ancienStatut;
+          this.selectedPlainte = { ...this.selectedPlainte };
+          
+        Swal.fire({
+          icon: 'error',
+          title: 'Erreur',
+            text: 'Impossible de supprimer le PV. Le changement de statut a été annulé.',
+          confirmButtonText: 'OK'
+        });
+      }
+    });
+    } else {
+      // Si pas de PV à supprimer, on change simplement le statut
+      this.selectedPlainte.statut = value;
+    }
+  }
+
+  // Méthode pour vérifier si le PV doit être affiché
+  shouldShowPV(): boolean {
+    return this.selectedPlainte?.statut === 'Resolue' && !!this.selectedPlainte?.pvUrl;
+  }
+
+  // Méthode pour obtenir le nom du fichier PV
+  getPVFileName(): string {
+    if (!this.selectedPlainte?.pvUrl) return '';
+    return this.selectedPlainte.pvUrl.split('/').pop() || '';
+}
+
+  // Retourne le nom du fichier à partir de l'URL
+  getFileName(pvUrl: string): string {
+    if (!pvUrl) return '';
+    return pvUrl.split('/').pop() || pvUrl;
+  }
+
+  // Retourne l'URL complète du PV
+  getFullPVUrl(pvUrl: string): string {
+    if (!pvUrl) return '';
+    return pvUrl.startsWith('http') ? pvUrl : `http://localhost:3001/${pvUrl}`;
+  }
+
+  // Modifier la méthode closeModal pour réinitialiser l'alerte
+  closeModal() {
+    this.showModal = false;
+    this.showAlert = false; // Réinitialiser l'alerte lors de la fermeture du modal
+    this.selectedPlainte = null;
+  }
+
+  // Supprimer le PV
+  async supprimerPV() {
+    if (!this.selectedPlainte?.pvUrl) return;
+
+    const result = await Swal.fire({
+      title: 'Êtes-vous sûr ?',
+      text: "Cette action est irréversible !",
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#d33',
+      cancelButtonColor: '#3085d6',
+      confirmButtonText: 'Oui, supprimer',
+      cancelButtonText: 'Annuler'
+    });
+
+    if (result.isConfirmed) {
+      try {
+        // Appeler le service pour supprimer le PV
+        await firstValueFrom(this.plainteService.deletePV(this.selectedPlainte.id));
+        
+        // Mettre à jour l'URL du PV dans la plainte
+        this.selectedPlainte.pvUrl = null;
+        
+        // Forcer la mise à jour de l'affichage
+        this.selectedPlainte = { ...this.selectedPlainte };
+        
+        // Afficher un message de succès
+        Swal.fire({
+          icon: 'success',
+          title: 'Succès !',
+          text: 'PV supprimé avec succès !',
+          timer: 2000,
+          showConfirmButton: false
+        });
+      } catch (error) {
+        console.error('Erreur lors de la suppression du PV:', error);
+        Swal.fire({
+          icon: 'error',
+          title: 'Erreur',
+          text: 'Erreur lors de la suppression du PV. Veuillez réessayer.',
+          confirmButtonText: 'OK'
+        });
+      }
+    }
+  }
+
+  onStatutChange(newStatut: string) {
+    if (!this.selectedPlainte) return;
+
+    const ancienStatut = this.selectedPlainte.statut;
+    const pvExiste = !!this.selectedPlainte.pvUrl;
+
+    // Si un PV existe, on le supprime quel que soit le changement de statut
+    if (pvExiste) {
+      // Supprimer le PV
+      this.plainteService.deletePV(this.selectedPlainte.id).subscribe({
+        next: () => {
+          // Mettre à jour l'état local
+          this.selectedPlainte.pvUrl = null;
+          this.selectedPlainte.statut = newStatut;
+          // Forcer la mise à jour de l'affichage
+          this.selectedPlainte = { ...this.selectedPlainte };
+
+          // Mettre à jour la base de données
+          this.plainteService.updatePlainte(this.selectedPlainte.id, {
+            statut: newStatut,
+            categorie: this.selectedPlainte.categorie,
+            detailsplainte: this.selectedPlainte.detailsplainte,
+            pvUrl: null
+          }).subscribe({
+            next: () => {
+              // Recharger les plaintes
+              this.rechargerPlaintes();
+              
+              Swal.fire({
+                icon: 'info',
+                title: 'PV supprimé',
+                text: 'Le PV a été supprimé car le statut a changé. Un nouveau PV devra être ajouté si nécessaire.',
+                timer: 2000,
+                showConfirmButton: false
+              });
+            },
+            error: (err) => {
+              console.error('Erreur lors de la mise à jour:', err);
+              // En cas d'erreur, on revient au statut précédent
+              this.selectedPlainte.statut = ancienStatut;
+              this.selectedPlainte = { ...this.selectedPlainte };
+            }
+          });
+        },
+        error: (err) => {
+          console.error('Erreur lors de la suppression du PV:', err);
+          // En cas d'erreur, on revient au statut précédent
+          this.selectedPlainte.statut = ancienStatut;
+          this.selectedPlainte = { ...this.selectedPlainte };
+          
+          Swal.fire({
+            icon: 'error',
+            title: 'Erreur',
+            text: 'Impossible de supprimer le PV. Le changement de statut a été annulé.',
+            confirmButtonText: 'OK'
+          });
+        }
+      });
+    } else {
+      // Si pas de PV à supprimer, on change simplement le statut
+      this.selectedPlainte.statut = newStatut;
+    }
+  }
+
+  loadPlaintes() {
+    this.plainteService.getAllPlaintes().subscribe({
+      next: (plaintes) => {
+        console.log('Plaintes chargées:', plaintes);
+        this.plaintes = plaintes;
+        // Pas besoin d'appeler filterPlaintes car filteredPlaintes est un getter
+      },
+      error: (error) => {
+        console.error('Erreur lors du chargement des plaintes:', error);
+      }
+    });
+  }
+
+  updatePlainte() {
+    if (this.selectedPlainte) {
+      // S'assurer que resolvedBy reste l'ID original
+      const plainteToUpdate = {
+        ...this.selectedPlainte,
+        resolvedBy: this.selectedPlainte.resolvedBy ? 
+          (typeof this.selectedPlainte.resolvedBy === 'object' ? 
+            this.selectedPlainte.resolvedBy.id : 
+            this.selectedPlainte.resolvedBy) : 
+          null
+      };
+      
+      console.log('Mise à jour de la plainte:', plainteToUpdate);
+      
+      this.plainteService.updatePlainte(this.selectedPlainte.id, plainteToUpdate).subscribe({
+        next: (response) => {
+          console.log('Plainte mise à jour avec succès:', response);
+          // Afficher l'alerte de succès
+          this.showSaveAlert = true;
+          // Fermer le modal
+          this.showModal = false;
+          this.isEditModalOpen = false;
+          // Recharger les plaintes
+          this.loadPlaintes();
+          // Masquer l'alerte après 3 secondes
+          setTimeout(() => {
+            this.showSaveAlert = false;
+          }, 3000);
+        },
+        error: (error) => {
+          console.error('Erreur lors de la mise à jour de la plainte:', error);
+          alert('Erreur lors de la mise à jour de la plainte');
+        }
+      });
+    }
   }
 }
