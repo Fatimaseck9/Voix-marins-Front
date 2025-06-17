@@ -19,6 +19,7 @@ import { MarinAuthGuard } from "./servicesclient/marin-auth.guard";
 import { AdminAuthGuard } from "./pages/auth/admin-auth.guard";
 import { AdminListComponent } from "./pages/admin-list/admin-list.component";
 import { PlaintesResoluesComponent } from './pages/plaintes-resolues/plaintes-resolues.component';
+import { MarinRegisterComponent } from "./pages-client/marin-register/marin-register.component";
 
 
 
@@ -48,7 +49,9 @@ export const AppRoutes: Routes = [
      
       { path: "login-marin", component: LoginMarinComponent }, 
 
-       { 
+      { path: "marin-register", component: MarinRegisterComponent },
+
+      { 
         path: "register", 
         component: RegisterComponent 
       },

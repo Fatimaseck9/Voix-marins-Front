@@ -1,10 +1,13 @@
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
+import { DomSanitizer } from '@angular/platform-browser';
+import { HttpClient } from '@angular/common/http';
+import { CookieService } from 'ngx-cookie-service';
 
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { AuthService } from 'src/app/servicesclient/auth.service';
-
+import { PlainteService } from 'src/app/servicesclient/plainte.service';
 
 @Component({
   selector: 'app-login',
@@ -20,7 +23,14 @@ export class LoginMarinComponent {
   isSuccess: boolean = false;
   step = 1;
 
-  constructor(private authService: AuthService, private router: Router) {
+  constructor(
+    private plainteService: PlainteService,
+    private sanitizer: DomSanitizer,
+    private http: HttpClient,
+    private authService: AuthService,
+    private cookieService: CookieService,
+    private router: Router
+  ) {
     // Vérifier si l'utilisateur est déjà connecté
     if (this.isUserLoggedIn()) {
       this.router.navigate(['/marin/home']);
@@ -68,11 +78,11 @@ export class LoginMarinComponent {
     });
   }
 
- verifyCode(): void {
-  this.authService.verifyCode(this.numero, this.code).subscribe({
-    next: res => {
-      this.message = res.message;
-      this.isSuccess = true;
+  verifyCode(): void {
+    this.authService.verifyCode(this.numero, this.code).subscribe({
+      next: res => {
+        this.message = res.message;
+        this.isSuccess = true;
 
         // Stocker le token d'accès dans sessionStorage avec expiration
         const tokenData = {
@@ -85,8 +95,8 @@ export class LoginMarinComponent {
         sessionStorage.setItem('refresh_token', res.refresh_token);
 
         // Stocker les informations non sensibles dans localStorage
-      if (res.role) {
-        localStorage.setItem('role', res.role);
+        if (res.role) {
+          localStorage.setItem('role', res.role);
           localStorage.setItem('userId', res.userId.toString());
         }
 
@@ -99,20 +109,24 @@ export class LoginMarinComponent {
           );
         } else {
           console.log('Rôle inconnu, redirection vers /login-marin');
-        this.router.navigate(['/login-marin']);
+          this.router.navigate(['/login-marin']);
+        }
+      },
+      error: err => {
+        this.message = err.error.message || 'Code incorrect';
+        this.isSuccess = false;
+        this.clearMessageAfterDelay();
       }
-    },
-    error: err => {
-      this.message = err.error.message || 'Code incorrect';
-      this.isSuccess = false;
-      this.clearMessageAfterDelay();
-    }
-  });
-}
+    });
+  }
 
   clearMessageAfterDelay(): void {
     setTimeout(() => {
       this.message = '';
     }, 5000);
+  }
+
+  navigateToRegister() {
+    this.router.navigate(['/marin-register']);
   }
 }

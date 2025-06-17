@@ -1,0 +1,53 @@
+<div class="app-background">
+  <div class="login-container">
+    <h2>
+      <img src="https://cdn-icons-png.flaticon.com/512/747/747376.png" alt="Ancre" style="width: 24px; vertical-align: middle; margin-right: 8px;">
+      Inscription Marin
+    </h2>
+    <form [formGroup]="registerForm" (ngSubmit)="onSubmit()">
+      <div class="input-group">
+       <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-person" viewBox="0 0 16 16">
+            <path d="M8 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6z"/>
+            <path fill-rule="evenodd" d="M8 9a5 5 0 0 0-5 5v.5h10V14a5 5 0 0 0-5-5z"/>
+       </svg>
+      <br>
+        <input
+          type="text"
+          formControlName="name"
+          placeholder="  Entrez votre nom complet"
+        >
+      </div>
+      <div *ngIf="registerForm.get('name')?.invalid && registerForm.get('name')?.touched" class="text-danger">
+        <small *ngIf="registerForm.get('name')?.errors?.['required']">Le nom est requis</small>
+        <small *ngIf="registerForm.get('name')?.errors?.['minlength']">Le nom doit contenir au moins 3 caractères</small>
+      </div>
+
+      <div class="input-group">
+        <span class="input-icon">📱</span>
+        <input
+          type="tel"
+          formControlName="numero"
+          placeholder="Entrez votre numéro (9 chiffres)"
+        >
+      </div>
+      <div *ngIf="registerForm.get('numero')?.invalid && registerForm.get('numero')?.touched" class="text-danger">
+        <small *ngIf="registerForm.get('numero')?.errors?.['required']">Le numéro de téléphone est requis</small>
+        <small *ngIf="registerForm.get('numero')?.errors?.['pattern']">Le numéro doit contenir 9 chiffres</small>
+      </div>
+
+      <button type="submit" [disabled]="registerForm.invalid">S'inscrire</button>
+
+      <div *ngIf="errorMessage" class="alert alert-error">
+        {{ errorMessage }}
+      </div>
+
+      <div *ngIf="successMessage" class="alert alert-success">
+        {{ successMessage }}
+      </div>
+
+      <div class="register-message">
+        <p>Déjà inscrit ? <a routerLink="/login-marin">Se connecter</a></p>
+      </div>
+    </form>
+  </div>
+</div> 

@@ -10,9 +10,9 @@ import { Router } from '@angular/router';
 })
 export class AuthService {
 //private baseUrl = 'https://ce1e-154-124-68-191.ngrok-free.app/auth';
-  private baseUrl = 'http://10.100.200.20:3001/auth';
+  //private baseUrl = 'http://10.100.200.20:3001/auth';
 
- // private baseUrl = 'http://localhost:3001/auth';
+  private baseUrl = 'http://localhost:3001/auth';
   private currentUserSubject = new BehaviorSubject<any>(null);
   private refreshInProgress = false;
 
