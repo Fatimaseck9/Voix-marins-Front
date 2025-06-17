@@ -63,16 +63,22 @@ export class LoginMarinComponent {
   }
 
   requestLogin(): void {
+    // Normaliser le numéro de téléphone
+    let normalizedNumber = this.numero;
+    if (normalizedNumber.startsWith('+221')) {
+      normalizedNumber = normalizedNumber.substring(4); // Enlever le +221
+    }
+    
     // Vérifier le format du numéro
-    if (!this.numero || this.numero.length !== 9) {
+    if (!normalizedNumber || normalizedNumber.length !== 9) {
       this.message = "Le numéro doit contenir 9 chiffres";
       this.isSuccess = false;
       return;
     }
 
-    console.log('Envoi de la requête avec le numéro:', this.numero);
+    console.log('Envoi de la requête avec le numéro:', normalizedNumber);
     
-    this.authService.requestLogin(this.numero).subscribe({
+    this.authService.requestLogin(normalizedNumber).subscribe({
       next: res => {
         console.log('Réponse du serveur:', res);
         this.message = res.message;
