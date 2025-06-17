@@ -4,8 +4,8 @@
   "theme_color": "#1976d2",
   "background_color": "#fafafa",
   "display": "standalone",
-  "scope": "./login-marin",
-  "start_url": "./login-marin",
+  "scope": "/login-marin",
+  "start_url": "/login-marin",
   "description": "Application de soumission des plaintes pour les marins",
   "orientation": "portrait",
   "icons": [
@@ -13,7 +13,7 @@
       "src": "assets/img/plaintes.png",
       "sizes": "512x512",
       "type": "image/png",
-      "purpose": "any"
+      "purpose": "any maskable"
     }
   ]
 }
