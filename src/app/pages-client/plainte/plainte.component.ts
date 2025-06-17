@@ -103,7 +103,7 @@ export class PlainteComponent {
       
       const headers = new HttpHeaders({
         'Authorization': `Bearer ${token}`,
-        'ngrok-skip-browser-warning': 'true'
+        //'ngrok-skip-browser-warning': 'true'
       });
  
       const categories = await firstValueFrom(this.http.get<any[]>(`${this.apiUrl}/categories`, { headers }));

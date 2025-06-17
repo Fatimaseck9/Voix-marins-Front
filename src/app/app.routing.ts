@@ -51,7 +51,7 @@ export const AppRoutes: Routes = [
 
       { path: "marin-register", component: MarinRegisterComponent },
 
-      { 
+       { 
         path: "register", 
         component: RegisterComponent 
       },

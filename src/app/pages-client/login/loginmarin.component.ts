@@ -63,15 +63,26 @@ export class LoginMarinComponent {
   }
 
   requestLogin(): void {
+    // Vérifier le format du numéro
+    if (!this.numero || this.numero.length !== 9) {
+      this.message = "Le numéro doit contenir 9 chiffres";
+      this.isSuccess = false;
+      return;
+    }
+
+    console.log('Envoi de la requête avec le numéro:', this.numero);
+    
     this.authService.requestLogin(this.numero).subscribe({
       next: res => {
+        console.log('Réponse du serveur:', res);
         this.message = res.message;
         this.isSuccess = true;
         this.step = 2;
         this.clearMessageAfterDelay();
       },
       error: err => {
-        this.message = err.error.message || "Erreur lors de l'envoi du code";
+        console.error('Erreur complète:', err);
+        this.message = err.error?.message || "Erreur lors de l'envoi du code";
         this.isSuccess = false;
         this.clearMessageAfterDelay();
       }

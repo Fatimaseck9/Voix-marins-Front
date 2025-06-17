@@ -1,5 +1,5 @@
 import { Injectable, Inject, PLATFORM_ID } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable, BehaviorSubject, throwError, of } from 'rxjs';
 import { isPlatformBrowser } from '@angular/common';
 import { tap, catchError, finalize, map } from 'rxjs/operators';
@@ -134,7 +134,24 @@ isTokenExpired(token: string): boolean {
   }
 
   requestLogin(numero: string): Observable<any> {
-    return this.http.post(`${this.baseUrl}/request-login`, { numero });
+    console.log('Envoi de la requête à:', `${this.baseUrl}/request-login`);
+    console.log('Données envoyées:', { numero });
+    
+    const headers = new HttpHeaders({
+      'Content-Type': 'application/json',
+      'Accept': 'application/json'
+    });
+
+    return this.http.post(`${this.baseUrl}/request-login`, 
+      { numero },
+      { headers }
+    ).pipe(
+      tap(response => console.log('Réponse du serveur:', response)),
+      catchError(error => {
+        console.error('Erreur détaillée:', error);
+        return throwError(() => error);
+      })
+    );
   }
 
   verifyCode(numero: string, code: string): Observable<any> {

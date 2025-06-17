@@ -31,7 +31,7 @@ export class PlainteService {
     return new HttpHeaders({
       'Authorization': `Bearer ${token}`,
       'Content-Type': 'application/json',
-      'ngrok-skip-browser-warning': 'true' 
+      //'ngrok-skip-browser-warning': 'true' 
     });
   }
 
@@ -63,7 +63,7 @@ export class PlainteService {
   getCategoriesPublic(): Observable<any> {
     const headers = new HttpHeaders({
       'Content-Type': 'application/json',
-      'ngrok-skip-browser-warning': 'true' 
+      //'ngrok-skip-browser-warning': 'true' 
     });
     return this.http.get(`${this.apiUrl}/categories`, { headers });
   }

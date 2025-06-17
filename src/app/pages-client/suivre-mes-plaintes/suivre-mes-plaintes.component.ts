@@ -78,7 +78,7 @@ export class SuivreMesPlaintesComponent implements OnInit {
     const headers = new HttpHeaders({
       'Authorization': `Bearer ${token}`,
       'Content-Type': 'application/json',
-      'ngrok-skip-browser-warning': 'true'
+      //'ngrok-skip-browser-warning': 'true'
     });
 
 
@@ -106,7 +106,7 @@ export class SuivreMesPlaintesComponent implements OnInit {
         const headers = new HttpHeaders({
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json',
-          'ngrok-skip-browser-warning': 'true'
+          //'ngrok-skip-browser-warning': 'true'
         });
 
         // 2. Utiliser l'endpoint /plaintes/:id avec DELETE et les en-têtes
