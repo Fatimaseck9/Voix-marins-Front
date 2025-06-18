@@ -74,7 +74,7 @@ export class ChangePasswordComponent implements OnInit {
     const token = this.authService.getToken();
     if (!token) {
       this.message = { text: 'Session expirée, veuillez vous reconnecter.', type: 'error' };
-      this.router.navigate(['/login']);
+      this.router.navigate(['/login-admin']);
       return;
     }
 
@@ -130,7 +130,7 @@ export class ChangePasswordComponent implements OnInit {
             // En cas d'erreur d'authentification, rediriger vers la page de connexion
             setTimeout(() => {
               this.authService.logout();
-              this.router.navigate(['/login']);
+              this.router.navigate(['/login-admin']);
             }, 2000);
           }
           console.error('Erreur détaillée:', err);
@@ -142,7 +142,7 @@ export class ChangePasswordComponent implements OnInit {
     } catch (error) {
       this.message = { text: 'Token invalide, veuillez vous reconnecter.', type: 'error' };
       this.authService.logout();
-      this.router.navigate(['/login']);
+      this.router.navigate(['/login-admin']);
     }
   }
 
