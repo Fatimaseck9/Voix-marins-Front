@@ -32,7 +32,7 @@ export class RegisterComponent implements OnInit, OnDestroy {
       email: this.form.email,
       password: this.form.password,
       role: 'admin',
-      isActive: true 
+      isActive: false 
     };
 
     this.http.post('https://api.gaalgui.sn/users/admin', payload).subscribe({
