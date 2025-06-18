@@ -57,17 +57,10 @@ export class SuivreMesPlaintesComponent implements OnInit {
 
  async loadPlaintes() {
   try {
-    const token = await firstValueFrom(this.authService.getToken());
-    const headers = new HttpHeaders({
-      'Authorization': `Bearer ${token}`,
-      'Content-Type': 'application/json'
-    });
-
-    const response = await firstValueFrom(
-      this.http.get<any[]>(`${this.apiUrl}/mes-plaintes`, { headers })
-    );
-
-    this.plaintes = response.map(p => ({
+    // Utiliser le service PlainteService qui gère déjà l'authentification
+    const response = await firstValueFrom(this.plainteService.getPlaintes());
+    
+    this.plaintes = response.map((p: any) => ({
       ...p,
       audioUrl: p.audioUrl ? this.formatAudioUrl(p.audioUrl) : undefined
     }));
