@@ -74,7 +74,7 @@ export class ChangePasswordComponent implements OnInit {
     const token = this.authService.getToken();
     if (!token) {
       this.message = { text: 'Session expirée, veuillez vous reconnecter.', type: 'error' };
-      this.router.navigate(['/login']);
+      this.router.navigate(['/login-admin']);
       return;
     }
 
@@ -121,6 +121,10 @@ export class ChangePasswordComponent implements OnInit {
             this.message = { text: 'Mot de passe modifié avec succès. Redirection...', type: 'success' };
             
             console.log('Tentative de redirection vers /admin/tableau-bord');
+            // Vérifier que le token est bien mis à jour
+            const updatedToken = this.authService.getToken();
+            console.log('Token après mise à jour:', updatedToken ? 'Présent' : 'Absent');
+            
             setTimeout(() => {
               console.log('Exécution de la redirection...');
               this.router.navigate(['/admin/tableau-bord']).then(
@@ -129,9 +133,12 @@ export class ChangePasswordComponent implements OnInit {
                 },
                 (error) => {
                   console.error('Erreur de redirection:', error);
+                  // En cas d'échec, essayer une redirection alternative
+                  console.log('Tentative de redirection alternative vers /admin/dashboard');
+                  this.router.navigate(['/admin/dashboard']);
                 }
               );
-            }, 1500);
+            }, 500); // Réduit de 1500ms à 500ms
           } else {
             console.error('Pas de token dans la réponse:', response);
           }

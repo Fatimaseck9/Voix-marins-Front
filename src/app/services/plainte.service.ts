@@ -29,7 +29,10 @@ export class PlainteService {
   ) {}
 
   getAllPlaintes(): Observable<any[]> {
+    console.log('=== getAllPlaintes appelé ===');
     const headers = this.getAuthHeaders();
+    console.log('Headers créés:', headers);
+    
     return this.http.get<any[]>(this.apiUrl, { headers }).pipe(
       tap({
         next: (plaintes) => {
@@ -71,6 +74,7 @@ export class PlainteService {
 
   private getAuthHeaders(): HttpHeaders {
     const token = this.cookieService.get('access_token');
+    console.log('Token récupéré dans getAuthHeaders:', token ? 'Token présent' : 'Token absent');
     return new HttpHeaders().set('Authorization', `Bearer ${token}`);
   }
 
