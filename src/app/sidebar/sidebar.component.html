@@ -59,11 +59,27 @@
         </div></span>
       </form> -->
       <ul class="nav navbar-nav nav-mobile-menu">
-        <li class="nav-item" *ngFor="let menuitem of menuItems">
-          <a class="nav-link" [routerLink]="[menuitem.path]">
-            <i class="material-icons">{{menuitem.icontype}}</i>
+        <li class="nav-item">
+          <a class="nav-link" routerLink="/admin/tableau-bord">
+            <i class="material-icons">dashboard</i>
             <p>
-              <span class="d-lg-none d-md-block">{{menuitem.title}}</span>
+              <span class="d-lg-none d-md-block">Tableau de bord</span>
+            </p>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" routerLink="/admin/plaintes">
+            <i class="material-icons">report_problem</i>
+            <p>
+              <span class="d-lg-none d-md-block">Plaintes</span>
+            </p>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" routerLink="/admin/plaintesresolues">
+            <i class="material-icons">check_circle</i>
+            <p>
+              <span class="d-lg-none d-md-block">Plaintes Résolues</span>
             </p>
           </a>
         </li>
