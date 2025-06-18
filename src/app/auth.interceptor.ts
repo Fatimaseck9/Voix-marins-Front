@@ -32,9 +32,9 @@ export class AuthInterceptor implements HttpInterceptor {
           catchError((error: HttpErrorResponse) => {
               console.error('Error intercepted:', error);
 
-              if (error.status === 401 && !req.url.includes('auth/login')) {
+              if (error.status === 401) {
                   this.authService.logout();
-                  this.router.navigate(['/login-admin']);
+                  this.router.navigate(['/pages/login']);
               }
 
               return throwError(error);

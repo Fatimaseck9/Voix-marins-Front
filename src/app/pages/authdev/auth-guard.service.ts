@@ -26,7 +26,7 @@ export class AuthGuard implements CanActivate{
           return true;
         } else {
           // Redirige vers la page de login si l'utilisateur n'a pas les rôles requis
-          this.router.navigate(['/login-admin']);
+          this.router.navigate(['pages/login']);
           return false;
         }
       }
@@ -36,7 +36,7 @@ export class AuthGuard implements CanActivate{
     }
 
     // Redirige vers la page de login si l'utilisateur n'est pas connecté
-    this.router.navigate(['/login-admin']);
+    this.router.navigate(['pages/login']);
     return false;
 
     
