@@ -18,5 +18,5 @@ export const environment = {
   serverURLjambarlocale: "http://localhost:3001/api/v1/",
   serverURLMETRIClocal: "http://localhost:3001/api/v1/",
   //apiUrl: "http://localhost:3001/api/v1"
-  apiUrl: "https://gaalgui.sn/login-admin"
+  apiUrl: "https://gaalgui.sn"
 };
