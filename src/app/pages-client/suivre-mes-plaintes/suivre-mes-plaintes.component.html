@@ -89,15 +89,11 @@
               
               <!-- Lecteur audio si disponible -->
               <div *ngIf="plainte.audioUrl" class="mt-3">
-                <audio controls preload="metadata" class="audio-player"
-                      (error)="onAudioError($event, plainte)"
-                      (loadeddata)="onAudioLoad($event, plainte)">
-                  <source [src]="plainte.audioUrl" type="audio/webm">
-                  <source [src]="plainte.audioUrl" type="audio/mp3">
-                  <source [src]="plainte.audioUrl" type="audio/wav">
-                  <source [src]="plainte.audioUrl" type="audio/ogg">
-                  Votre navigateur ne supporte pas l'audio.
+                <audio *ngIf="plainte.audioUrl" controls>
+                   <source [src]="plainte.audioUrl" type="audio/webm">
+                      Votre navigateur ne supporte pas l'audio.
                 </audio>
+
               </div>
             </div>
           </div>

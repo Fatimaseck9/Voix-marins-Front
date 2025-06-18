@@ -50,53 +50,54 @@ export class SuivreMesPlaintesComponent implements OnInit {
     }
   }
 
-  readonly backendBaseUrl = 'https://voix-marins-backend-production.up.railway.app';
+  readonly backendBaseUrl = 'https://voix-marins-backend-production.up.railway.app/';
   
   //readonly backendBaseUrl = 'https://ce1e-154-124-68-191.ngrok-free.app';
    //readonly backendBaseUrl ='http://10.100.200.20:3001';
 
  async loadPlaintes() {
   try {
-    // Utiliser le service PlainteService qui gère déjà l'authentification
-    const response = await firstValueFrom(this.plainteService.getPlaintes());
-    
-    this.plaintes = response.map((p: any) => ({
+    // Vérifier si l'utilisateur est connecté
+    if (!this.authService.isLoggedIn()) {
+      console.warn('Utilisateur non connecté. Veuillez vous connecter.');
+      return;
+    }
+
+    // Récupérer le token (ou ID de l'utilisateur) pour charger les plaintes
+    const token = await firstValueFrom(this.authService.getToken());
+    if (!token) {
+      console.error('Token invalide. Vérifiez votre connexion.');
+      return;
+    }
+
+    // Décodons le token pour obtenir l'ID de l'utilisateur
+    const user = this.authService.decodeToken(token);
+    const userId = user.sub; // Assurez-vous que 'sub' contient bien l'ID de l'utilisateur
+
+    // Configurez les en-têtes avec le token d'authentification
+    const headers = new HttpHeaders({
+      'Authorization': `Bearer ${token}`,
+      'Content-Type': 'application/json',
+      //'ngrok-skip-browser-warning': 'true'
+    });
+
+
+    // Utilisez l'endpoint /plaintes/user/:userId
+    const response = await firstValueFrom(
+      this.http.get<Plainte[]>(`${this.apiUrl}/user/${userId}`, { headers }) // Ajoutez l'en-tête ici
+    );
+
+    //this.plaintes = response;
+     this.plaintes = response.map(p => ({
       ...p,
-      audioUrl: p.audioUrl ? this.formatAudioUrl(p.audioUrl) : undefined
+      audioUrl: p.audioUrl ? `${this.backendBaseUrl}${p.audioUrl}` : undefined
     }));
-    
-    console.log('Réponse du backend (list of plaintes):', response);
+     console.log('Réponse du backend (list of plaintes):', response); // Ajou
   } catch (error) {
     console.error('Erreur lors du chargement des plaintes:', error);
     this.plaintes = [];
   }
 }
-
-  private formatAudioUrl(audioUrl: string): string {
-    // Si l'URL est déjà complète, la retourner
-    if (audioUrl.startsWith('http')) {
-      return audioUrl;
-    }
-    
-    // Nettoyer l'URL de base et l'URL audio
-    const baseUrl = this.backendBaseUrl.replace(/\/+$/, ''); // Enlever tous les slashes finaux
-    const cleanAudioUrl = audioUrl.replace(/^\/+/, ''); // Enlever tous les slashes initiaux
-    
-    // Construire l'URL complète sans double slash
-    return `${baseUrl}/${cleanAudioUrl}`;
-  }
-
-  // Méthode pour vérifier si l'audio est valide
-  onAudioError(event: any, plainte: Plainte) {
-    console.error('Erreur de lecture audio pour la plainte:', plainte.id, event);
-    // Optionnel : masquer le lecteur audio en cas d'erreur
-    // plainte.audioUrl = undefined;
-  }
-
-  onAudioLoad(event: any, plainte: Plainte) {
-    console.log('Audio chargé avec succès pour la plainte:', plainte.id);
-  }
-
   async annulerPlainte(plainte: Plainte) {
     if (confirm('Êtes-vous sûr de vouloir annuler cette plainte ?')) {
       try {
