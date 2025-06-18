@@ -88,10 +88,17 @@ export class SuivreMesPlaintesComponent implements OnInit {
     );
 
     //this.plaintes = response;
-     this.plaintes = response.map(p => ({
-      ...p,
-      audioUrl: p.audioUrl ? `${this.backendBaseUrl}${p.audioUrl}` : undefined
-    }));
+    this.plaintes = response.map(p => {
+  console.log('Plainte audio URL:', p.audioUrl); // 🔍 Ajout ici
+  return {
+    ...p,
+    audioUrl: p.audioUrl ? `${this.backendBaseUrl.replace(/\/$/, '')}${p.audioUrl}` : undefined
+  };
+});
+
+
+ 
+    
      console.log('Réponse du backend (list of plaintes):', response); // Ajou
   } catch (error) {
     console.error('Erreur lors du chargement des plaintes:', error);
