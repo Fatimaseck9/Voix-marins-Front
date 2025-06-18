@@ -50,7 +50,7 @@ export class SuivreMesPlaintesComponent implements OnInit {
     }
   }
 
-  readonly backendBaseUrl = 'https://voix-marins-backend-production.up.railway.app/';
+  readonly backendBaseUrl = 'https://voix-marins-backend-production.up.railway.app';
   
   //readonly backendBaseUrl = 'https://ce1e-154-124-68-191.ngrok-free.app';
    //readonly backendBaseUrl ='http://10.100.200.20:3001';
@@ -85,11 +85,12 @@ export class SuivreMesPlaintesComponent implements OnInit {
       return audioUrl;
     }
     
-    // Sinon, construire l'URL complète
-    const baseUrl = this.backendBaseUrl.replace(/\/$/, ''); // Enlever le slash final s'il y en a
-    const cleanAudioUrl = audioUrl.startsWith('/') ? audioUrl : `/${audioUrl}`;
+    // Nettoyer l'URL de base et l'URL audio
+    const baseUrl = this.backendBaseUrl.replace(/\/+$/, ''); // Enlever tous les slashes finaux
+    const cleanAudioUrl = audioUrl.replace(/^\/+/, ''); // Enlever tous les slashes initiaux
     
-    return `${baseUrl}${cleanAudioUrl}`;
+    // Construire l'URL complète sans double slash
+    return `${baseUrl}/${cleanAudioUrl}`;
   }
 
   // Méthode pour vérifier si l'audio est valide
