@@ -35,7 +35,7 @@ export class RegisterComponent implements OnInit, OnDestroy {
       isActive: true 
     };
 
-    this.http.post('http://localhost:3001/users/admin', payload).subscribe({
+    this.http.post('https://api.gaalgui.sn/users/admin', payload).subscribe({
       next: (res) => {
         console.log('Administrateur ajouté', res);
         alert('Administrateur ajouté avec succès !');

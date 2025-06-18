@@ -1,3 +1,4 @@
+
 import { Component, OnInit, ViewChild, ElementRef, AfterViewInit } from '@angular/core';
 import { PlainteService } from 'src/app/services/plainte.service';
 import { AngularEditorConfig } from '@kolkov/angular-editor';

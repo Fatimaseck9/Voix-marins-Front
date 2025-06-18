@@ -14,7 +14,7 @@ export class AuthService {
   constructor(private http: HttpClient) {}
 
   login(credentials: { username: string; password: string }): Observable<any> {
-    return this.http.post<any>('http://localhost:3001/auth/login', credentials).pipe(
+    return this.http.post<any>('https://api.gaalgui.sn/auth/login', credentials).pipe(
       tap(response => {
         if (response.access_token) {
           // Supprimer l'ancien token et les données utilisateur

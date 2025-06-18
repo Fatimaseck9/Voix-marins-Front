@@ -20,7 +20,7 @@ interface Plainte {
   providedIn: 'root'
 })
 export class PlainteService {
-  private apiUrl = 'http://localhost:3001/plaintes';
+  private apiUrl = 'https://api.gaalgui.sn/plaintes';
   //private baseUrl = 'https://521a-154-124-68-191.ngrok-free.app/auth';
 
   constructor(
