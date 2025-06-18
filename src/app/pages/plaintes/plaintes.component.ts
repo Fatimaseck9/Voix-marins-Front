@@ -123,8 +123,10 @@ export class PlaintesComponent implements OnInit, AfterViewInit {
 
   getFullAudioUrl(relativeUrl: string): string {
     if (!relativeUrl) return '';
-    return relativeUrl;
-  }
+    // Assurez-vous que l'URL ne commence pas déjà par http
+    if (relativeUrl.startsWith('http')) return relativeUrl;
+    return `http://localhost:3001${relativeUrl.startsWith('/') ? '' : '/'}${relativeUrl}`;
+}
 
   traiterPlainte(plainte: any) {
     const updateData = {

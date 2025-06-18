@@ -63,7 +63,10 @@ export class PlainteService {
 
   getFullAudioUrl(audioUrl: string): string {
     if (!audioUrl) return '';
-    return audioUrl;
+    if (audioUrl.startsWith('http')) {
+      return audioUrl;
+    }
+    return this.apiUrl + audioUrl;
   }
 
   private getAuthHeaders(): HttpHeaders {

@@ -374,14 +374,15 @@ export class PlainteComponent {
       });
       return;
     }
-
+   
+ 
     this.isSubmitting = true;
     Swal.fire({
       title: 'Envoi en cours...',
       allowOutsideClick: false,
       didOpen: () => Swal.showLoading()
     });
-
+ 
     try {
       const token = this.authService.getStoredToken();
       if (!token) {
@@ -392,10 +393,10 @@ export class PlainteComponent {
         });
         return;
       }
-
+ 
       const userPayload = this.authService.decodeToken(token);
       const userId = userPayload ? userPayload.sub : null;
-
+ 
       if (!userId) {
         Swal.fire({
           title: 'Erreur',
@@ -404,38 +405,23 @@ export class PlainteComponent {
         });
         return;
       }
-
-      // 1. Upload audio to backend (Cloudinary)
+ 
+      const formData = new FormData();
       const audioFile = new File([this.audioBlob], 'enregistrement.webm', { type: 'audio/webm' });
-      const uploadFormData = new FormData();
-      uploadFormData.append('file', audioFile);
-      const uploadRes: any = await firstValueFrom(
-        this.http.post(`${this.apiUrl}/upload`, uploadFormData, {
+      formData.append('audio', audioFile);
+      formData.append('titre', this.plainte.titre || 'Plainte vocale');
+      formData.append('categorie', this.plainte.categorie || 'Enregistrement vocal');
+      formData.append('description', this.plainte.description || 'Plainte enregistrée vocalement');
+      formData.append('utilisateurId', userId);
+ 
+      await firstValueFrom(
+        this.http.post<PlainteResponse>(`${this.apiUrl}/create`, formData, {
           headers: new HttpHeaders({
             'Authorization': `Bearer ${token}`
           })
         })
       );
-      const audioUrl = uploadRes.url;
-
-      // 2. Envoyer la plainte avec l'URL Cloudinary
-      const plainteData = {
-        titre: this.plainte.titre || 'Plainte vocale',
-        categorie: this.plainte.categorie || 'Enregistrement vocal',
-        description: this.plainte.description || 'Plainte enregistrée vocalement',
-        utilisateurId: userId,
-        audioUrl: audioUrl
-      };
-
-      await firstValueFrom(
-        this.http.post<PlainteResponse>(`${this.apiUrl}/create`, plainteData, {
-          headers: new HttpHeaders({
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json'
-          })
-        })
-      );
-
+ 
       Swal.fire({
         title: 'Succès',
         text: 'Enregistrement envoyé avec succès ✅',
@@ -444,15 +430,16 @@ export class PlainteComponent {
         this.resetRecording();
         this.router.navigate(['marin/suivre-plaintes']);
       });
-    } catch (error) {
+    } catch (error: any) {
+      console.error('Erreur:', error);
       Swal.fire({
         title: 'Erreur',
-        text: 'Erreur lors de l\'envoi de l\'enregistrement',
+        text: 'Erreur lors de l\'envoi de la plainte',
         icon: 'error'
       });
-      console.error('Erreur lors de l\'envoi de l\'enregistrement:', error);
     } finally {
       this.isSubmitting = false;
+      Swal.close();
     }
   }
  
