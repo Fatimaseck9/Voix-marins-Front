@@ -92,15 +92,36 @@ export class SuivreMesPlaintesComponent implements OnInit {
 
     // Traiter les plaintes et vérifier l'accessibilité des fichiers audio
     this.plaintes = await Promise.all(response.map(async (p) => {
+      let audioUrl = undefined;
+      
+      // Construire l'URL audio selon le format reçu du backend
+      if (p.audioUrl) {
+        console.log('Audio URL original:', p.audioUrl);
+        
+        if (p.audioUrl.startsWith('http')) {
+          // URL complète déjà fournie
+          audioUrl = p.audioUrl;
+        } else if (p.audioUrl.startsWith('/')) {
+          // Chemin relatif commençant par /
+          audioUrl = `${this.backendBaseUrl}${p.audioUrl}`;
+        } else {
+          // Chemin relatif sans /
+          audioUrl = `${this.backendBaseUrl}/${p.audioUrl}`;
+        }
+        
+        console.log('Audio URL construite:', audioUrl);
+      }
+      
       const plainte = {
         ...p,
-        audioUrl: p.audioUrl ? `${this.backendBaseUrl}${p.audioUrl}` : undefined,
+        audioUrl: audioUrl,
         audioAccessible: false
       };
       
       // Vérifier l'accessibilité du fichier audio si disponible
       if (plainte.audioUrl) {
         plainte.audioAccessible = await this.checkAudioAccessibility(plainte.audioUrl, token);
+        console.log('Audio accessible:', plainte.audioAccessible, 'pour URL:', plainte.audioUrl);
       }
       
       return plainte;
@@ -180,26 +201,43 @@ async playAudio(plainte: Plainte) {
       return;
     }
     
-    // Créer un nouvel élément audio avec authentification
+    // Récupérer le token d'authentification
     const token = await firstValueFrom(this.authService.getToken());
     if (!token) {
       alert('Erreur d\'authentification. Veuillez vous reconnecter.');
       return;
     }
     
-    // Construire l'URL avec authentification
-    const url = new URL(plainte.audioUrl);
-    url.searchParams.set('token', token);
+    console.log('Tentative de lecture audio pour URL:', plainte.audioUrl);
+    
+    // Utiliser fetch pour récupérer l'audio avec authentification
+    const response = await fetch(plainte.audioUrl, {
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'ngrok-skip-browser-warning': 'true'
+      }
+    });
+    
+    if (!response.ok) {
+      throw new Error(`Erreur HTTP: ${response.status} - ${response.statusText}`);
+    }
+    
+    // Convertir la réponse en blob
+    const audioBlob = await response.blob();
+    const audioUrl = URL.createObjectURL(audioBlob);
     
     // Créer l'élément audio
-    const audio = new Audio(url.toString());
-    
-    // Ajouter les en-têtes d'authentification
-    audio.crossOrigin = 'anonymous';
+    const audio = new Audio(audioUrl);
     
     // Gérer les événements
-    audio.addEventListener('ended', () => this.onAudioEnded(plainte));
-    audio.addEventListener('error', (event) => this.onAudioError(plainte, event));
+    audio.addEventListener('ended', () => {
+      this.onAudioEnded(plainte);
+      URL.revokeObjectURL(audioUrl); // Libérer la mémoire
+    });
+    audio.addEventListener('error', (event) => {
+      this.onAudioError(plainte, event);
+      URL.revokeObjectURL(audioUrl); // Libérer la mémoire
+    });
     audio.addEventListener('loadstart', () => {
       plainte.isPlaying = true;
     });
@@ -209,10 +247,12 @@ async playAudio(plainte: Plainte) {
     plainte.audioElement = audio;
     plainte.isPlaying = true;
     
+    console.log('Lecture audio démarrée avec succès');
+    
   } catch (error) {
     console.error('Erreur lors de la lecture audio:', error);
     plainte.isPlaying = false;
-    alert('Erreur lors de la lecture audio. Vérifiez votre connexion.');
+    alert(`Erreur lors de la lecture audio: ${error.message}`);
   }
 }
 
@@ -221,6 +261,11 @@ stopAudio(plainte: Plainte) {
   if (plainte.audioElement) {
     plainte.audioElement.pause();
     plainte.audioElement.currentTime = 0;
+    
+    // Nettoyer l'URL blob si elle existe
+    if (plainte.audioElement.src && plainte.audioElement.src.startsWith('blob:')) {
+      URL.revokeObjectURL(plainte.audioElement.src);
+    }
   }
   plainte.isPlaying = false;
 }
