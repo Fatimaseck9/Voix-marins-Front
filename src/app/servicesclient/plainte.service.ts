@@ -8,9 +8,9 @@ import { AuthService } from './auth.service';
 })
 export class PlainteService {
  // private apiUrl = 'https://ce1e-154-124-68-191.ngrok-free.app/plaintes';
-  // private apiUrl = 'http://10.100.200.20:3001/plaintes';
+   private apiUrl = 'http://doscg4skk8wwsksk0k0c84gk.92.113.25.175.sslip.io/plaintes';
   
-  private apiUrl = 'https://voix-marins-backend-production.up.railway.app/plaintes';
+  //private apiUrl = 'https://voix-marins-backend-production.up.railway.app/plaintes';
   
   categories = [
     { key: 'harcelement', label: 'Harcèlement', image: 'Harcélement.jpeg' },
@@ -35,13 +35,21 @@ export class PlainteService {
     });
   }
 
-  // CORRECTION : Utiliser l'API au lieu du localStorage
-  submitPlainte(plainteData: any): Observable<any> {
-
-    // L'intercepteur ajoutera automatiquement le token
-     const headers = this.getAuthHeaders();
-    return this.http.post(`${this.apiUrl}/form`, plainteData, { headers });
-   
+  // Nouvelle méthode pour soumettre une plainte avec ou sans audio
+  submitPlainte(plainteData: any, audioFile?: File): Observable<any> {
+    const token = this.authService.getToken();
+    const headers = new HttpHeaders({
+      'Authorization': `Bearer ${token}`
+      // Ne pas mettre Content-Type ici, il sera géré automatiquement par FormData
+    });
+    const formData = new FormData();
+    Object.keys(plainteData).forEach(key => {
+      formData.append(key, plainteData[key]);
+    });
+    if (audioFile) {
+      formData.append('audio', audioFile, audioFile.name);
+    }
+    return this.http.post(`${this.apiUrl}/create`, formData, { headers });
   }
 
   getPlaintes(): Observable<any> {

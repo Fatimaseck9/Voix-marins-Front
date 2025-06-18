@@ -65,7 +65,7 @@ export class PlainteComponent {
     { key: 'paiement', label: 'Problème de paiement', image: 'paiement.jpeg' }
   ];
  
-  private apiUrl = 'https://voix-marins-backend-production.up.railway.app/plaintes';
+  private apiUrl = 'http://doscg4skk8wwsksk0k0c84gk.92.113.25.175.sslip.io/plaintes';
    //private apiUrl = 'https://ce1e-154-124-68-191.ngrok-free.app/plaintes';
    //private apiUrl = 'http://10.100.200.20:3001/plaintes';
  
