@@ -50,7 +50,7 @@ export class SuivreMesPlaintesComponent implements OnInit {
     }
   }
 
-  readonly backendBaseUrl = 'https://voix-marins-backend-production.up.railway.app/';
+  readonly backendBaseUrl = 'https://voix-marins-backend-production.up.railway.app';
   
   //readonly backendBaseUrl = 'https://ce1e-154-124-68-191.ngrok-free.app';
    //readonly backendBaseUrl ='http://10.100.200.20:3001';
