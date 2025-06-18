@@ -18,6 +18,7 @@ interface Plainte {
   statut: string;
   utilisateur: string;
   audioUrl?: string;
+  audioAccessible?: boolean;
 }
 
 @Component({
@@ -87,17 +88,67 @@ export class SuivreMesPlaintesComponent implements OnInit {
       this.http.get<Plainte[]>(`${this.apiUrl}/user/${userId}`, { headers }) // Ajoutez l'en-tête ici
     );
 
-    //this.plaintes = response;
-     this.plaintes = response.map(p => ({
-      ...p,
-      audioUrl: p.audioUrl ? `${this.backendBaseUrl}${p.audioUrl}` : undefined
+    // Traiter les plaintes et vérifier l'accessibilité des fichiers audio
+    this.plaintes = await Promise.all(response.map(async (p) => {
+      const plainte = {
+        ...p,
+        audioUrl: p.audioUrl ? `${this.backendBaseUrl}${p.audioUrl}` : undefined,
+        audioAccessible: false
+      };
+      
+      // Vérifier l'accessibilité du fichier audio si disponible
+      if (plainte.audioUrl) {
+        plainte.audioAccessible = await this.checkAudioAccessibility(plainte.audioUrl, token);
+      }
+      
+      return plainte;
     }));
-     console.log('Réponse du backend (list of plaintes):', response); // Ajou
+    
+    console.log('Réponse du backend (list of plaintes):', response);
   } catch (error) {
     console.error('Erreur lors du chargement des plaintes:', error);
     this.plaintes = [];
   }
 }
+
+// Méthode pour vérifier l'accessibilité d'un fichier audio
+private async checkAudioAccessibility(audioUrl: string, token: string): Promise<boolean> {
+  try {
+    const headers = new HttpHeaders({
+      'Authorization': `Bearer ${token}`,
+      'Range': 'bytes=0-1' // Demander seulement les premiers bytes pour vérifier l'existence
+    });
+    
+    const response = await firstValueFrom(
+      this.http.head(audioUrl, { headers, observe: 'response' })
+    );
+    
+    return response.status === 200 || response.status === 206;
+  } catch (error) {
+    console.warn(`Fichier audio inaccessible: ${audioUrl}`, error);
+    return false;
+  }
+}
+
+// Méthode pour obtenir l'URL audio avec authentification
+getAudioUrl(plainte: Plainte): string {
+  if (!plainte.audioUrl) return '';
+  
+  // Si l'audio n'est pas accessible, retourner une URL vide
+  if (!plainte.audioAccessible) return '';
+  
+  return plainte.audioUrl;
+}
+
+// Méthode pour gérer les erreurs de lecture audio
+onAudioError(plainte: Plainte, event: any) {
+  console.error('Erreur de lecture audio:', event);
+  plainte.audioAccessible = false;
+  
+  // Afficher un message à l'utilisateur
+  alert('Impossible de lire l\'enregistrement audio. Le fichier pourrait être corrompu ou inaccessible.');
+}
+
   async annulerPlainte(plainte: Plainte) {
     if (confirm('Êtes-vous sûr de vouloir annuler cette plainte ?')) {
       try {

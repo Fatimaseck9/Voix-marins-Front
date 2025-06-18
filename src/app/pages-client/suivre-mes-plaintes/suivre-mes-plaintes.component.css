@@ -550,3 +550,54 @@ audio::-webkit-media-controls-panel {
   }
 }
 
+/* Styles pour le lecteur audio */
+.audio-player-container {
+  background-color: #f8f9fa;
+  border-radius: 8px;
+  padding: 1rem;
+  border: 1px solid #e9ecef;
+}
+
+.audio-player-container audio {
+  width: 100%;
+  max-width: 100%;
+  height: 40px;
+}
+
+.audio-player-container audio::-webkit-media-controls-panel {
+  background-color: #ffffff;
+}
+
+.audio-player-container audio::-webkit-media-controls-play-button {
+  background-color: #007bff;
+  border-radius: 50%;
+}
+
+.audio-player-container audio::-webkit-media-controls-current-time-display,
+.audio-player-container audio::-webkit-media-controls-time-remaining-display {
+  color: #495057;
+  font-weight: 500;
+}
+
+/* Amélioration de l'alerte d'erreur audio */
+.alert-warning {
+  background-color: #fff3cd;
+  border-color: #ffeaa7;
+  color: #856404;
+}
+
+.alert-warning i {
+  color: #f39c12;
+}
+
+/* Responsive pour le lecteur audio */
+@media (max-width: 768px) {
+  .audio-player-container {
+    padding: 0.75rem;
+  }
+  
+  .audio-player-container audio {
+    height: 35px;
+  }
+}
+
