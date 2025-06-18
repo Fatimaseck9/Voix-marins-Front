@@ -19,6 +19,8 @@ interface Plainte {
   utilisateur: string;
   audioUrl?: string;
   audioAccessible?: boolean;
+  isPlaying?: boolean;
+  audioElement?: HTMLAudioElement;
 }
 
 @Component({
@@ -111,42 +113,124 @@ export class SuivreMesPlaintesComponent implements OnInit {
   }
 }
 
+// Méthode pour obtenir l'URL audio avec authentification
+async getAudioUrl(plainte: Plainte): Promise<string> {
+  if (!plainte.audioUrl) return '';
+  
+  try {
+    // Récupérer le token d'authentification
+    const token = await firstValueFrom(this.authService.getToken());
+    if (!token) return '';
+    
+    // Construire l'URL avec le token d'authentification
+    const url = new URL(plainte.audioUrl);
+    url.searchParams.set('token', token);
+    
+    return url.toString();
+  } catch (error) {
+    console.error('Erreur lors de la construction de l\'URL audio:', error);
+    return plainte.audioUrl; // Retourner l'URL originale en cas d'erreur
+  }
+}
+
 // Méthode pour vérifier l'accessibilité d'un fichier audio
 private async checkAudioAccessibility(audioUrl: string, token: string): Promise<boolean> {
   try {
+    // Construire l'URL avec le token
+    const url = new URL(audioUrl);
+    url.searchParams.set('token', token);
+    
     const headers = new HttpHeaders({
       'Authorization': `Bearer ${token}`,
-      'Range': 'bytes=0-1' // Demander seulement les premiers bytes pour vérifier l'existence
+      'Range': 'bytes=0-1'
     });
     
     const response = await firstValueFrom(
-      this.http.head(audioUrl, { headers, observe: 'response' })
+      this.http.head(url.toString(), { headers, observe: 'response' })
     );
     
     return response.status === 200 || response.status === 206;
   } catch (error) {
     console.warn(`Fichier audio inaccessible: ${audioUrl}`, error);
-    return false;
+    // En cas d'erreur, on considère que le fichier pourrait être accessible
+    // car certains serveurs ne supportent pas les requêtes HEAD
+    return true;
   }
-}
-
-// Méthode pour obtenir l'URL audio avec authentification
-getAudioUrl(plainte: Plainte): string {
-  if (!plainte.audioUrl) return '';
-  
-  // Si l'audio n'est pas accessible, retourner une URL vide
-  if (!plainte.audioAccessible) return '';
-  
-  return plainte.audioUrl;
 }
 
 // Méthode pour gérer les erreurs de lecture audio
 onAudioError(plainte: Plainte, event: any) {
   console.error('Erreur de lecture audio:', event);
   plainte.audioAccessible = false;
+  plainte.isPlaying = false;
   
   // Afficher un message à l'utilisateur
   alert('Impossible de lire l\'enregistrement audio. Le fichier pourrait être corrompu ou inaccessible.');
+}
+
+// Méthode pour démarrer la lecture audio
+async playAudio(plainte: Plainte) {
+  try {
+    if (!plainte.audioUrl) return;
+    
+    // Si l'audio est déjà en cours de lecture, le mettre en pause
+    if (plainte.isPlaying && plainte.audioElement) {
+      plainte.audioElement.pause();
+      plainte.isPlaying = false;
+      return;
+    }
+    
+    // Créer un nouvel élément audio avec authentification
+    const token = await firstValueFrom(this.authService.getToken());
+    if (!token) {
+      alert('Erreur d\'authentification. Veuillez vous reconnecter.');
+      return;
+    }
+    
+    // Construire l'URL avec authentification
+    const url = new URL(plainte.audioUrl);
+    url.searchParams.set('token', token);
+    
+    // Créer l'élément audio
+    const audio = new Audio(url.toString());
+    
+    // Ajouter les en-têtes d'authentification
+    audio.crossOrigin = 'anonymous';
+    
+    // Gérer les événements
+    audio.addEventListener('ended', () => this.onAudioEnded(plainte));
+    audio.addEventListener('error', (event) => this.onAudioError(plainte, event));
+    audio.addEventListener('loadstart', () => {
+      plainte.isPlaying = true;
+    });
+    
+    // Démarrer la lecture
+    await audio.play();
+    plainte.audioElement = audio;
+    plainte.isPlaying = true;
+    
+  } catch (error) {
+    console.error('Erreur lors de la lecture audio:', error);
+    plainte.isPlaying = false;
+    alert('Erreur lors de la lecture audio. Vérifiez votre connexion.');
+  }
+}
+
+// Méthode pour arrêter la lecture audio
+stopAudio(plainte: Plainte) {
+  if (plainte.audioElement) {
+    plainte.audioElement.pause();
+    plainte.audioElement.currentTime = 0;
+  }
+  plainte.isPlaying = false;
+}
+
+// Méthode appelée quand l'audio se termine
+onAudioEnded(plainte: Plainte) {
+  plainte.isPlaying = false;
+  if (plainte.audioElement) {
+    plainte.audioElement.currentTime = 0;
+  }
 }
 
   async annulerPlainte(plainte: Plainte) {

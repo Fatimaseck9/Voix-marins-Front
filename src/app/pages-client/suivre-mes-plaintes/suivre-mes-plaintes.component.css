@@ -601,3 +601,66 @@ audio::-webkit-media-controls-panel {
   }
 }
 
+/* Styles pour les contrôles audio personnalisés */
+.audio-controls {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.audio-play-btn {
+  min-width: 100px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  font-weight: 500;
+  transition: all 0.3s ease;
+}
+
+.audio-play-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.audio-play-btn:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.audio-play-btn i {
+  font-size: 0.9rem;
+}
+
+/* Animation pour le bouton en cours de lecture */
+.audio-play-btn:disabled {
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0% {
+    opacity: 0.7;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0.7;
+  }
+}
+
+/* Responsive pour les contrôles audio */
+@media (max-width: 768px) {
+  .audio-controls {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  .audio-play-btn {
+    width: 100%;
+    margin-bottom: 0.5rem;
+  }
+}
+
