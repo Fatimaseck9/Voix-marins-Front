@@ -59,26 +59,14 @@
         </div></span>
       </form> -->
       <ul class="nav navbar-nav nav-mobile-menu">
-        <li class="nav-item">
-          <a class="nav-link" href="#">
-            <i class="material-icons">dashboard</i>
+        <li class="nav-item" *ngFor="let menuitem of menuItems">
+          <a class="nav-link" [routerLink]="[menuitem.path]">
+            <i class="material-icons">{{menuitem.icontype}}</i>
             <p>
-              <span class="d-lg-none d-md-block">Accueil</span>
+              <span class="d-lg-none d-md-block">{{menuitem.title}}</span>
             </p>
           </a>
         </li>
-       <!--  <li class="nav-item dropdown">
-          <a class="nav-link" href="#pablo" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-            <i class="material-icons">notifications</i>
-            <span class="notification">1</span>
-                <p>
-                <span class="d-lg-none d-md-block">Notifications</span>
-              </p>
-          </a>
-          <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdownMenuLink">
-            <a class="dropdown-item">Bientôt</a>
-          </div>
-        </li> -->
         <li class="nav-item dropdown">
             <a class="nav-link" href="#" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
               <i class="material-icons">person</i>
