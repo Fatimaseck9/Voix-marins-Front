@@ -58,45 +58,53 @@
 							"node_modules/jqvmap/dist/jquery.vmap.min.js",
 							"node_modules/jqvmap/dist/maps/jquery.vmap.world.js",
 							"node_modules/jquery-validation/dist/jquery.validate.min.js"
-						],
-						"extraWebpackConfig": "webpack.config.js",
-						"commonChunk": false
+						]
 					},
 					"configurations": {
 						"production": {
 							"budgets": [
 								{
-								  "type": "initial",
-								  "maximumWarning": "3mb",
-								  "maximumError": "5mb"
-								  },
-							  {
-								  "type": "anyComponentStyle",
-								  "maximumWarning": "12kb",
-								  "maximumError": "15kb"
-							  }
-							  ],
+									"type": "initial",
+									"maximumWarning": "3mb",
+									"maximumError": "5mb"
+								},
+								{
+									"type": "anyComponentStyle",
+									"maximumWarning": "12kb",
+									"maximumError": "15kb"
+								}
+							],
 							"outputHashing": "all",
 							"serviceWorker": true,
-							"extraWebpackConfig": "webpack.prod.config.js"
+							"extraWebpackConfig": "webpack.prod.config.js",
+							"optimization": {
+								"scripts": true,
+								"styles": true,
+								"fonts": true
+							},
+							"sourceMap": false,
+							"namedChunks": false,
+							"vendorChunk": true,
+							"buildOptimizer": true,
+							"extractLicenses": true
 						},
 						"development": {
 							"buildOptimizer": false,
 							"optimization": {
 								"scripts": false,
 								"styles": {
-								  "minify": false,
-								  "inlineCritical": false
+									"minify": false,
+									"inlineCritical": false
 								},
 								"fonts": false
-							  },
+							},
 							"vendorChunk": true,
 							"extractLicenses": false,
 							"sourceMap": true,
 							"namedChunks": true
 						}
 					},
-					"defaultConfiguration": "development"
+					"defaultConfiguration": "production"
 				},
 				"serve": {
 					"builder": "ngx-build-plus:dev-server",
@@ -210,9 +218,8 @@
 				}
 			}
 		}
-  },
-  "cli": {
-    "analytics": "af531d74-cd82-42f9-8827-6fefc1dff026"
-  }
-	
+	},
+	"cli": {
+		"analytics": "af531d74-cd82-42f9-8827-6fefc1dff026"
+	}
 }

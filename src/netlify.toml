@@ -1,12 +1,38 @@
+[build]
+  command = "npm run build"
+  publish = "dist/demo"
+  base = "src"
+
 [[headers]]
   for = "/*"
   [headers.values]
     Access-Control-Allow-Origin = "*"
     Access-Control-Allow-Methods = "GET, POST, PUT, DELETE, OPTIONS"
     Access-Control-Allow-Headers = "Origin, X-Requested-With, Content-Type, Accept, Authorization, ngrok-skip-browser-warning"
+    Access-Control-Allow-Credentials = "true"
 
 [[redirects]]
   from = "/*"
   to = "/index.html"
   status = 200
   force = true
+
+[[headers]]
+  for = "/*.js"
+    [headers.values]
+    Content-Type = "application/javascript"
+
+[[headers]]
+  for = "/*.mjs"
+    [headers.values]
+    Content-Type = "application/javascript"
+
+[[headers]]
+  for = "/ngsw-worker.js"
+    [headers.values]
+    Content-Type = "application/javascript"
+    Service-Worker-Allowed = "/"
+
+[build.environment]
+  NODE_VERSION = "18"
+  NPM_VERSION = "9"
