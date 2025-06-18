@@ -31,7 +31,7 @@ export class SuivreMesPlaintesComponent implements OnInit {
   menuActive = false;
   plaintes: Plainte[] = [];
   isBrowser: boolean;
-  private apiUrl = 'http://doscg4skk8wwsksk0k0c84gk.92.113.25.175.sslip.io/plaintes';
+  private apiUrl = 'https://api.gaalgui.sn/plaintes';
  // private apiUrl ='https://ce1e-154-124-68-191.ngrok-free.app/plaintes';
  // private apiUrl = 'http://10.100.200.20:3001/plaintes';
 
@@ -50,7 +50,7 @@ export class SuivreMesPlaintesComponent implements OnInit {
     }
   }
 
-  readonly backendBaseUrl = 'http://doscg4skk8wwsksk0k0c84gk.92.113.25.175.sslip.io';
+  readonly backendBaseUrl = 'https://api.gaalgui.sn';
   
   //readonly backendBaseUrl = 'https://ce1e-154-124-68-191.ngrok-free.app';
    //readonly backendBaseUrl ='http://10.100.200.20:3001';

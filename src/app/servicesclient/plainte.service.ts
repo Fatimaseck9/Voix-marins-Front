@@ -8,7 +8,7 @@ import { AuthService } from './auth.service';
 })
 export class PlainteService {
  // private apiUrl = 'https://ce1e-154-124-68-191.ngrok-free.app/plaintes';
-   private apiUrl = 'http://doscg4skk8wwsksk0k0c84gk.92.113.25.175.sslip.io/plaintes';
+   private apiUrl = 'https://api.gaalgui.sn/plaintes';
   
   //private apiUrl = 'https://voix-marins-backend-production.up.railway.app/plaintes';
   

@@ -10,7 +10,7 @@ import { Router } from '@angular/router';
 })
 export class AuthService {
 //private baseUrl = 'https://ce1e-154-124-68-191.ngrok-free.app/auth';
-  private baseUrl = 'http://doscg4skk8wwsksk0k0c84gk.92.113.25.175.sslip.io/auth';
+  private baseUrl = 'https://api.gaalgui.sn/auth';
     //private baseUrl = 'https://voix-marins-backend-production.up.railway.app/auth'
   //private baseUrl = 'http://localhost:3001/auth';
   private currentUserSubject = new BehaviorSubject<any>(null);

@@ -6,7 +6,7 @@ import { Observable } from 'rxjs';
   providedIn: 'root'
 })
 export class MarinRegisterService {
-  private apiUrl = 'http://doscg4skk8wwsksk0k0c84gk.92.113.25.175.sslip.io/marins/register';
+  private apiUrl = 'https://api.gaalgui.sn/marins/register';
 
   constructor(private http: HttpClient) {}
 
