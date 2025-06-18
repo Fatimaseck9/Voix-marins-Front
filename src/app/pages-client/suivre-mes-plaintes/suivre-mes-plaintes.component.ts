@@ -84,17 +84,11 @@ export class SuivreMesPlaintesComponent implements OnInit {
 
     // Utilisez l'endpoint /plaintes/user/:userId
     const response = await firstValueFrom(
-      this.http.get<Plainte[]>(`${this.apiUrl}/user/${userId}`, { headers }) // Ajoutez l'en-tête ici
+      this.http.get<Plainte[]>(`${this.apiUrl}/user/${userId}`, { headers })
     );
 
-    //this.plaintes = response;
-    this.plaintes = response.map(p => {
-  console.log('Plainte audio URL:', p.audioUrl); // 🔍 Ajout ici
-  return {
-    ...p,
-    audioUrl: p.audioUrl ? `${this.backendBaseUrl.replace(/\/$/, '')}${p.audioUrl}` : undefined
-  };
-});
+    // Utiliser directement l'URL Cloudinary
+    this.plaintes = response;
 
 
  
