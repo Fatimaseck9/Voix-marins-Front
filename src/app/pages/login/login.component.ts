@@ -38,9 +38,10 @@ export class LoginComponent implements OnInit, OnDestroy {
         this.sidebarVisible = false;
 
         // Vérifier si l'utilisateur est déjà connecté
-        if (this.authService.isLoggedIn()) {
-            this.redirectBasedOnUserStatus();
-        }
+        // Temporairement commenté pour permettre de voir les erreurs de login
+        // if (this.authService.isLoggedIn()) {
+        //     this.redirectBasedOnUserStatus();
+        // }
     }
 
     private redirectBasedOnUserStatus(): void {
