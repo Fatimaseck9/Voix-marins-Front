@@ -53,7 +53,7 @@ export class SuivreMesPlaintesComponent implements OnInit {
     }
   }
 
-  readonly backendBaseUrl = 'https://voix-marins-backend-production.up.railway.app/';
+  readonly backendBaseUrl = 'https://voix-marins-backend-production.up.railway.app';
   
   //readonly backendBaseUrl = 'https://ce1e-154-124-68-191.ngrok-free.app';
    //readonly backendBaseUrl ='http://10.100.200.20:3001';
@@ -102,11 +102,11 @@ export class SuivreMesPlaintesComponent implements OnInit {
           // URL complète déjà fournie
           audioUrl = p.audioUrl;
         } else if (p.audioUrl.startsWith('/')) {
-          // Chemin relatif commençant par /
-          audioUrl = `${this.backendBaseUrl}${p.audioUrl}`;
+          // Chemin relatif commençant par / - éviter le double slash
+          audioUrl = `${this.backendBaseUrl.replace(/\/$/, '')}${p.audioUrl}`;
         } else {
-          // Chemin relatif sans /
-          audioUrl = `${this.backendBaseUrl}/${p.audioUrl}`;
+          // Chemin relatif sans / - ajouter un slash
+          audioUrl = `${this.backendBaseUrl.replace(/\/$/, '')}/${p.audioUrl}`;
         }
         
         console.log('Audio URL construite:', audioUrl);
@@ -154,27 +154,42 @@ async getAudioUrl(plainte: Plainte): Promise<string> {
   }
 }
 
+// Méthode pour tester l'existence d'un fichier audio
+private async testAudioFile(url: string, token: string): Promise<boolean> {
+  try {
+    console.log('Test d\'existence du fichier:', url);
+    
+    const response = await fetch(url, {
+      method: 'HEAD',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'ngrok-skip-browser-warning': 'true'
+      }
+    });
+    
+    console.log('Réponse du test:', response.status, response.statusText);
+    return response.ok;
+  } catch (error) {
+    console.error('Erreur lors du test du fichier:', error);
+    return false;
+  }
+}
+
 // Méthode pour vérifier l'accessibilité d'un fichier audio
 private async checkAudioAccessibility(audioUrl: string, token: string): Promise<boolean> {
   try {
-    // Construire l'URL avec le token
-    const url = new URL(audioUrl);
-    url.searchParams.set('token', token);
+    // Tester d'abord l'existence du fichier
+    const fileExists = await this.testAudioFile(audioUrl, token);
     
-    const headers = new HttpHeaders({
-      'Authorization': `Bearer ${token}`,
-      'Range': 'bytes=0-1'
-    });
+    if (!fileExists) {
+      console.warn(`Fichier audio introuvable: ${audioUrl}`);
+      return false;
+    }
     
-    const response = await firstValueFrom(
-      this.http.head(url.toString(), { headers, observe: 'response' })
-    );
-    
-    return response.status === 200 || response.status === 206;
+    return true;
   } catch (error) {
-    console.warn(`Fichier audio inaccessible: ${audioUrl}`, error);
+    console.warn(`Erreur lors de la vérification d'accessibilité: ${audioUrl}`, error);
     // En cas d'erreur, on considère que le fichier pourrait être accessible
-    // car certains serveurs ne supportent pas les requêtes HEAD
     return true;
   }
 }

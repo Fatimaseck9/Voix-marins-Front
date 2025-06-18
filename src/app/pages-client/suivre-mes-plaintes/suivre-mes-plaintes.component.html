@@ -90,6 +90,12 @@
               <!-- Lecteur audio si disponible -->
               <div *ngIf="plainte.audioUrl" class="mt-3">
                 <div class="audio-player-container">
+                  <!-- Debug info (à retirer en production) -->
+                  <div class="debug-info" style="font-size: 0.8rem; color: #666; margin-bottom: 0.5rem;">
+                    <small>URL: {{ plainte.audioUrl }}</small><br>
+                    <small>Accessible: {{ plainte.audioAccessible }}</small>
+                  </div>
+                  
                   <!-- Bouton de lecture personnalisé -->
                   <div class="audio-controls">
                     <button 
