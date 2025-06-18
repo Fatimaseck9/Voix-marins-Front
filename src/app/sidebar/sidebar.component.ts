@@ -92,7 +92,7 @@ export class SidebarComponent implements OnInit {
             .subscribe(
                 res => {
                     // redirect to login
-                    this.router.navigate(['/login']);
+                    this.router.navigate(['/login-admin']);
                 },
                 err => {
                     console.log(err);
