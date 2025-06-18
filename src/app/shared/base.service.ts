@@ -41,7 +41,7 @@ export class BaseService {
         console.error('Erreur HTTP:', error);
         if (error.status === 401) {
           this.cookieService.delete('access_token');
-          window.location.href = '/login-admin';
+          window.location.href = '/login';
         }
         return throwError(() => error);
       })
@@ -57,7 +57,7 @@ export class BaseService {
       catchError((error) => {
         if (error.status === 401) {
           this.cookieService.delete('access_token');
-          window.location.href = '/login-admin';
+          window.location.href = '/login';
         }
         return throwError(() => error);
       })
@@ -73,7 +73,7 @@ export class BaseService {
       catchError((error) => {
         if (error.status === 401) {
           this.cookieService.delete('access_token');
-          window.location.href = '/login-admin';
+          window.location.href = '/login';
         }
         return throwError(() => error);
       })
@@ -89,7 +89,7 @@ export class BaseService {
       catchError((error) => {
         if (error.status === 401) {
           this.cookieService.delete('access_token');
-          window.location.href = '/login-admin';
+          window.location.href = '/login';
         }
         return throwError(() => error);
       })
@@ -105,7 +105,7 @@ export class BaseService {
       catchError((error) => {
         if (error.status === 401) {
           this.cookieService.delete('access_token');
-          window.location.href = '/login-admin';
+          window.location.href = '/login';
         }
         return throwError(() => error);
       })
