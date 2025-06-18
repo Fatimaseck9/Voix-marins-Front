@@ -130,7 +130,7 @@ export class PlaintesResoluesComponent implements OnInit {
 
   getFullPVUrl(pvUrl: string): string {
     if (!pvUrl) return '';
-    return pvUrl.startsWith('http') ? pvUrl : `http://localhost:3001/${pvUrl}`;
+    return pvUrl.startsWith('http') ? pvUrl : `https://api.gaalgui.sn/${pvUrl}`;
   }
 
   telechargerPV(plainte: any) {

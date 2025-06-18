@@ -1,4 +1,3 @@
-
 import { Component, OnInit, ViewChild, ElementRef, AfterViewInit } from '@angular/core';
 import { PlainteService } from 'src/app/services/plainte.service';
 import { AngularEditorConfig } from '@kolkov/angular-editor';
@@ -7,7 +6,7 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { firstValueFrom } from 'rxjs';
 import Swal from 'sweetalert2';
 import { jwtDecode } from 'jwt-decode';
-import { AuthService } from 'src/app/services/auth.service';
+import { AuthService } from '../auth/auth.service';
 import { CookieService } from 'ngx-cookie-service';
 import { Observable, tap, catchError, throwError } from 'rxjs';
 
@@ -126,8 +125,8 @@ export class PlaintesComponent implements OnInit, AfterViewInit {
     if (!relativeUrl) return '';
     // Assurez-vous que l'URL ne commence pas déjà par http
     if (relativeUrl.startsWith('http')) return relativeUrl;
-    return `http://localhost:3001${relativeUrl.startsWith('/') ? '' : '/'}${relativeUrl}`;
-}
+    return `https://api.gaalgui.sn${relativeUrl.startsWith('/') ? '' : '/'}${relativeUrl}`;
+  }
 
   traiterPlainte(plainte: any) {
     const updateData = {
@@ -369,8 +368,6 @@ export class PlaintesComponent implements OnInit, AfterViewInit {
 
   // Vérifier si une plainte peut être modifiée
   canModifyPlainte(plainte: any): boolean {
-    if (!plainte) return false;
-    
     // Si la plainte n'est pas résolue, n'importe quel admin peut la modifier
     if (plainte.statut !== 'Resolue') return true;
     
@@ -378,7 +375,8 @@ export class PlaintesComponent implements OnInit, AfterViewInit {
     if (!plainte.resolvedBy) return true;
     
     // Si la plainte est résolue, seul l'admin qui l'a résolue peut la modifier
-    const currentAdminId = this.authService.getCurrentAdminId();
+    const currentAccount = this.authService.getCurrentAccount();
+    const currentAdminId = currentAccount ? currentAccount.id : null;
     const resolvedById = typeof plainte.resolvedBy === 'object' ? plainte.resolvedBy.id : plainte.resolvedBy;
     
     console.log('Current Admin ID:', currentAdminId);
@@ -660,7 +658,7 @@ get nombreTotal(): number {
   // Retourne l'URL complète du PV
   getFullPVUrl(pvUrl: string): string {
     if (!pvUrl) return '';
-    return pvUrl.startsWith('http') ? pvUrl : `http://localhost:3001/${pvUrl}`;
+    return pvUrl.startsWith('http') ? pvUrl : `https://api.gaalgui.sn/${pvUrl}`;
   }
 
   // Modifier la méthode closeModal pour réinitialiser l'alerte

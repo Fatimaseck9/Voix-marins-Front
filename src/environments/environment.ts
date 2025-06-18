@@ -14,9 +14,9 @@ export const environment = {
   imagePath: "http://localhost:3001/images/",
   metricPath: "http://localhost:3001/metric/",
   serverURLMETRIC: "http://localhost:3001/api/v1/",
-  serverURLjambar: "http://localhost:3001/api/v1/",
+  serverURLjambar: "https://api.gaalgui.sn/",
   serverURLjambarlocale: "http://localhost:3001/api/v1/",
   serverURLMETRIClocal: "http://localhost:3001/api/v1/",
   //apiUrl: "http://localhost:3001/api/v1"
-  apiUrl: "https://gaalgui.sn"
+  apiUrl: "https://api.gaalgui.sn"
 };

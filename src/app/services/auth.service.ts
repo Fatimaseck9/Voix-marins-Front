@@ -73,42 +73,4 @@ export class AuthService {
       return null;
     }
   }
-
-  getCurrentAdmin(): any {
-    const adminStr = localStorage.getItem('currentAdmin');
-    return adminStr ? JSON.parse(adminStr) : null;
-  }
-
-  getCurrentAdminId(): number | null {
-    console.log('Tous les cookies:', document.cookie);
-    const adminCookie = this.getCookie('currentAccount');
-    console.log('Cookie currentAccount:', adminCookie);
-    
-    if (!adminCookie) {
-      console.log('Aucun cookie currentAccount trouvé');
-      return null;
-    }
-    
-    try {
-      const admin = JSON.parse(decodeURIComponent(adminCookie));
-      console.log('Admin parsé depuis le cookie:', admin);
-      return admin.id;
-    } catch (error) {
-      console.error('Erreur lors du parsing de l\'admin:', error);
-      return null;
-    }
-  }
-
-  private getCookie(name: string): string | null {
-    const value = `; ${document.cookie}`;
-    console.log('Recherche du cookie:', name, 'dans:', value);
-    const parts = value.split(`; ${name}=`);
-    if (parts.length === 2) {
-      const cookieValue = parts.pop()?.split(';').shift() || null;
-      console.log('Valeur du cookie trouvée:', cookieValue);
-      return cookieValue;
-    }
-    console.log('Cookie non trouvé');
-    return null;
-  }
 } 
