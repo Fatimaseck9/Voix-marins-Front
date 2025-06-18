@@ -18,9 +18,6 @@ interface Plainte {
   statut: string;
   utilisateur: string;
   audioUrl?: string;
-  audioAccessible?: boolean;
-  isPlaying?: boolean;
-  audioElement?: HTMLAudioElement;
 }
 
 @Component({
@@ -53,7 +50,7 @@ export class SuivreMesPlaintesComponent implements OnInit {
     }
   }
 
-  readonly backendBaseUrl = 'https://voix-marins-backend-production.up.railway.app';
+  readonly backendBaseUrl = 'https://voix-marins-backend-production.up.railway.app/';
   
   //readonly backendBaseUrl = 'https://ce1e-154-124-68-191.ngrok-free.app';
    //readonly backendBaseUrl ='http://10.100.200.20:3001';
@@ -90,209 +87,17 @@ export class SuivreMesPlaintesComponent implements OnInit {
       this.http.get<Plainte[]>(`${this.apiUrl}/user/${userId}`, { headers }) // Ajoutez l'en-tête ici
     );
 
-    // Traiter les plaintes et vérifier l'accessibilité des fichiers audio
-    this.plaintes = await Promise.all(response.map(async (p) => {
-      let audioUrl = undefined;
-      
-      // Construire l'URL audio selon le format reçu du backend
-      if (p.audioUrl) {
-        console.log('Audio URL original:', p.audioUrl);
-        
-        if (p.audioUrl.startsWith('http')) {
-          // URL complète déjà fournie
-          audioUrl = p.audioUrl;
-        } else if (p.audioUrl.startsWith('/')) {
-          // Chemin relatif commençant par / - éviter le double slash
-          audioUrl = `${this.backendBaseUrl.replace(/\/$/, '')}${p.audioUrl}`;
-        } else {
-          // Chemin relatif sans / - ajouter un slash
-          audioUrl = `${this.backendBaseUrl.replace(/\/$/, '')}/${p.audioUrl}`;
-        }
-        
-        console.log('Audio URL construite:', audioUrl);
-      }
-      
-      const plainte = {
-        ...p,
-        audioUrl: audioUrl,
-        audioAccessible: false
-      };
-      
-      // Vérifier l'accessibilité du fichier audio si disponible
-      if (plainte.audioUrl) {
-        plainte.audioAccessible = await this.checkAudioAccessibility(plainte.audioUrl, token);
-        console.log('Audio accessible:', plainte.audioAccessible, 'pour URL:', plainte.audioUrl);
-      }
-      
-      return plainte;
+    //this.plaintes = response;
+     this.plaintes = response.map(p => ({
+      ...p,
+      audioUrl: p.audioUrl ? `${this.backendBaseUrl}${p.audioUrl}` : undefined
     }));
-    
-    console.log('Réponse du backend (list of plaintes):', response);
+     console.log('Réponse du backend (list of plaintes):', response); // Ajou
   } catch (error) {
     console.error('Erreur lors du chargement des plaintes:', error);
     this.plaintes = [];
   }
 }
-
-// Méthode pour obtenir l'URL audio avec authentification
-async getAudioUrl(plainte: Plainte): Promise<string> {
-  if (!plainte.audioUrl) return '';
-  
-  try {
-    // Récupérer le token d'authentification
-    const token = await firstValueFrom(this.authService.getToken());
-    if (!token) return '';
-    
-    // Construire l'URL avec le token d'authentification
-    const url = new URL(plainte.audioUrl);
-    url.searchParams.set('token', token);
-    
-    return url.toString();
-  } catch (error) {
-    console.error('Erreur lors de la construction de l\'URL audio:', error);
-    return plainte.audioUrl; // Retourner l'URL originale en cas d'erreur
-  }
-}
-
-// Méthode pour tester l'existence d'un fichier audio
-private async testAudioFile(url: string, token: string): Promise<boolean> {
-  try {
-    console.log('Test d\'existence du fichier:', url);
-    
-    const response = await fetch(url, {
-      method: 'HEAD',
-      headers: {
-        'Authorization': `Bearer ${token}`,
-        'ngrok-skip-browser-warning': 'true'
-      }
-    });
-    
-    console.log('Réponse du test:', response.status, response.statusText);
-    return response.ok;
-  } catch (error) {
-    console.error('Erreur lors du test du fichier:', error);
-    return false;
-  }
-}
-
-// Méthode pour vérifier l'accessibilité d'un fichier audio
-private async checkAudioAccessibility(audioUrl: string, token: string): Promise<boolean> {
-  try {
-    // Tester d'abord l'existence du fichier
-    const fileExists = await this.testAudioFile(audioUrl, token);
-    
-    if (!fileExists) {
-      console.warn(`Fichier audio introuvable: ${audioUrl}`);
-      return false;
-    }
-    
-    return true;
-  } catch (error) {
-    console.warn(`Erreur lors de la vérification d'accessibilité: ${audioUrl}`, error);
-    // En cas d'erreur, on considère que le fichier pourrait être accessible
-    return true;
-  }
-}
-
-// Méthode pour gérer les erreurs de lecture audio
-onAudioError(plainte: Plainte, event: any) {
-  console.error('Erreur de lecture audio:', event);
-  plainte.audioAccessible = false;
-  plainte.isPlaying = false;
-  
-  // Afficher un message à l'utilisateur
-  alert('Impossible de lire l\'enregistrement audio. Le fichier pourrait être corrompu ou inaccessible.');
-}
-
-// Méthode pour démarrer la lecture audio
-async playAudio(plainte: Plainte) {
-  try {
-    if (!plainte.audioUrl) return;
-    
-    // Si l'audio est déjà en cours de lecture, le mettre en pause
-    if (plainte.isPlaying && plainte.audioElement) {
-      plainte.audioElement.pause();
-      plainte.isPlaying = false;
-      return;
-    }
-    
-    // Récupérer le token d'authentification
-    const token = await firstValueFrom(this.authService.getToken());
-    if (!token) {
-      alert('Erreur d\'authentification. Veuillez vous reconnecter.');
-      return;
-    }
-    
-    console.log('Tentative de lecture audio pour URL:', plainte.audioUrl);
-    
-    // Utiliser fetch pour récupérer l'audio avec authentification
-    const response = await fetch(plainte.audioUrl, {
-      headers: {
-        'Authorization': `Bearer ${token}`,
-        'ngrok-skip-browser-warning': 'true'
-      }
-    });
-    
-    if (!response.ok) {
-      throw new Error(`Erreur HTTP: ${response.status} - ${response.statusText}`);
-    }
-    
-    // Convertir la réponse en blob
-    const audioBlob = await response.blob();
-    const audioUrl = URL.createObjectURL(audioBlob);
-    
-    // Créer l'élément audio
-    const audio = new Audio(audioUrl);
-    
-    // Gérer les événements
-    audio.addEventListener('ended', () => {
-      this.onAudioEnded(plainte);
-      URL.revokeObjectURL(audioUrl); // Libérer la mémoire
-    });
-    audio.addEventListener('error', (event) => {
-      this.onAudioError(plainte, event);
-      URL.revokeObjectURL(audioUrl); // Libérer la mémoire
-    });
-    audio.addEventListener('loadstart', () => {
-      plainte.isPlaying = true;
-    });
-    
-    // Démarrer la lecture
-    await audio.play();
-    plainte.audioElement = audio;
-    plainte.isPlaying = true;
-    
-    console.log('Lecture audio démarrée avec succès');
-    
-  } catch (error) {
-    console.error('Erreur lors de la lecture audio:', error);
-    plainte.isPlaying = false;
-    alert(`Erreur lors de la lecture audio: ${error.message}`);
-  }
-}
-
-// Méthode pour arrêter la lecture audio
-stopAudio(plainte: Plainte) {
-  if (plainte.audioElement) {
-    plainte.audioElement.pause();
-    plainte.audioElement.currentTime = 0;
-    
-    // Nettoyer l'URL blob si elle existe
-    if (plainte.audioElement.src && plainte.audioElement.src.startsWith('blob:')) {
-      URL.revokeObjectURL(plainte.audioElement.src);
-    }
-  }
-  plainte.isPlaying = false;
-}
-
-// Méthode appelée quand l'audio se termine
-onAudioEnded(plainte: Plainte) {
-  plainte.isPlaying = false;
-  if (plainte.audioElement) {
-    plainte.audioElement.currentTime = 0;
-  }
-}
-
   async annulerPlainte(plainte: Plainte) {
     if (confirm('Êtes-vous sûr de vouloir annuler cette plainte ?')) {
       try {

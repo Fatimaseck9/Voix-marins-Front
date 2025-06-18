@@ -64,16 +64,16 @@
 						"production": {
 							"budgets": [
 								{
-									"type": "initial",
-									"maximumWarning": "3mb",
-									"maximumError": "5mb"
-								},
-								{
-									"type": "anyComponentStyle",
-									"maximumWarning": "12kb",
-									"maximumError": "15kb"
-								}
-							],
+								  "type": "initial",
+								  "maximumWarning": "3mb",
+								  "maximumError": "5mb"
+								  },
+							  {
+								  "type": "anyComponentStyle",
+								  "maximumWarning": "12kb",
+								  "maximumError": "15kb"
+							  }
+							  ],
 							"outputHashing": "all",
 							"serviceWorker": true,
 							"extraWebpackConfig": "webpack.prod.config.js",
@@ -93,11 +93,11 @@
 							"optimization": {
 								"scripts": false,
 								"styles": {
-									"minify": false,
-									"inlineCritical": false
+								  "minify": false,
+								  "inlineCritical": false
 								},
 								"fonts": false
-							},
+							  },
 							"vendorChunk": true,
 							"extractLicenses": false,
 							"sourceMap": true,
@@ -218,8 +218,8 @@
 				}
 			}
 		}
-	},
-	"cli": {
-		"analytics": "af531d74-cd82-42f9-8827-6fefc1dff026"
-	}
+  },
+  "cli": {
+    "analytics": "af531d74-cd82-42f9-8827-6fefc1dff026"
+  }
 }
