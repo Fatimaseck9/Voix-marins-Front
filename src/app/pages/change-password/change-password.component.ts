@@ -94,6 +94,7 @@ export class ChangePasswordComponent implements OnInit {
         }
       ).subscribe({
         next: (response: any) => {
+          console.log('Réponse du serveur:', response);
           if (response?.data?.access_token) {
             // Mettre à jour les tokens via AuthService
             this.authService.setToken(response.data.access_token);
@@ -103,6 +104,8 @@ export class ChangePasswordComponent implements OnInit {
 
             // Mettre à jour les informations utilisateur
             const decodedNewToken: any = jwtDecode(response.data.access_token);
+            console.log('Nouveau token décodé:', decodedNewToken);
+            
             const user = {
               id: decodedNewToken.sub,
               email: decodedNewToken.email,
@@ -110,14 +113,27 @@ export class ChangePasswordComponent implements OnInit {
               isActive: true
             };
             
+            console.log('Utilisateur mis à jour:', user);
+            
             // Mettre à jour le service d'authentification
             this.authService.setAccount(user);
 
             this.message = { text: 'Mot de passe modifié avec succès. Redirection...', type: 'success' };
             
+            console.log('Tentative de redirection vers /admin/tableau-bord');
             setTimeout(() => {
-              this.router.navigate(['/admin/tableau-bord']);
+              console.log('Exécution de la redirection...');
+              this.router.navigate(['/admin/tableau-bord']).then(
+                (success) => {
+                  console.log('Redirection réussie:', success);
+                },
+                (error) => {
+                  console.error('Erreur de redirection:', error);
+                }
+              );
             }, 1500);
+          } else {
+            console.error('Pas de token dans la réponse:', response);
           }
         },
         error: (err) => {
