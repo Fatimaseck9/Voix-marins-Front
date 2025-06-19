@@ -406,17 +406,13 @@ export class PlaintesComponent implements OnInit, AfterViewInit {
       detailsplainte: this.selectedPlainte.detailsplainte
     };
 
-    // Si le statut est "Resolue", ajouter les informations de l'admin
+    // Si le statut est "Resolue", ajouter uniquement l'id de l'admin
     if (updateData.statut === 'Resolue') {
       const admin = this.getCurrentAdmin();
       console.log('Admin actuel lors de la résolution:', admin);
       
       if (admin) {
-        updateData['resolvedBy'] = {
-          name: admin.name,
-          email: admin.email,
-          role: admin.role
-        };
+        updateData['resolvedBy'] = admin.id || admin.sub;
         updateData['dateResolution'] = new Date().toISOString();
         console.log('Données de résolution:', updateData);
       } else {
