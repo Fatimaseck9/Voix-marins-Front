@@ -1,7 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { PlainteService } from 'src/app/services/plainte.service';
-import { UserService } from 'src/app/services/user.service';
 import { MarinService } from 'src/app/services/marin.service';
 
 @Component({
@@ -13,14 +12,11 @@ export class AjouterPlainteAdminComponent implements OnInit {
   plainteForm: FormGroup;
   successMessage = '';
   errorMessage = '';
-  marins: any[] = [];
-  users: any[] = [];
   marinsAffichage: any[] = [];
 
   constructor(
     private fb: FormBuilder,
     private plainteService: PlainteService,
-    private userService: UserService,
     private marinService: MarinService
   ) {
     this.plainteForm = this.fb.group({
@@ -34,24 +30,13 @@ export class AjouterPlainteAdminComponent implements OnInit {
   ngOnInit() {
     this.marinService.getMarins().subscribe({
       next: (marins) => {
-        this.marins = marins;
-        this.userService.getMarins().subscribe({
-          next: (users) => {
-            this.users = users;
-            this.marinsAffichage = this.marins.map(marin => {
-              const user = this.users.find(u => u.id === marin.userId);
-              console.log('Fusion:', {marin, user});
-              return {
-                id: marin.id,
-                numero: marin.numero,
-                name: user ? user.name : 'Nom inconnu'
-              };
-            });
-          },
-          error: () => this.users = []
-        });
+        this.marinsAffichage = marins.map(marin => ({
+          id: marin.id,
+          numero: marin.numero,
+          name: marin.user?.name || 'Nom inconnu'
+        }));
       },
-      error: () => this.marins = []
+      error: () => this.marinsAffichage = []
     });
   }
 
