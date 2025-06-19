@@ -863,9 +863,9 @@ body {
 
             <!-- Bouton Ajouter une plainte -->
             <div class="mb-4 d-flex justify-content-end">
-              <a routerLink="/admin/ajouter-plainte" class="btn btn-success">
+              <button mat-raised-button color="primary" (click)="ouvrirAjoutPlainte()" class="btn btn-success">
                 <i class="fas fa-plus me-2"></i>Ajouter une plainte
-              </a>
+              </button>
             </div>
 
             <!-- Table Container -->

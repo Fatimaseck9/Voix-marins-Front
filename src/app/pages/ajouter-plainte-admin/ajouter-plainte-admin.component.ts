@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { PlainteService } from 'src/app/services/plainte.service';
 import { MarinService } from 'src/app/services/marin.service';
+import { MatDialogRef } from '@angular/material/dialog';
 
 @Component({
   selector: 'app-ajouter-plainte-admin',
@@ -17,7 +18,8 @@ export class AjouterPlainteAdminComponent implements OnInit {
   constructor(
     private fb: FormBuilder,
     private plainteService: PlainteService,
-    private marinService: MarinService
+    private marinService: MarinService,
+    private dialogRef: MatDialogRef<AjouterPlainteAdminComponent>
   ) {
     this.plainteForm = this.fb.group({
       marinId: ['', Validators.required],
@@ -45,6 +47,7 @@ export class AjouterPlainteAdminComponent implements OnInit {
           this.successMessage = 'Plainte ajoutée avec succès !';
           this.errorMessage = '';
           this.plainteForm.reset();
+          this.dialogRef.close('refresh');
         },
         error: (err) => {
           this.errorMessage = "Erreur lors de l'ajout de la plainte.";

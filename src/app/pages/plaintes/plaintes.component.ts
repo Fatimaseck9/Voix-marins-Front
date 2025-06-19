@@ -9,6 +9,8 @@ import { jwtDecode } from 'jwt-decode';
 import { AuthService } from '../auth/auth.service';
 import { CookieService } from 'ngx-cookie-service';
 import { Observable, tap, catchError, throwError } from 'rxjs';
+import { MatDialog } from '@angular/material/dialog';
+import { AjouterPlainteAdminComponent } from '../ajouter-plainte-admin/ajouter-plainte-admin.component';
 
 @Component({
   selector: 'app-plaintes',
@@ -66,7 +68,8 @@ export class PlaintesComponent implements OnInit, AfterViewInit {
     private sanitizer: DomSanitizer,
     private http: HttpClient,
     private authService: AuthService,
-    private cookieService: CookieService
+    private cookieService: CookieService,
+    private dialog: MatDialog
   ) {}
 
   ngOnInit(): void {
@@ -822,5 +825,17 @@ get nombreTotal(): number {
         }
       });
     }
+  }
+
+  ouvrirAjoutPlainte(): void {
+    const dialogRef = this.dialog.open(AjouterPlainteAdminComponent, {
+      width: '600px'
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result === 'refresh') {
+        this.rechargerPlaintes(); // recharge la liste après ajout
+      }
+    });
   }
 }
