@@ -188,7 +188,7 @@ export class PlainteService {
   submitPlainte(plainteData: any): Observable<any> {
     const headers = this.getAuthHeaders();
     // On suppose que plainteData contient marinId, titre, categorie, description
-    return this.http.post(`${this.apiUrl}/create`, plainteData, { headers });
+    return this.http.post(`${this.apiUrl}/create-by-admin`, plainteData, { headers });
   }
 }
 
