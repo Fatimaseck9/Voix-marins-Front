@@ -63,7 +63,6 @@ import { PwaInstallPromptComponent } from "./components/pwa-install-prompt/pwa-i
 
 import { environment } from '../environments/environment';
 import { ServiceWorkerModule } from "@angular/service-worker";
-import { AdminListComponent } from "./pages/admin-list/admin-list.component";
 
 
 
@@ -105,7 +104,6 @@ import { AdminListComponent } from "./pages/admin-list/admin-list.component";
    
   
     TableauDeBordComponent,
-    AdminListComponent,
    
   ],
 })

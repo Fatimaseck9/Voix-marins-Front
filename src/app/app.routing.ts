@@ -17,7 +17,6 @@ import { AppelerAnamComponent } from "./pages-client/appeler-anam/appeler-anam.c
 import { LoginMarinComponent } from "./pages-client/login/loginmarin.component";
 import { MarinAuthGuard } from "./servicesclient/marin-auth.guard";
 import { AdminAuthGuard } from "./pages/auth/admin-auth.guard";
-import { AdminListComponent } from "./pages/admin-list/admin-list.component";
 import { PlaintesResoluesComponent } from './pages/plaintes-resolues/plaintes-resolues.component';
 import { MarinRegisterComponent } from "./pages-client/marin-register/marin-register.component";
 import { AjouterPlainteAdminComponent } from './pages/ajouter-plainte-admin/ajouter-plainte-admin.component';
@@ -114,8 +113,7 @@ export const AppRoutes: Routes = [
       { 
         path: "register", 
         component: RegisterComponent 
-      },
-      { path: 'admin-list', component: AdminListComponent }
+      }
     ]
   },
 

@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { FormBuilder, FormGroup, Validators, AbstractControl } from '@angular/forms';
 import { Router } from '@angular/router';
 import { BaseService } from 'src/app/shared/base.service';
 import { AuthService } from '../auth/auth.service';
@@ -29,20 +29,73 @@ export class ChangePasswordComponent implements OnInit {
         Validators.pattern(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/)
       ]],
       confirmNewPassword: ['', Validators.required]
-    }, { validators: this.passwordMatchValidator });
+    }, { validators: this.passwordMatchValidator.bind(this) });
+
+    // Écouter les changements pour réinitialiser les erreurs
+    this.changePasswordForm.valueChanges.subscribe(() => {
+      this.clearValidationErrors();
+    });
   }
 
   ngOnInit() {}
 
-  passwordMatchValidator(form: FormGroup) {
+  passwordMatchValidator(form: AbstractControl) {
     const newPassword = form.get('newPassword')?.value;
     const confirmPassword = form.get('confirmNewPassword')?.value;
+    const oldPassword = form.get('oldPassword')?.value;
     
-    if (newPassword === form.get('oldPassword')?.value) {
+    if (!newPassword || !confirmPassword) {
+      return null;
+    }
+    
+    if (newPassword === oldPassword) {
       return { sameAsOld: true };
     }
     
     return newPassword === confirmPassword ? null : { mismatch: true };
+  }
+
+  clearValidationErrors() {
+    // Réinitialiser les erreurs de validation personnalisées
+    const errors = this.changePasswordForm.errors;
+    if (errors) {
+      const newErrors = { ...errors };
+      delete newErrors['mismatch'];
+      delete newErrors['sameAsOld'];
+      
+      if (Object.keys(newErrors).length === 0) {
+        this.changePasswordForm.setErrors(null);
+      } else {
+        this.changePasswordForm.setErrors(newErrors);
+      }
+    }
+    
+    // Forcer la validation du formulaire
+    this.changePasswordForm.updateValueAndValidity();
+  }
+
+  // Méthode pour déboguer l'état du formulaire
+  debugFormState() {
+    console.log('État du formulaire:', {
+      valid: this.changePasswordForm.valid,
+      invalid: this.changePasswordForm.invalid,
+      errors: this.changePasswordForm.errors,
+      oldPassword: {
+        value: this.changePasswordForm.get('oldPassword')?.value,
+        valid: this.changePasswordForm.get('oldPassword')?.valid,
+        errors: this.changePasswordForm.get('oldPassword')?.errors
+      },
+      newPassword: {
+        value: this.changePasswordForm.get('newPassword')?.value,
+        valid: this.changePasswordForm.get('newPassword')?.valid,
+        errors: this.changePasswordForm.get('newPassword')?.errors
+      },
+      confirmNewPassword: {
+        value: this.changePasswordForm.get('confirmNewPassword')?.value,
+        valid: this.changePasswordForm.get('confirmNewPassword')?.valid,
+        errors: this.changePasswordForm.get('confirmNewPassword')?.errors
+      }
+    });
   }
 
   getPasswordStrength(password: string): number {
@@ -56,8 +109,12 @@ export class ChangePasswordComponent implements OnInit {
   }
 
   onSubmit() {
+    // Déboguer l'état du formulaire
+    this.debugFormState();
+    
     if (this.isSubmitting || this.changePasswordForm.invalid) {
       this.message = { text: 'Veuillez corriger les erreurs du formulaire.', type: 'error' };
+      console.log('Formulaire invalide ou en cours de soumission');
       return;
     }
 
