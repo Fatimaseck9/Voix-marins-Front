@@ -130,7 +130,19 @@ export class PlaintesResoluesComponent implements OnInit {
 
   getFullPVUrl(pvUrl: string): string {
     if (!pvUrl) return '';
-    return pvUrl.startsWith('http') ? pvUrl : `https://api.gaalgui.sn/${pvUrl}`;
+    
+    // Si l'URL contient gaalgui.sn, la remplacer par api.gaalgui.sn
+    if (pvUrl.includes('gaalgui.sn') && !pvUrl.includes('api.gaalgui.sn')) {
+      return pvUrl.replace('gaalgui.sn', 'api.gaalgui.sn');
+    }
+    
+    // Si c'est déjà une URL complète avec api.gaalgui.sn, la retourner telle quelle
+    if (pvUrl.startsWith('http')) {
+      return pvUrl;
+    }
+    
+    // Sinon, construire l'URL complète
+    return `https://api.gaalgui.sn/${pvUrl}`;
   }
 
   telechargerPV(plainte: any) {
