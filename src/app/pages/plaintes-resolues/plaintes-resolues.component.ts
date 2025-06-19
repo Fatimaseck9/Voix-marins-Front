@@ -135,7 +135,17 @@ export class PlaintesResoluesComponent implements OnInit {
 
   telechargerPV(plainte: any) {
     if (plainte.pvUrl) {
-      window.open(plainte.pvUrl, '_blank');
+      const fullUrl = this.getFullPVUrl(plainte.pvUrl);
+      console.log('Téléchargement du PV:', fullUrl);
+      window.open(fullUrl, '_blank');
+    } else {
+      console.error('Aucun PV disponible pour cette plainte');
+      Swal.fire({
+        icon: 'error',
+        title: 'Erreur',
+        text: 'Aucun PV disponible pour cette plainte.',
+        confirmButtonText: 'OK'
+      });
     }
   }
 
