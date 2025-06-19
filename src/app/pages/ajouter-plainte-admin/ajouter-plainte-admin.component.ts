@@ -33,6 +33,7 @@ export class AjouterPlainteAdminComponent implements OnInit {
     this.marinService.getMarins().subscribe({
       next: (marins) => {
         this.marins = marins;
+        console.log('Marins reçus:', this.marins);
       },
       error: () => this.marins = []
     });
