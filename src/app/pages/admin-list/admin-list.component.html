@@ -8,27 +8,17 @@
       <tr>
         <th>Nom</th>
         <th>Email</th>
-        <th>Rôle</th>
-        <th>Statut</th>
         <th>Actions</th>
       </tr>
     </thead>
     <tbody>
       <tr *ngFor="let admin of admins">
         <td>{{ admin.name }}</td>
-        <td>{{ admin.email }}</td>
-        <td>{{ admin.role }}</td>
+        <td>{{ admin.admin?.email }}</td>
         <td>
-          <span [ngClass]="{ 'text-success': admin.isActive, 'text-danger': !admin.isActive }">
-            {{ admin.isActive ? 'Actif' : 'Inactif' }}
-          </span>
-        </td>
-        <td>
-          <button class="btn btn-warning btn-sm me-2" (click)="toggleStatus(admin.id)">
-            {{ admin.isActive ? 'Désactiver' : 'Activer' }}
+          <button class="btn btn-danger btn-sm" (click)="deleteAdmin(admin.id)">
+            <i class="fas fa-trash"></i> Supprimer
           </button>
-          <button class="btn btn-info btn-sm me-2" (click)="updateAdmin(admin.id, admin.name)">Modifier</button>
-          <button class="btn btn-danger btn-sm" (click)="deleteAdmin(admin.id)">Supprimer</button>
         </td>
       </tr>
     </tbody>
@@ -66,5 +56,27 @@
   color: #0c5460;
   background-color: #d1ecf1;
   border-color: #bee5eb;
+}
+
+.table {
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.table thead th {
+  background-color: #f8f9fa;
+  border-bottom: 2px solid #dee2e6;
+  font-weight: 600;
+}
+
+.btn-danger {
+  background-color: #dc3545;
+  border-color: #dc3545;
+}
+
+.btn-danger:hover {
+  background-color: #c82333;
+  border-color: #bd2130;
 }
 </style>

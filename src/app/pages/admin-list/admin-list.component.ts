@@ -35,27 +35,4 @@ export class AdminListComponent implements OnInit {
       });
     }
   }
-
-  toggleStatus(id: number) {
-    this.baseService.patch(`users/${id}/toggle`, true, {}).subscribe({
-      next: () => {
-        alert('Statut mis à jour');
-        this.loadAdmins();
-      },
-      error: (err) => console.error('Error toggling status:', err),
-    });
-  }
-
-  updateAdmin(id: number, name: string) {
-    const newName = prompt('Nouveau nom ?', name);
-    if (newName && newName !== name) {
-      this.baseService.patch(`users/${id}`, true, { name: newName }).subscribe({
-        next: () => {
-          alert('Nom mis à jour');
-          this.loadAdmins();
-        },
-        error: (err) => console.error('Error updating admin:', err),
-      });
-    }
-  }
 }
