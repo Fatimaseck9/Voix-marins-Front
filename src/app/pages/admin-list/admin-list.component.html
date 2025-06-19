@@ -8,59 +8,80 @@
             Gestion des comptes administrateurs de la plateforme
         </p>
         
-        <div class="text-center mb-4">
-            <span class="admin-count">
-                <i class="fas fa-users me-2"></i>
-                {{ admins.length }} administrateur(s)
-            </span>
+        <!-- Indicateur de chargement -->
+        <div *ngIf="loading" class="text-center mb-4">
+            <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Chargement...</span>
+            </div>
+            <p class="mt-2">Chargement des administrateurs...</p>
         </div>
         
-        <div class="table-container">
-            <div class="table-responsive">
-                <table class="table">
-                    <thead>
-                        <tr>
-                            <th>
-                                <i class="fas fa-user me-2"></i>
-                                Nom et Prénom
-                            </th>
-                            <th>
-                                <i class="fas fa-envelope me-2"></i>
-                                Email
-                            </th>
-                            <th>
-                                <i class="fas fa-cogs me-2"></i>
-                                Actions
-                            </th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr *ngFor="let admin of admins">
-                            <td>
-                                <strong>{{ admin.name }}</strong>
-                            </td>
-                            <td>
-                                <i class="fas fa-envelope me-2 text-muted"></i>
-                                {{ admin.admin.email }}
-                            </td>
-                            <td>
-                                <button class="btn btn-danger btn-sm" (click)="deleteAdmin(admin.id)">
-                                    <i class="fas fa-trash me-1"></i>
-                                    Supprimer
-                                </button>
-                            </td>
-                        </tr>
-                        <tr *ngIf="admins.length === 0">
-                            <td colspan="3">
-                                <div class="empty-state">
-                                    <i class="fas fa-users-slash"></i>
-                                    <h5>Aucun administrateur trouvé</h5>
-                                    <p>La liste des administrateurs est vide.</p>
-                                </div>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
+        <!-- Message d'erreur -->
+        <div *ngIf="error" class="alert alert-danger text-center mb-4" role="alert">
+            <i class="fas fa-exclamation-triangle me-2"></i>
+            {{ error }}
+            <button class="btn btn-outline-danger btn-sm ms-3" (click)="loadAdmins()">
+                <i class="fas fa-redo me-1"></i>
+                Réessayer
+            </button>
+        </div>
+        
+        <!-- Contenu principal -->
+        <div *ngIf="!loading && !error">
+            <div class="text-center mb-4">
+                <span class="admin-count">
+                    <i class="fas fa-users me-2"></i>
+                    {{ admins.length }} administrateur(s)
+                </span>
+            </div>
+            
+            <div class="table-container">
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>
+                                    <i class="fas fa-user me-2"></i>
+                                    Nom et Prénom
+                                </th>
+                                <th>
+                                    <i class="fas fa-envelope me-2"></i>
+                                    Email
+                                </th>
+                                <th>
+                                    <i class="fas fa-cogs me-2"></i>
+                                    Actions
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr *ngFor="let admin of admins">
+                                <td>
+                                    <strong>{{ admin.name }}</strong>
+                                </td>
+                                <td>
+                                    <i class="fas fa-envelope me-2 text-muted"></i>
+                                    {{ admin.admin?.email || 'N/A' }}
+                                </td>
+                                <td>
+                                    <button class="btn btn-danger btn-sm" (click)="deleteAdmin(admin.id)">
+                                        <i class="fas fa-trash me-1"></i>
+                                        Supprimer
+                                    </button>
+                                </td>
+                            </tr>
+                            <tr *ngIf="admins.length === 0">
+                                <td colspan="3">
+                                    <div class="empty-state">
+                                        <i class="fas fa-users-slash"></i>
+                                        <h5>Aucun administrateur trouvé</h5>
+                                        <p>La liste des administrateurs est vide.</p>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
     </div>

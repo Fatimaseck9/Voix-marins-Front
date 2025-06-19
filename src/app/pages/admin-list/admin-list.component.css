@@ -1,11 +1,14 @@
 .admin-list-container {
-    min-height: 100vh;
+    min-height: calc(100vh - 80px);
     display: flex;
     align-items: center;
     justify-content: center;
     padding: 2rem;
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    margin-top: 0;
+    position: relative;
+    z-index: 1;
 }
 
 .content-card {
@@ -17,6 +20,7 @@
     width: 100%;
     max-width: 900px;
     border: 1px solid rgba(255, 255, 255, 0.2);
+    margin: 0 auto;
 }
 
 .page-title {
@@ -43,6 +47,7 @@
 
 .table {
     margin-bottom: 0;
+    width: 100%;
 }
 
 .table thead th {
@@ -106,10 +111,14 @@
 @media (max-width: 768px) {
     .admin-list-container {
         padding: 1rem;
+        min-height: auto;
+        align-items: flex-start;
+        padding-top: 2rem;
     }
     
     .content-card {
         padding: 1.5rem;
+        margin-top: 1rem;
     }
     
     .page-title {
@@ -118,5 +127,11 @@
     
     .table-responsive {
         border-radius: 15px;
+    }
+}
+
+@media (min-width: 769px) {
+    .admin-list-container {
+        padding-top: 4rem;
     }
 }
