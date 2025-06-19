@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { PlainteService } from 'src/app/services/plainte.service';
 import { UserService } from 'src/app/services/user.service';
+import { MarinService } from 'src/app/services/marin.service';
 
 @Component({
   selector: 'app-ajouter-plainte-admin',
@@ -14,7 +15,12 @@ export class AjouterPlainteAdminComponent implements OnInit {
   errorMessage = '';
   marins: any[] = [];
 
-  constructor(private fb: FormBuilder, private plainteService: PlainteService, private userService: UserService) {
+  constructor(
+    private fb: FormBuilder,
+    private plainteService: PlainteService,
+    private userService: UserService,
+    private marinService: MarinService
+  ) {
     this.plainteForm = this.fb.group({
       marinId: ['', Validators.required],
       titre: ['', Validators.required],
@@ -24,10 +30,9 @@ export class AjouterPlainteAdminComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.userService.getMarins().subscribe({
-      next: (users) => {
-        // Filtrer uniquement les utilisateurs ayant le rôle "marin"
-        this.marins = users.filter(u => u.role === 'marin');
+    this.marinService.getMarins().subscribe({
+      next: (marins) => {
+        this.marins = marins;
       },
       error: () => this.marins = []
     });
