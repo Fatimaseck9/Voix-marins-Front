@@ -1,28 +1,30 @@
-<div class="container mt-4">
-  <h2>Liste des Administrateurs</h2>
-  <div *ngIf="admins.length === 0" class="alert alert-info">
-    Aucun administrateur trouvé
+<div class="container mt-4 d-flex justify-content-center">
+  <div class="col-md-10 col-lg-8">
+    <h2 class="text-center mb-4">Liste des Administrateurs</h2>
+    <div *ngIf="admins.length === 0" class="alert alert-info">
+      Aucun administrateur trouvé
+    </div>
+    <table class="table table-bordered" *ngIf="admins.length > 0">
+      <thead>
+        <tr>
+          <th>Nom</th>
+          <th>Email</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let admin of admins">
+          <td>{{ admin.name }}</td>
+          <td>{{ admin.admin?.email }}</td>
+          <td>
+            <button class="btn btn-danger btn-sm" (click)="deleteAdmin(admin.id)">
+              <i class="fas fa-trash"></i> Supprimer
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
   </div>
-  <table class="table table-bordered" *ngIf="admins.length > 0">
-    <thead>
-      <tr>
-        <th>Nom</th>
-        <th>Email</th>
-        <th>Actions</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr *ngFor="let admin of admins">
-        <td>{{ admin.name }}</td>
-        <td>{{ admin.admin?.email }}</td>
-        <td>
-          <button class="btn btn-danger btn-sm" (click)="deleteAdmin(admin.id)">
-            <i class="fas fa-trash"></i> Supprimer
-          </button>
-        </td>
-      </tr>
-    </tbody>
-  </table>
 </div>
 
 <style>
@@ -62,12 +64,19 @@
   background-color: white;
   border-radius: 8px;
   box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  margin: 0 auto;
 }
 
 .table thead th {
   background-color: #f8f9fa;
   border-bottom: 2px solid #dee2e6;
   font-weight: 600;
+  text-align: center;
+}
+
+.table tbody td {
+  text-align: center;
+  vertical-align: middle;
 }
 
 .btn-danger {
@@ -78,5 +87,10 @@
 .btn-danger:hover {
   background-color: #c82333;
   border-color: #bd2130;
+}
+
+h2 {
+  color: #333;
+  font-weight: 600;
 }
 </style>
