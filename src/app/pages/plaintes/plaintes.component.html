@@ -770,10 +770,19 @@ body {
 }
 
 /* Styles pour le modal Bootstrap */
+.modal-dialog {
+  display: flex;
+  align-items: center;
+  min-height: calc(100% - 1rem);
+}
+
 .modal-content {
   border-radius: 15px;
   border: none;
   box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+  width: 100%;
+  max-width: 600px;
+  margin: 0 auto;
 }
 
 .modal-header {
@@ -781,16 +790,22 @@ body {
   color: white;
   border-radius: 15px 15px 0 0;
   border-bottom: none;
+  padding: 1.5rem 2rem;
 }
 
 .modal-title {
   font-weight: 600;
   font-size: 1.25rem;
+  margin: 0;
 }
 
 .btn-close {
   filter: invert(1);
   opacity: 0.8;
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
 }
 
 .btn-close:hover {
@@ -799,6 +814,7 @@ body {
 
 .modal-body {
   padding: 2rem;
+  background: white;
 }
 
 .form-label {
@@ -812,16 +828,20 @@ body {
   border: 1px solid #ddd;
   padding: 0.75rem;
   transition: all 0.3s ease;
+  width: 100%;
 }
 
 .form-control:focus, .form-select:focus {
   border-color: #28a745;
   box-shadow: 0 0 0 0.2rem rgba(40, 167, 69, 0.25);
+  outline: none;
 }
 
 .modal-footer {
   border-top: 1px solid #eee;
   padding: 1.5rem 2rem;
+  background: white;
+  border-radius: 0 0 15px 15px;
 }
 
 .btn-secondary {
@@ -830,6 +850,14 @@ body {
   border-radius: 8px;
   padding: 0.75rem 1.5rem;
   font-weight: 600;
+  color: white;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.btn-secondary:hover {
+  background: #5a6268;
+  transform: translateY(-1px);
 }
 
 .btn-primary {
@@ -839,6 +867,9 @@ body {
   padding: 0.75rem 1.5rem;
   font-weight: 600;
   box-shadow: 0 4px 12px rgba(40, 167, 69, 0.3);
+  color: white;
+  cursor: pointer;
+  transition: all 0.3s ease;
 }
 
 .btn-primary:hover {
@@ -864,21 +895,45 @@ body {
   border-top: 1px solid #eee;
 }
 
-.text-start {
-    max-height: 100px;
-    overflow-y: auto;
-    display: block;
-    white-space: pre-wrap; /* Respecte les sauts de ligne */
-    word-wrap: break-word;
+/* Assurer que le modal est centré sur tous les écrans */
+@media (min-width: 576px) {
+  .modal-dialog {
+    max-width: 600px;
+    margin: 1.75rem auto;
+  }
 }
 
-.description-column {
-  width: 300px; /* ou un pourcentage, ex: 20% */
-  max-width: 400px;
-  word-wrap: break-word;
-  white-space: normal;
+/* Correction pour le centrage du modal */
+.modal.show .modal-dialog {
+  transform: none;
+  margin: 1.75rem auto;
 }
 
+/* Forcer le centrage du modal */
+#ajoutPlainteModal .modal-dialog {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  min-height: calc(100vh - 3.5rem) !important;
+  margin: 1.75rem auto !important;
+  max-width: 600px !important;
+}
+
+#ajoutPlainteModal .modal-content {
+  width: 100% !important;
+  max-width: 600px !important;
+  margin: 0 auto !important;
+  position: relative !important;
+}
+
+/* S'assurer que le modal est au-dessus de tout */
+.modal {
+  z-index: 1055 !important;
+}
+
+.modal-backdrop {
+  z-index: 1050 !important;
+}
 
 </style>
 
