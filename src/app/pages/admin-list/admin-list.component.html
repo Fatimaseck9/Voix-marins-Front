@@ -1,85 +1,12 @@
-<div class="container py-4 d-flex justify-content-center align-items-center min-vh-100">
-  <div class="w-100" style="max-width: 1000px;">
-    <h2 class="mb-3 text-primary text-center">
-      <i class="fas fa-users-cog me-2"></i>
-      Liste des administrateurs
-    </h2>
-
-    <!-- Debug info temporaire -->
-    <div class="alert alert-info mb-3">
-      <strong>Debug:</strong> Loading: {{ loading }}, Error: {{ error }}, Count: {{ admins.length }}
-    </div>
-
-    <!-- Indicateur de chargement -->
-    <div *ngIf="loading" class="text-center my-4">
-      <div class="spinner-border text-primary" role="status">
-        <span class="visually-hidden">Chargement...</span>
-      </div>
-      <p class="mt-2">Chargement des administrateurs...</p>
-    </div>
-
-    <!-- Message d'erreur -->
-    <div *ngIf="error" class="alert alert-danger d-flex align-items-center justify-content-between" role="alert">
-      <span>
-        <i class="fas fa-exclamation-circle me-2"></i>{{ error }}
-      </span>
-      <button class="btn btn-outline-danger btn-sm" (click)="loadAdmins()">
-        <i class="fas fa-redo me-1"></i> Réessayer
-      </button>
-    </div>
-
-    <!-- Tableau des administrateurs -->
-    <div *ngIf="!loading && !error">
-      <div *ngIf="admins.length > 0; else noAdmins">
-        <div class="mb-3 text-muted text-center">
-          <i class="fas fa-user-shield me-1"></i>
-          {{ admins.length }} administrateur(s)
-        </div>
-
-        <div class="table-responsive">
-          <table class="table table-striped align-middle">
-            <thead class="table-light">
-              <tr>
-                <th>Nom</th>
-                <th>Email</th>
-                <th>Rôle</th>
-                <th>Statut</th>
-                <th class="text-end">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr *ngFor="let admin of admins">
-                <td>
-                  <strong>{{ admin.name || 'N/A' }}</strong><br />
-                  <small class="text-muted">ID: {{ admin.id }}</small>
-                </td>
-                <td>{{ admin.admin?.email || 'N/A' }}</td>
-                <td>
-                  <span class="badge bg-primary">{{ admin.role || 'N/A' }}</span>
-                </td>
-                <td>
-                  <span class="badge" [ngClass]="admin.admin?.isActive ? 'bg-success' : 'bg-danger'">
-                    {{ admin.admin?.isActive ? 'Actif' : 'Inactif' }}
-                  </span>
-                </td>
-                <td class="text-end">
-                  <button class="btn btn-sm btn-outline-danger" (click)="deleteAdmin(admin.id)">
-                    <i class="fas fa-trash me-1"></i> Supprimer
-                  </button>
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
-
-      <!-- Aucun admin trouvé -->
-      <ng-template #noAdmins>
-        <div class="alert alert-info text-center" role="alert">
-          <i class="fas fa-users-slash me-2"></i>
-          Aucun administrateur trouvé.
-        </div>
-      </ng-template>
-    </div>
-  </div>
-</div>
+<tr *ngFor="let admin of admins">
+  <td>
+    <strong>{{ admin.name }}</strong><br />
+    <small class="text-muted">ID: {{ admin.id }}</small>
+  </td>
+  <td>{{ admin.admin?.email || 'N/A' }}</td>
+  <td class="text-end">
+    <button class="btn btn-sm btn-outline-danger" (click)="deleteAdmin(admin.id)">
+      <i class="fas fa-trash me-1"></i> Supprimer
+    </button>
+  </td>
+</tr>

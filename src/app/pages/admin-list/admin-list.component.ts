@@ -56,7 +56,7 @@ export class AdminListComponent implements OnInit {
         console.log('Data length:', Array.isArray(data) ? data.length : 'Not an array');
         
         if (Array.isArray(data)) {
-          this.admins = data;
+        this.admins = data;
         } else if (data && typeof data === 'object') {
           // Si c'est un objet, essayer de trouver un tableau à l'intérieur
           const possibleArrays = Object.values(data).filter(val => Array.isArray(val));
@@ -76,10 +76,8 @@ export class AdminListComponent implements OnInit {
         // Log détaillé du premier admin pour debug
         if (this.admins.length > 0) {
           console.log('First admin structure:', this.admins[0]);
-          console.log('First admin name:', this.admins[0].name);
-          console.log('First admin email:', this.admins[0].admin?.email);
-          console.log('First admin role:', this.admins[0].role);
-          console.log('First admin isActive:', this.admins[0].admin?.isActive);
+          console.log('First admin name:', this.admins[0].user?.name || this.admins[0].name);
+          console.log('First admin email:', this.admins[0].admin?.email || this.admins[0].email);
         }
         
         // Forcer la détection de changement
