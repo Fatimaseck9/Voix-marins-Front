@@ -56,13 +56,13 @@ export let ROUTES: RouteInfo[] = [
     //type: 'link',
     //icontype: 'person_add'
   //},
-  //{
-   // path: '/admin/admin-list',
-    //title: 'Liste des administrateurs',
-    //visible: true,
-    //type: 'link',
-    //icontype: 'people' // Choisis une icône Material appropriée
- // }
+  {
+    path: '/admin/admin-list',
+    title: 'Liste des administrateurs',
+    visible: true,
+    type: 'link',
+    icontype: 'people' // Icône Material pour les utilisateurs
+  },
   
 ];
 

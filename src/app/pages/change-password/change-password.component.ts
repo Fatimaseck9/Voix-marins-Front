@@ -74,7 +74,7 @@ export class ChangePasswordComponent implements OnInit {
     const token = this.authService.getToken();
     if (!token) {
       this.message = { text: 'Session expirée, veuillez vous reconnecter.', type: 'error' };
-      this.router.navigate(['/login-admin']);
+      window.location.href = 'https://gaalgui.sn/login-admin';
       return;
     }
 
@@ -127,7 +127,7 @@ export class ChangePasswordComponent implements OnInit {
             
             setTimeout(() => {
               console.log('Exécution de la redirection...');
-              this.router.navigate(['/admin/tableau-bord']).then(
+              this.router.navigate(['https://gaalgui.sn/admin/tableau-bord']).then(
                 (success) => {
                   console.log('Redirection réussie:', success);
                 },
@@ -135,7 +135,7 @@ export class ChangePasswordComponent implements OnInit {
                   console.error('Erreur de redirection:', error);
                   // En cas d'échec, essayer une redirection alternative
                   console.log('Tentative de redirection alternative vers /admin/dashboard');
-                  this.router.navigate(['/admin/dashboard']);
+                  window.location.href = 'https://gaalgui.sn/admin/tableau-bord';
                 }
               );
             }, 500); // Réduit de 1500ms à 500ms
@@ -153,7 +153,7 @@ export class ChangePasswordComponent implements OnInit {
             // En cas d'erreur d'authentification, rediriger vers la page de connexion
             setTimeout(() => {
               this.authService.logout();
-              this.router.navigate(['/login']);
+              window.location.href = 'https://gaalgui.sn/login-admin';
             }, 2000);
           }
           console.error('Erreur détaillée:', err);
@@ -165,7 +165,7 @@ export class ChangePasswordComponent implements OnInit {
     } catch (error) {
       this.message = { text: 'Token invalide, veuillez vous reconnecter.', type: 'error' };
       this.authService.logout();
-      this.router.navigate(['/login']);
+      window.location.href = 'https://gaalgui.sn/login-admin';
     }
   }
 
