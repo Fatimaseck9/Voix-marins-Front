@@ -29,6 +29,10 @@
         <label for="description" class="form-label">Description</label>
         <textarea id="description" class="form-control" formControlName="description" rows="4" required></textarea>
       </div>
+      <div class="mb-3">
+        <label for="date" class="form-label">Date de l'incident</label>
+        <input type="date" id="date" class="form-control" formControlName="date" required>
+      </div>
       <button type="submit" class="btn btn-primary w-100" [disabled]="plainteForm.invalid">Ajouter la plainte</button>
     </form>
     <div *ngIf="successMessage" class="alert alert-success mt-3">{{ successMessage }}</div>

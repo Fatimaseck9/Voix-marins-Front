@@ -24,6 +24,7 @@ export class AjouterPlainteAdminComponent implements OnInit {
       titre: ['', Validators.required],
       categorie: ['', Validators.required],
       description: ['', Validators.required],
+      date: ['', Validators.required],
     });
   }
 
