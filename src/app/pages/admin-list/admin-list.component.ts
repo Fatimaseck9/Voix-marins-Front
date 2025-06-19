@@ -13,6 +13,7 @@ export class AdminListComponent implements OnInit {
   constructor(private baseService: BaseService) {}
 
   ngOnInit(): void {
+    console.log('AdminListComponent initialized');
     this.loadAdmins();
   }
 
@@ -21,6 +22,7 @@ export class AdminListComponent implements OnInit {
     this.error = '';
     
     console.log('Loading admins from endpoint: users/admins');
+    console.log('Loading state set to:', this.loading);
     
     this.baseService.get('users/admins', true).subscribe({
       next: (data) => {
@@ -40,12 +42,17 @@ export class AdminListComponent implements OnInit {
         }
         
         console.log('Processed admins:', this.admins);
+        console.log('Admins length:', this.admins.length);
         this.loading = false;
+        console.log('Loading state set to:', this.loading);
+        console.log('Error state:', this.error);
       },
       error: (err) => {
         console.error('Error loading admins:', err);
         this.error = 'Erreur lors du chargement des administrateurs: ' + (err.message || err.statusText || 'Erreur inconnue');
         this.loading = false;
+        console.log('Error occurred, loading set to:', this.loading);
+        console.log('Error message:', this.error);
       },
     });
   }

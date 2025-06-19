@@ -4,9 +4,14 @@
             <i class="fas fa-users-cog me-3"></i>
             Liste des Administrateurs
         </h1>
-        <p class="page-subtitle">
-            Gestion des comptes administrateurs de la plateforme
-        </p>
+        
+        <!-- Debug info -->
+        <div class="mb-3">
+            <small class="text-muted">
+                <i class="fas fa-info-circle me-1"></i>
+                Debug: Loading={{ loading }}, Error={{ error }}, Admins count={{ admins.length }}
+            </small>
+        </div>
         
         <!-- Loading indicator -->
         <div *ngIf="loading" class="text-center mb-4">
@@ -30,12 +35,12 @@
             </span>
         </div>
         
-        <!-- Debug info -->
-        <div *ngIf="!loading" class="mb-3">
-            <small class="text-muted">
-                <i class="fas fa-info-circle me-1"></i>
-                Debug: {{ admins.length }} éléments dans le tableau
-            </small>
+        <!-- Simple display for testing -->
+        <div *ngIf="!loading" class="mb-4">
+            <h4>Test d'affichage simple:</h4>
+            <div *ngFor="let admin of admins; let i = index" class="border p-2 mb-2">
+                <strong>Admin {{ i + 1 }}:</strong> {{ admin.name }} - {{ admin.admin?.email }}
+            </div>
         </div>
         
         <!-- Table -->
