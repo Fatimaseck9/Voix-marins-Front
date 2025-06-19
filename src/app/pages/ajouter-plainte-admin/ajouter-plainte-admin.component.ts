@@ -40,7 +40,8 @@ export class AjouterPlainteAdminComponent implements OnInit {
 
   onSubmit() {
     if (this.plainteForm.valid) {
-      this.plainteService.submitPlainte(this.plainteForm.value).subscribe({
+      const formValue = { ...this.plainteForm.value, marinId: Number(this.plainteForm.value.marinId) };
+      this.plainteService.submitPlainte(formValue).subscribe({
         next: () => {
           this.successMessage = 'Plainte ajoutée avec succès !';
           this.errorMessage = '';
