@@ -49,13 +49,13 @@ export let ROUTES: RouteInfo[] = [
     type: 'link',
     icontype: 'check_circle'
   },
-  {
-    path: '/admin/register',
-    title: 'Inscription admin',
-    visible: true,
-    type: 'link',
-    icontype: 'person_add'
-  },
+  //{
+    //path: '/admin/register',
+   // title: 'Inscription admin',
+    //visible: true,
+    //type: 'link',
+    //icontype: 'person_add'
+  //},
   //{
    // path: '/admin/admin-list',
     //title: 'Liste des administrateurs',
