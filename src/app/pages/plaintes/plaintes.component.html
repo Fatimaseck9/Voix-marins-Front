@@ -944,16 +944,22 @@ body {
     <!-- Modal Bootstrap pour l'ajout de plainte -->
 <div class="modal fade" id="ajoutPlainteModal" tabindex="-1" aria-labelledby="ajoutPlainteLabel" aria-hidden="true">
   <div class="modal-dialog modal-lg modal-dialog-centered">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="ajoutPlainteLabel">Ajouter une nouvelle plainte</h5>
+    <div class="modal-content white-modal">
+      <div class="modal-header white-modal-header">
+        <h5 class="modal-title" id="ajoutPlainteLabel">
+          <i class="fas fa-plus-circle me-2 text-primary"></i>
+          Ajouter une nouvelle plainte
+        </h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
       </div>
-      <div class="modal-body">
+      <div class="modal-body white-modal-body">
         <!-- Formulaire -->
         <form (ngSubmit)="ajouterPlainte()" #plainteForm="ngForm">
           <div class="mb-3">
-            <label for="marinId" class="form-label">Marin concerné</label>
+            <label for="marinId" class="form-label fw-bold">
+              <i class="fas fa-user me-2 text-primary"></i>
+              Marin concerné
+            </label>
             <select class="form-select" id="marinId" [(ngModel)]="nouvellePlainte.marinId" name="marinId" required>
               <option value="">-- Sélectionner un marin --</option>
               <option *ngFor="let marin of marinsAffichage" [value]="marin.id">
@@ -962,11 +968,17 @@ body {
             </select>
           </div>
           <div class="mb-3">
-            <label for="titre" class="form-label">Titre</label>
+            <label for="titre" class="form-label fw-bold">
+              <i class="fas fa-heading me-2 text-primary"></i>
+              Titre
+            </label>
             <input type="text" class="form-control" id="titre" [(ngModel)]="nouvellePlainte.titre" name="titre" required>
           </div>
           <div class="mb-3">
-            <label for="categorie" class="form-label">Catégorie</label>
+            <label for="categorie" class="form-label fw-bold">
+              <i class="fas fa-tags me-2 text-primary"></i>
+              Catégorie
+            </label>
             <select class="form-select" id="categorie" [(ngModel)]="nouvellePlainte.categorie" name="categorie" required>
               <option value="">-- Choisir une catégorie --</option>
               <option value="harcelement">Harcèlement</option>
@@ -976,16 +988,28 @@ body {
             </select>
           </div>
           <div class="mb-3">
-            <label for="description" class="form-label">Description</label>
+            <label for="description" class="form-label fw-bold">
+              <i class="fas fa-align-left me-2 text-primary"></i>
+              Description
+            </label>
             <textarea class="form-control" id="description" rows="4" [(ngModel)]="nouvellePlainte.description" name="description" required></textarea>
           </div>
           <div class="mb-3">
-            <label for="date" class="form-label">Date de la plainte</label>
+            <label for="date" class="form-label fw-bold">
+              <i class="fas fa-calendar me-2 text-primary"></i>
+              Date de la plainte
+            </label>
             <input type="date" class="form-control" id="date" [(ngModel)]="nouvellePlainte.date" name="date" required>
           </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
-            <button type="submit" class="btn btn-primary">Ajouter</button>
+          <div class="modal-footer white-modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+              <i class="fas fa-times me-2"></i>
+              Annuler
+            </button>
+            <button type="submit" class="btn btn-primary">
+              <i class="fas fa-plus me-2"></i>
+              Ajouter
+            </button>
           </div>
         </form>
       </div>

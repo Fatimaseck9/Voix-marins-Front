@@ -75,3 +75,100 @@ button.btn:focus {
   justify-content: center;
   font-size: 1.25rem;
 }
+
+/* Styles pour le modal blanc d'ajout de plainte */
+.white-modal {
+  background: white !important;
+  border: none !important;
+  border-radius: 15px !important;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15) !important;
+}
+
+.white-modal-header {
+  background: white !important;
+  border-bottom: 2px solid #e9ecef !important;
+  border-radius: 15px 15px 0 0 !important;
+  padding: 1.5rem !important;
+}
+
+.white-modal-header .modal-title {
+  color: #2c3e50 !important;
+  font-weight: 700 !important;
+  font-size: 1.25rem !important;
+}
+
+.white-modal-body {
+  background: white !important;
+  padding: 2rem !important;
+}
+
+.white-modal-footer {
+  background: white !important;
+  border-top: 2px solid #e9ecef !important;
+  border-radius: 0 0 15px 15px !important;
+  padding: 1.5rem !important;
+}
+
+.white-modal .form-label {
+  color: #495057 !important;
+  font-weight: 600 !important;
+  margin-bottom: 0.5rem !important;
+}
+
+.white-modal .form-control,
+.white-modal .form-select {
+  border: 2px solid #e9ecef !important;
+  border-radius: 8px !important;
+  padding: 0.75rem !important;
+  background: white !important;
+  transition: all 0.3s ease !important;
+}
+
+.white-modal .form-control:focus,
+.white-modal .form-select:focus {
+  border-color: #007bff !important;
+  box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25) !important;
+  background: white !important;
+}
+
+.white-modal .btn {
+  border-radius: 8px !important;
+  padding: 0.75rem 1.5rem !important;
+  font-weight: 600 !important;
+  transition: all 0.3s ease !important;
+}
+
+.white-modal .btn-primary {
+  background: linear-gradient(135deg, #007bff, #0056b3) !important;
+  border: none !important;
+}
+
+.white-modal .btn-primary:hover {
+  transform: translateY(-2px) !important;
+  box-shadow: 0 5px 15px rgba(0, 123, 255, 0.4) !important;
+}
+
+.white-modal .btn-secondary {
+  background: linear-gradient(135deg, #6c757d, #545b62) !important;
+  border: none !important;
+}
+
+.white-modal .btn-secondary:hover {
+  transform: translateY(-2px) !important;
+  box-shadow: 0 5px 15px rgba(108, 117, 125, 0.4) !important;
+}
+
+/* Animation d'ouverture du modal */
+.modal.fade .modal-dialog {
+  transform: scale(0.8) !important;
+  transition: transform 0.3s ease-out !important;
+}
+
+.modal.show .modal-dialog {
+  transform: scale(1) !important;
+}
+
+/* Overlay du modal */
+.modal-backdrop {
+  background-color: rgba(0, 0, 0, 0.5) !important;
+}
