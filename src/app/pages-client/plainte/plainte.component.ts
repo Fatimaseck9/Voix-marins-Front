@@ -248,58 +248,49 @@ export class PlainteComponent {
       this.stream = await navigator.mediaDevices.getUserMedia(audioConstraints);
       this.prepareRecorderUI();
 
-      // Vérifier les formats supportés par l'appareil
-      let mimeType = 'audio/webm;codecs=opus';
-      if (!MediaRecorder.isTypeSupported(mimeType)) {
-        mimeType = 'audio/webm';
-        if (!MediaRecorder.isTypeSupported(mimeType)) {
-          mimeType = 'audio/mp4';
-          if (!MediaRecorder.isTypeSupported(mimeType)) {
-            mimeType = 'audio/wav';
-          }
-        }
-      }
+     // Détection d’iOS
+    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !(window as any).MSStream;
 
-      this.mediaRecorder = new MediaRecorder(this.stream, {
-        mimeType: mimeType
-      });
 
-      this.mediaRecorder.ondataavailable = (event: BlobEvent) => {
-        if (event.data.size > 0) this.audioChunks.push(event.data);
-      };
-
-      this.mediaRecorder.addEventListener('stop', () => this.finalizeRecording());
-      this.mediaRecorder.start(1000);
-      this.startTimer();
-    } catch (error: any) {
-      console.error('Erreur microphone:', error);
-      
-      let errorMessage = 'Veuillez autoriser l\'accès au microphone';
-      let errorTitle = 'Microphone inaccessible';
-      
-      if (error.name === 'NotAllowedError' || error.name === 'PermissionDeniedError') {
-        errorMessage = 'L\'accès au microphone a été refusé. Veuillez:\n1. Autoriser l\'accès au microphone dans les paramètres de votre navigateur\n2. Recharger la page\n3. Essayer à nouveau';
-        errorTitle = 'Permission refusée';
-      } else if (error.name === 'NotFoundError' || error.name === 'DevicesNotFoundError') {
-        errorMessage = 'Aucun microphone détecté. Vérifiez que votre appareil dispose d\'un microphone fonctionnel.';
-        errorTitle = 'Microphone non trouvé';
-      } else if (error.name === 'NotSupportedError') {
-        errorMessage = 'Votre navigateur ne supporte pas l\'enregistrement audio. Essayez avec Chrome, Firefox ou Safari.';
-        errorTitle = 'Navigateur non supporté';
-      } else if (error.name === 'NotSecureError' || error.message.includes('secure')) {
-        errorMessage = 'L\'enregistrement audio nécessite une connexion sécurisée (HTTPS). Vérifiez votre connexion.';
-        errorTitle = 'Connexion non sécurisée';
-      }
-
-      Swal.fire({
-        title: errorTitle,
-        text: errorMessage,
-        icon: 'error',
-        confirmButtonText: 'Compris',
-        footer: 'Astuce: Essayez de recharger la page et d\'autoriser l\'accès au microphone'
-      });
+    // Choix du type MIME
+    let mimeType = isIOS ? 'audio/mpeg' : 'audio/webm;codecs=opus';
+    if (!MediaRecorder.isTypeSupported(mimeType)) {
+      mimeType = isIOS ? 'audio/mp3' : 'audio/webm';
     }
+ 
+    this.mediaRecorder = new MediaRecorder(this.stream, { mimeType });
+ 
+    this.audioChunks = [];
+ 
+    this.mediaRecorder.ondataavailable = (event: BlobEvent) => {
+      if (event.data.size > 0) this.audioChunks.push(event.data);
+    };
+ 
+    this.mediaRecorder.addEventListener('stop', () => this.finalizeRecording());
+    this.mediaRecorder.start(1000);
+    this.startTimer();
+  } catch (error: any) {
+    console.error('Erreur microphone:', error);
+    let errorMessage = 'Veuillez autoriser l\'accès au microphone';
+    let errorTitle = 'Microphone inaccessible';
+ 
+    if (error.name === 'NotAllowedError' || error.name === 'PermissionDeniedError') {
+      errorMessage = 'L\'accès au microphone a été refusé...';
+      errorTitle = 'Permission refusée';
+    } else if (error.name === 'NotFoundError') {
+      errorMessage = 'Aucun microphone détecté.';
+      errorTitle = 'Microphone non trouvé';
+    }
+ 
+    Swal.fire({
+      title: errorTitle,
+      text: errorMessage,
+      icon: 'error',
+      confirmButtonText: 'Compris',
+      footer: 'Essayez de recharger la page et d\'autoriser l\'accès au micro.'
+    });
   }
+}
  
   private prepareRecorderUI() {
     this.showRecorderControls = true;
