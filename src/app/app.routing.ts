@@ -115,10 +115,6 @@ export const AppRoutes: Routes = [
         path: "register", 
         component: RegisterComponent 
       },
-      {
-        path: 'ajouter-plainte',
-        component: AjouterPlainteAdminComponent
-      },
       { path: 'admin-list', component: AdminListComponent }
     ]
   },

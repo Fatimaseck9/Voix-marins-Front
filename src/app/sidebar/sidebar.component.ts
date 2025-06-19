@@ -56,13 +56,6 @@ export let ROUTES: RouteInfo[] = [
     type: 'link',
     icontype: 'person_add'
   },
-  {
-    path: '/admin/ajouter-plainte',
-    title: 'Ajouter une plainte',
-    visible: true,
-    type: 'link',
-    icontype: 'add_circle'
-  },
   //{
    // path: '/admin/admin-list',
     //title: 'Liste des administrateurs',
