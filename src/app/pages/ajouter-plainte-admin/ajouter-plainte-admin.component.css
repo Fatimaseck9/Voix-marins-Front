@@ -1,4 +1,52 @@
 /* Style basique pour le formulaire d'ajout de plainte admin */
 .container {
   max-width: 600px;
+}
+
+.ajouter-plainte-bg {
+  background: #f5f6fa;
+  min-height: 100vh;
+  width: 100vw;
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 0;
+}
+
+.ajouter-plainte-card {
+  background: #fff;
+  border-radius: 18px;
+  box-shadow: 0 6px 32px rgba(0,0,0,0.10), 0 1.5px 4px rgba(0,0,0,0.08);
+  padding: 2.5rem 2rem 2rem 2rem;
+  max-width: 430px;
+  width: 100%;
+  margin: 48px 0;
+  z-index: 1;
+}
+
+.ajouter-plainte-title {
+  font-weight: 700;
+  font-size: 1.5rem;
+  text-align: center;
+  color: #222;
+  letter-spacing: 0.5px;
+  margin-bottom: 1.5rem;
+}
+
+@media (max-width: 600px) {
+  .ajouter-plainte-card {
+    padding: 1.2rem 0.7rem 1.5rem 0.7rem;
+    max-width: 98vw;
+    margin: 24px 0;
+  }
+  .ajouter-plainte-title {
+    font-size: 1.1rem;
+  }
+}
+
+.btn-primary.w-100 {
+  margin-top: 0.5rem;
+  font-weight: 600;
+  font-size: 1.1rem;
+  padding: 0.7rem 0;
 } 
