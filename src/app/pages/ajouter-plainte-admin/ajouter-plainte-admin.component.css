@@ -3,7 +3,8 @@
   max-width: 600px;
 }
 
-.ajouter-plainte-bg {
+/* Supprimer ou commenter le style ajouter-plainte-bg */
+/* .ajouter-plainte-bg {
   background: #f5f6fa;
   min-height: 100vh;
   width: 100vw;
@@ -11,7 +12,7 @@
   top: 0;
   left: 0;
   z-index: 0;
-}
+} */
 
 .ajouter-plainte-card {
   background: #fff;
@@ -25,7 +26,7 @@
 }
 
 .ajouter-plainte-card-large {
-  max-width: 600px;
+  max-width: 430px;
 }
 
 .ajouter-plainte-title {
