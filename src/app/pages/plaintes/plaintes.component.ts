@@ -61,6 +61,8 @@ export class PlaintesComponent implements OnInit, AfterViewInit {
     ]
   };
 
+  showAjoutPlainteModal = false;
+
   constructor(
     private plainteService: PlainteService,
     private sanitizer: DomSanitizer,
@@ -822,5 +824,13 @@ get nombreTotal(): number {
         }
       });
     }
+  }
+
+  ouvrirModalAjoutPlainte() {
+    this.showAjoutPlainteModal = true;
+  }
+
+  fermerModalAjoutPlainte() {
+    this.showAjoutPlainteModal = false;
   }
 }

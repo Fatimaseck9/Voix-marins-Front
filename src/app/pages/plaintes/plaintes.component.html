@@ -861,6 +861,10 @@ body {
                 </div>
             </div>
 
+            <button class="btn btn-success mb-3" (click)="ouvrirModalAjoutPlainte()">
+              <i class="fas fa-plus"></i> Ajouter une plainte
+            </button>
+
             <!-- Table Container -->
             <div class="table-container">
                 <table class="custom-table">
@@ -1097,5 +1101,14 @@ body {
         <strong>Succès !</strong> La plainte a été mise à jour avec succès.
     </div>
     <button type="button" class="btn-close" (click)="showSaveAlert = false" aria-label="Close"></button>
+</div>
+
+<!-- Modale d'ajout de plainte -->
+<div class="modal-backdrop" *ngIf="showAjoutPlainteModal" (click)="fermerModalAjoutPlainte()"></div>
+<div class="modal-ajout-plainte" *ngIf="showAjoutPlainteModal">
+  <div class="modal-content">
+    <button class="btn-close" (click)="fermerModalAjoutPlainte()">&times;</button>
+    <app-ajouter-plainte-admin></app-ajouter-plainte-admin>
+  </div>
 </div>
 
