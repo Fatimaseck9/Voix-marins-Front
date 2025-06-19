@@ -30,11 +30,6 @@ export class ChangePasswordComponent implements OnInit {
       ]],
       confirmNewPassword: ['', Validators.required]
     }, { validators: this.passwordMatchValidator.bind(this) });
-
-    // Écouter les changements pour réinitialiser les erreurs
-    this.changePasswordForm.valueChanges.subscribe(() => {
-      this.clearValidationErrors();
-    });
   }
 
   ngOnInit() {}
@@ -53,25 +48,6 @@ export class ChangePasswordComponent implements OnInit {
     }
     
     return newPassword === confirmPassword ? null : { mismatch: true };
-  }
-
-  clearValidationErrors() {
-    // Réinitialiser les erreurs de validation personnalisées
-    const errors = this.changePasswordForm.errors;
-    if (errors) {
-      const newErrors = { ...errors };
-      delete newErrors['mismatch'];
-      delete newErrors['sameAsOld'];
-      
-      if (Object.keys(newErrors).length === 0) {
-        this.changePasswordForm.setErrors(null);
-      } else {
-        this.changePasswordForm.setErrors(newErrors);
-      }
-    }
-    
-    // Forcer la validation du formulaire
-    this.changePasswordForm.updateValueAndValidity();
   }
 
   // Méthode pour déboguer l'état du formulaire
@@ -177,27 +153,50 @@ export class ChangePasswordComponent implements OnInit {
 
             this.message = { text: 'Mot de passe modifié avec succès. Redirection...', type: 'success' };
             
-            console.log('Tentative de redirection vers /admin/tableau-bord');
-            // Vérifier que le token est bien mis à jour
-            const updatedToken = this.authService.getToken();
-            console.log('Token après mise à jour:', updatedToken ? 'Présent' : 'Absent');
-            
             setTimeout(() => {
-              console.log('Exécution de la redirection...');
-              this.router.navigate(['https://gaalgui.sn/admin/tableau-bord']).then(
+              this.router.navigate(['/admin/tableau-bord']).then(
                 (success) => {
                   console.log('Redirection réussie:', success);
                 },
                 (error) => {
                   console.error('Erreur de redirection:', error);
-                  // En cas d'échec, essayer une redirection alternative
-                  console.log('Tentative de redirection alternative vers /admin/dashboard');
                   window.location.href = 'https://gaalgui.sn/admin/tableau-bord';
                 }
               );
-            }, 500); // Réduit de 1500ms à 500ms
+            }, 1500);
+          } else if (response?.status === 'success') {
+            // Le serveur a confirmé le changement de mot de passe
+            this.message = { text: 'Mot de passe modifié avec succès. Redirection...', type: 'success' };
+            
+            // Vérifier si l'utilisateur est toujours authentifié
+            const currentToken = this.authService.getToken();
+            if (currentToken) {
+              console.log('Token actuel toujours valide, redirection vers tableau de bord');
+              setTimeout(() => {
+                // Essayer d'abord avec le router Angular
+                console.log('Tentative de redirection avec router.navigate vers /admin/tableau-bord');
+                this.router.navigate(['/admin/tableau-bord']).then(
+                  (success) => {
+                    console.log('Redirection vers tableau de bord réussie:', success);
+                  },
+                  (error) => {
+                    console.error('Erreur de redirection vers tableau de bord:', error);
+                    // En cas d'échec, essayer avec window.location
+                    console.log('Tentative de redirection avec window.location');
+                    window.location.href = 'https://gaalgui.sn/admin/tableau-bord';
+                  }
+                );
+              }, 1500);
+            } else {
+              console.log('Token expiré, redirection vers login');
+              setTimeout(() => {
+                this.authService.logout();
+                window.location.href = 'https://gaalgui.sn/login-admin';
+              }, 1500);
+            }
           } else {
-            console.error('Pas de token dans la réponse:', response);
+            console.error('Réponse inattendue du serveur:', response);
+            this.message = { text: 'Erreur lors du changement de mot de passe.', type: 'error' };
           }
         },
         error: (err) => {
