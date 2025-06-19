@@ -8,15 +8,6 @@
             Gestion des comptes administrateurs de la plateforme
         </p>
         
-        <!-- Debug info -->
-        <div class="debug-info">
-            <strong>Debug Info:</strong><br>
-            Loading: {{ loading }}<br>
-            Error: {{ error }}<br>
-            Admins count: {{ admins.length }}<br>
-            Admins data: {{ admins | json }}
-        </div>
-        
         <!-- Indicateur de chargement -->
         <div *ngIf="loading" class="text-center mb-4">
             <div class="spinner-border text-primary" role="status">

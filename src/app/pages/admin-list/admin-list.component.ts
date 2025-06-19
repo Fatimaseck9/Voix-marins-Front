@@ -42,7 +42,7 @@ export class AdminListComponent implements OnInit {
           // Si c'est un objet, essayer de trouver un tableau à l'intérieur
           const possibleArrays = Object.values(data).filter(val => Array.isArray(val));
           if (possibleArrays.length > 0) {
-            this.admins = possibleArrays[0];
+            this.admins = possibleArrays[0] as any[];
           } else {
             this.admins = [data]; // Traiter comme un seul admin
           }

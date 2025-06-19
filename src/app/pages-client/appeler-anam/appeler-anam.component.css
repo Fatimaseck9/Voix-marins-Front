@@ -1,163 +1,169 @@
 .call-container {
-    max-width: 500px;
-    margin: 2rem auto;
-    padding: 2rem;
-    text-align: center;
-    background-color: #f8f9fa;
-    border-radius: 16px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 2rem;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.call-header {
+  margin-bottom: 2rem;
+  color: #1a237e;
+  text-align: center;
+}
+
+.call-header h1 {
+  font-size: 1.8rem;
+  margin-bottom: 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.8rem;
+}
+
+.call-header p {
+  color: #6c757d;
+  font-size: 1rem;
+}
+
+.phone-number-card {
+  background: white;
+  padding: 2rem;
+  border-radius: 12px;
+  margin: 2rem 0;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.phone-number-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+}
+
+.phone-icon {
+  font-size: 3rem;
+  color: #2e7d32;
+  margin-bottom: 1rem;
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0% {
+    transform: scale(1);
   }
-  
-  .call-header {
-    margin-bottom: 2rem;
-    color: #1a237e;
-  
-    h1 {
-      font-size: 1.8rem;
-      margin-bottom: 0.5rem;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 0.8rem;
-    }
-  
-    p {
-      color: #6c757d;
-      font-size: 1rem;
-    }
+  50% {
+    transform: scale(1.1);
   }
-  
-  .phone-number-card {
-    background: white;
-    padding: 2rem;
-    border-radius: 12px;
-    margin: 2rem 0;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-    transition: all 0.3s ease;
-    cursor: pointer;
-  
-    &:hover {
-      transform: translateY(-5px);
-      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
-    }
+  100% {
+    transform: scale(1);
   }
-  
-  .phone-icon {
-    font-size: 3rem;
-    color: #2e7d32;
-    margin-bottom: 1rem;
-    animation: pulse 2s infinite;
+}
+
+.phone-link {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #1a237e;
+  text-decoration: none;
+  transition: color 0.3s ease;
+  display: inline-block;
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  background-color: rgba(26, 35, 126, 0.05);
+}
+
+.phone-link:hover {
+  color: #0d47a1;
+  background-color: rgba(26, 35, 126, 0.1);
+}
+
+.call-cta {
+  color: #6c757d;
+  margin-top: 1rem;
+  font-size: 0.9rem;
+}
+
+.alternative-options {
+  margin-top: 2rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid #eee;
+}
+
+.alternative-options p {
+  color: #6c757d;
+  margin-bottom: 1.5rem;
+}
+
+.btn {
+  padding: 0.8rem 1.5rem;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  margin: 0.5rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.whatsapp-btn {
+  background-color: #25D366;
+  color: white;
+}
+
+.whatsapp-btn:hover {
+  background-color: #128C7E;
+}
+
+.email-btn {
+  background-color: #d44638;
+  color: white;
+}
+
+.email-btn:hover {
+  background-color: #b33a2e;
+}
+
+/* Responsive Design */
+@media (max-width: 600px) {
+  .call-container {
+    padding: 1.5rem;
+    margin: 1rem;
   }
-  
-  @keyframes pulse {
-    0% {
-      transform: scale(1);
-    }
-    50% {
-      transform: scale(1.1);
-    }
-    100% {
-      transform: scale(1);
-    }
+
+  .call-header h1 {
+    font-size: 1.5rem;
   }
-  
+
   .phone-link {
-    font-size: 2rem;
-    font-weight: 700;
-    color: #1a237e;
-    text-decoration: none;
-    transition: color 0.3s ease;
-    display: inline-block;
-    padding: 0.5rem 1rem;
-    border-radius: 8px;
-    background-color: rgba(26, 35, 126, 0.05);
-  
-    &:hover {
-      color: #0d47a1;
-      background-color: rgba(26, 35, 126, 0.1);
-    }
+    font-size: 1.5rem;
+    padding: 0.5rem;
   }
-  
-  .call-cta {
-    color: #6c757d;
-    margin-top: 1rem;
+
+  .phone-icon {
+    font-size: 2.5rem;
+  }
+}
+
+@media (max-width: 400px) {
+  .phone-link {
+    font-size: 1.3rem;
+  }
+
+  .btn {
+    padding: 0.7rem 1rem;
     font-size: 0.9rem;
   }
-  
-  .alternative-options {
-    margin-top: 2rem;
-    padding-top: 1.5rem;
-    border-top: 1px solid #eee;
-  
-    p {
-      color: #6c757d;
-      margin-bottom: 1.5rem;
-    }
-  }
-  
-  .btn {
-    padding: 0.8rem 1.5rem;
-    border: none;
-    border-radius: 8px;
-    font-weight: 600;
-    margin: 0.5rem;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5rem;
-  
-    &.whatsapp-btn {
-      background-color: #25D366;
-      color: white;
-  
-      &:hover {
-        background-color: #128C7E;
-      }
-    }
-  
-    &.email-btn {
-      background-color: #d44638;
-      color: white;
-  
-      &:hover {
-        background-color: #b33a2e;
-      }
-    }
-  }
-  
-  /* Responsive Design */
-  @media (max-width: 600px) {
-    .call-container {
-      padding: 1.5rem;
-      margin: 1rem;
-    }
-  
-    .call-header h1 {
-      font-size: 1.5rem;
-    }
-  
-    .phone-link {
-      font-size: 1.5rem;
-      padding: 0.5rem;
-    }
-  
-    .phone-icon {
-      font-size: 2.5rem;
-    }
-  }
-  
-  @media (max-width: 400px) {
-    .phone-link {
-      font-size: 1.3rem;
-    }
-  
-    .btn {
-      padding: 0.7rem 1rem;
-      font-size: 0.9rem;
-    }
-  }
-   .glass-header {
+}
+
+.glass-header {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -165,7 +171,6 @@
   border-bottom: 4px solid rgba(255, 255, 255, 0.2);
   background: white;
   backdrop-filter: blur(10px);
- 
   position: relative;
   z-index: 100;
 }
@@ -198,22 +203,19 @@
   position: relative;
 }
 
- .page-title {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    padding: 2rem 1rem 1.2rem 1rem;
-    background: linear-gradient(90deg, #0077b6 80%, #48cae4 100%);
-    color: white;
-    position: relative;
-    margin-top: 70px;
-    border-radius: 0 0 20px 20px;
-  }
+.page-title {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 2rem 1rem 1.2rem 1rem;
+  background: linear-gradient(90deg, #0077b6 80%, #48cae4 100%);
+  color: white;
+  position: relative;
+  margin-top: 70px;
+}
+
 .main-nav {
   position: relative;
-  
-  
-  
 }
 
 .nav-list {
@@ -396,16 +398,16 @@
     background: #1a237e;
   }
 }
-.ocean{
+
+.ocean {
   position: relative;
   width: 100%;
- 
 }
-.waves{
+
+.waves {
   position: relative;
   height: 300px;
 }
-
 
 .wave {
   position: absolute;
@@ -419,59 +421,65 @@
   background-blend-mode: multiply; /* Mélange les couches pour un effet plus naturel */
   opacity: 0.8;
 }
-#wave-1{
+
+#wave-1 {
   bottom: 0;
   opacity: 0.9; 
   z-index: 5;
-   animation: vague_mouvante 6s ease-in-out infinite;
+  animation: vague_mouvante 6s ease-in-out infinite;
 }
-#wave-2{
+
+#wave-2 {
   bottom: 10px;
-   opacity: 0.6; 
-    z-index: 4;
-   animation: vague_mouvante_inverse 4s ease-in-out infinite;
+  opacity: 0.6; 
+  z-index: 4;
+  animation: vague_mouvante_inverse 4s ease-in-out infinite;
 }
-#wave-3{
+
+#wave-3 {
   bottom: 15px;
   opacity: 0.7;
-    z-index: 3;
-     animation: vague_mouvante 5s ease-in-out infinite;
+  z-index: 3;
+  animation: vague_mouvante 5s ease-in-out infinite;
 }
-#wave-4{
+
+#wave-4 {
   bottom: 20px;
   opacity: 0.5;
   z-index: 2;
   animation: vague_mouvante_inverse 6s ease-in-out infinite;
 }
-#wave-5{
+
+#wave-5 {
   bottom: 25px;
   opacity: 0.4;
   z-index: 1;
-   animation: vague_mouvante 4s ease-in-out infinite;
+  animation: vague_mouvante 4s ease-in-out infinite;
 }
-@keyframes vague_mouvante{
-  0%{
+
+@keyframes vague_mouvante {
+  0% {
     background-position-x: 1500px;
     transform: translateY(100px);
   }
-  50%{
-    
+  50% {
     transform: translateY(0px);
   }
-  100%{
+  100% {
     background-position-x: 0px;
     transform: translateY(100px);
   }
 }
-@keyframes vague_mouvante_inverse{
-  0%{
+
+@keyframes vague_mouvante_inverse {
+  0% {
     background-position-x: 0px;
     transform: translateY(100px);
   }
-  50%{
-      transform: translateY(0px);
-    }
-  100%{
+  50% {
+    transform: translateY(0px);
+  }
+  100% {
     background-position-x: 1500px;
     transform: translateY(100px);
   }
