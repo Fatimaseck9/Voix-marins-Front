@@ -1,0 +1,35 @@
+<div class="container mt-4">
+  <h2>Ajouter une plainte pour un marin</h2>
+  <form [formGroup]="plainteForm" (ngSubmit)="onSubmit()">
+    <div class="mb-3">
+      <label for="marinId" class="form-label">Marin</label>
+      <select id="marinId" class="form-select" formControlName="marinId" required>
+        <option value="">Sélectionner un marin</option>
+        <option *ngFor="let marin of marins" [value]="marin.id">
+          {{ marin.name }} ({{ marin.email }})
+        </option>
+      </select>
+    </div>
+    <div class="mb-3">
+      <label for="titre" class="form-label">Titre</label>
+      <input type="text" id="titre" class="form-control" formControlName="titre" required>
+    </div>
+    <div class="mb-3">
+      <label for="categorie" class="form-label">Catégorie</label>
+      <select id="categorie" class="form-select" formControlName="categorie" required>
+        <option value="">Sélectionner une catégorie</option>
+        <option value="harcelement">Harcèlement</option>
+        <option value="violence">Violence physique</option>
+        <option value="nourriture">Refus de nourriture</option>
+        <option value="paiement">Problème de paiement</option>
+      </select>
+    </div>
+    <div class="mb-3">
+      <label for="description" class="form-label">Description</label>
+      <textarea id="description" class="form-control" formControlName="description" rows="4" required></textarea>
+    </div>
+    <button type="submit" class="btn btn-primary" [disabled]="plainteForm.invalid">Ajouter la plainte</button>
+  </form>
+  <div *ngIf="successMessage" class="alert alert-success mt-3">{{ successMessage }}</div>
+  <div *ngIf="errorMessage" class="alert alert-danger mt-3">{{ errorMessage }}</div>
+</div> 

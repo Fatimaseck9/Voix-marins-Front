@@ -20,6 +20,7 @@ import { AdminAuthGuard } from "./pages/auth/admin-auth.guard";
 import { AdminListComponent } from "./pages/admin-list/admin-list.component";
 import { PlaintesResoluesComponent } from './pages/plaintes-resolues/plaintes-resolues.component';
 import { MarinRegisterComponent } from "./pages-client/marin-register/marin-register.component";
+import { AjouterPlainteAdminComponent } from './pages/ajouter-plainte-admin/ajouter-plainte-admin.component';
 
 
 
@@ -113,6 +114,10 @@ export const AppRoutes: Routes = [
       { 
         path: "register", 
         component: RegisterComponent 
+      },
+      {
+        path: 'ajouter-plainte',
+        component: AjouterPlainteAdminComponent
       },
       { path: 'admin-list', component: AdminListComponent }
     ]

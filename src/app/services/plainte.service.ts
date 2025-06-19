@@ -183,6 +183,13 @@ export class PlainteService {
       })
     );
   }
+
+  // Soumission d'une plainte par un admin pour un marin
+  submitPlainte(plainteData: any): Observable<any> {
+    const headers = this.getAuthHeaders();
+    // On suppose que plainteData contient marinId, titre, categorie, description
+    return this.http.post(`${this.apiUrl}/create`, plainteData, { headers });
+  }
 }
 
 
