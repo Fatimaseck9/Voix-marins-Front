@@ -19,7 +19,7 @@ export class AjouterPlainteAdminComponent implements OnInit {
     private fb: FormBuilder,
     private plainteService: PlainteService,
     private marinService: MarinService,
-    private dialogRef: MatDialogRef<AjouterPlainteAdminComponent>
+    public dialogRef: MatDialogRef<AjouterPlainteAdminComponent>
   ) {
     this.plainteForm = this.fb.group({
       marinId: ['', Validators.required],
