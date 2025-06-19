@@ -13,7 +13,6 @@ export class AdminListComponent implements OnInit {
   constructor(private baseService: BaseService) {}
 
   ngOnInit(): void {
-    console.log('AdminListComponent initialized');
     this.loadAdmins();
   }
 
@@ -21,15 +20,8 @@ export class AdminListComponent implements OnInit {
     this.loading = true;
     this.error = '';
     
-    console.log('Loading admins from endpoint: users/admins');
-    console.log('Loading state set to:', this.loading);
-    
     this.baseService.get('users/admins', true).subscribe({
       next: (data) => {
-        console.log('Raw admins data:', JSON.stringify(data, null, 2));
-        console.log('Data type:', typeof data);
-        console.log('Is array:', Array.isArray(data));
-        
         if (Array.isArray(data)) {
           this.admins = data;
         } else if (data && data.data && Array.isArray(data.data)) {
@@ -37,22 +29,15 @@ export class AdminListComponent implements OnInit {
         } else if (data && data.users && Array.isArray(data.users)) {
           this.admins = data.users;
         } else {
-          console.warn('Unexpected data structure:', data);
           this.admins = [];
         }
         
-        console.log('Processed admins:', this.admins);
-        console.log('Admins length:', this.admins.length);
         this.loading = false;
-        console.log('Loading state set to:', this.loading);
-        console.log('Error state:', this.error);
       },
       error: (err) => {
         console.error('Error loading admins:', err);
         this.error = 'Erreur lors du chargement des administrateurs: ' + (err.message || err.statusText || 'Erreur inconnue');
         this.loading = false;
-        console.log('Error occurred, loading set to:', this.loading);
-        console.log('Error message:', this.error);
       },
     });
   }
