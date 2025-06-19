@@ -40,6 +40,7 @@ export class AjouterPlainteAdminComponent implements OnInit {
             this.users = users;
             this.marinsAffichage = this.marins.map(marin => {
               const user = this.users.find(u => u.id === marin.userId);
+              console.log('Fusion:', {marin, user});
               return {
                 id: marin.id,
                 numero: marin.numero,
