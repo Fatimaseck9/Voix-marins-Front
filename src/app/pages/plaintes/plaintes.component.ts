@@ -866,14 +866,21 @@ get nombreTotal(): number {
       next: () => {
         Swal.fire('Succès', 'Plainte ajoutée avec succès !', 'success');
         this.nouvellePlainte = { marinId: '', titre: '', categorie: '', description: '', date: '' };
-        const modal = document.getElementById('ajoutPlainteModal');
-        if (modal) {
-          (window as any).bootstrap.Modal.getInstance(modal)?.hide();
+        
+        // Fermer le modal Bootstrap
+        const modalElement = document.getElementById('ajoutPlainteModal');
+        if (modalElement) {
+          const modal = (window as any).bootstrap.Modal.getInstance(modalElement);
+          if (modal) {
+            modal.hide();
+          }
         }
+        
         this.rechargerPlaintes();
       },
       error: (err) => {
-        Swal.fire('Erreur', "Erreur lors de l'ajout de la plainte.", 'error');
+        console.error('Erreur lors de l\'ajout de la plainte:', err);
+        Swal.fire('Erreur', 'Erreur lors de l\'ajout de la plainte.', 'error');
       }
     });
   }
