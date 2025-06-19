@@ -24,6 +24,10 @@
   z-index: 1;
 }
 
+.ajouter-plainte-card-large {
+  max-width: 600px;
+}
+
 .ajouter-plainte-title {
   font-weight: 700;
   font-size: 1.5rem;
@@ -31,16 +35,18 @@
   color: #222;
   letter-spacing: 0.5px;
   margin-bottom: 1.5rem;
+  margin-top: 2.5rem;
 }
 
 @media (max-width: 600px) {
-  .ajouter-plainte-card {
+  .ajouter-plainte-card, .ajouter-plainte-card-large {
     padding: 1.2rem 0.7rem 1.5rem 0.7rem;
     max-width: 98vw;
     margin: 24px 0;
   }
   .ajouter-plainte-title {
     font-size: 1.1rem;
+    margin-top: 1.2rem;
   }
 }
 

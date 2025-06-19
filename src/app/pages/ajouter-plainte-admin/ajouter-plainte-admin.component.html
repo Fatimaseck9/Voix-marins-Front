@@ -1,13 +1,13 @@
 <div class="ajouter-plainte-bg d-flex align-items-center justify-content-center min-vh-100">
-  <div class="ajouter-plainte-card">
-    <h2 class="ajouter-plainte-title mb-4">Ajouter une plainte pour un marin</h2>
+  <div class="ajouter-plainte-card ajouter-plainte-card-large">
+    <h2 class="ajouter-plainte-title mb-4 mt-5">Ajouter une plainte pour un marin</h2>
     <form [formGroup]="plainteForm" (ngSubmit)="onSubmit()">
       <div class="mb-3">
         <label for="marinId" class="form-label">Marin</label>
         <select id="marinId" class="form-select" formControlName="marinId" required>
           <option value="">Sélectionner un marin</option>
           <option *ngFor="let marin of marins" [value]="marin.id">
-            {{ marin.name }} ({{ marin.email }})
+            {{ marin.name }} - {{ marin.email }}
           </option>
         </select>
       </div>
