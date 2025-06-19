@@ -8,6 +8,15 @@
             Gestion des comptes administrateurs de la plateforme
         </p>
         
+        <!-- Debug info -->
+        <div class="debug-info">
+            <strong>Debug Info:</strong><br>
+            Loading: {{ loading }}<br>
+            Error: {{ error }}<br>
+            Admins count: {{ admins.length }}<br>
+            Admins data: {{ admins | json }}
+        </div>
+        
         <!-- Indicateur de chargement -->
         <div *ngIf="loading" class="text-center mb-4">
             <div class="spinner-border text-primary" role="status">
@@ -55,13 +64,14 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <tr *ngFor="let admin of admins">
+                            <tr *ngFor="let admin of admins; let i = index">
                                 <td>
-                                    <strong>{{ admin.name }}</strong>
+                                    <strong>{{ admin.user?.name || admin.name || 'N/A' }}</strong>
+                                    <small class="text-muted d-block">ID: {{ admin.id }}</small>
                                 </td>
                                 <td>
                                     <i class="fas fa-envelope me-2 text-muted"></i>
-                                    {{ admin.admin?.email || 'N/A' }}
+                                    {{ admin.email || admin.admin?.email || 'N/A' }}
                                 </td>
                                 <td>
                                     <button class="btn btn-danger btn-sm" (click)="deleteAdmin(admin.id)">

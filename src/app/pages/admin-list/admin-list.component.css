@@ -1,9 +1,10 @@
 .admin-list-container {
     min-height: calc(100vh - 80px);
     display: flex;
-    align-items: center;
+    align-items: flex-end;
     justify-content: center;
     padding: 2rem;
+    padding-bottom: 2rem;
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     margin-top: 0;
@@ -21,6 +22,7 @@
     max-width: 900px;
     border: 1px solid rgba(255, 255, 255, 0.2);
     margin: 0 auto;
+    margin-bottom: 2rem;
 }
 
 .page-title {
@@ -108,17 +110,30 @@
     opacity: 0.5;
 }
 
+/* Debug styles pour voir les données */
+.debug-info {
+    background: #f8f9fa;
+    border: 1px solid #dee2e6;
+    border-radius: 8px;
+    padding: 1rem;
+    margin-bottom: 1rem;
+    font-family: monospace;
+    font-size: 0.9rem;
+}
+
 @media (max-width: 768px) {
     .admin-list-container {
         padding: 1rem;
         min-height: auto;
         align-items: flex-start;
-        padding-top: 2rem;
+        padding-top: 1rem;
+        padding-bottom: 1rem;
     }
     
     .content-card {
         padding: 1.5rem;
-        margin-top: 1rem;
+        margin-top: 0.5rem;
+        margin-bottom: 1rem;
     }
     
     .page-title {
@@ -132,6 +147,7 @@
 
 @media (min-width: 769px) {
     .admin-list-container {
-        padding-top: 4rem;
+        padding-top: 1rem;
+        padding-bottom: 1rem;
     }
 }
