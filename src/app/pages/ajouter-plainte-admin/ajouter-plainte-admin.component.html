@@ -1,5 +1,5 @@
 <div class="modal-overlay">
-  <div class="modal-container glass-card">
+  <div class="modal-container">
     <div class="modal-header">
       <h3>➕ Ajouter une plainte pour un marin</h3>
       <button class="btn-close" (click)="dialogRef.close()">&times;</button>
@@ -80,7 +80,10 @@
   max-width: 600px;
   padding: 25px;
   border-radius: 15px;
-  background: white;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
   box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
   animation: modalSlideIn 0.3s ease-out;
 }
@@ -126,16 +129,18 @@
   width: 100%;
   padding: 10px;
   border-radius: 8px;
-  background: #f8f9fa;
-  border: 1px solid #e0e0e0;
+  background: rgba(255, 255, 255, 0.9);
+  border: 1px solid rgba(0, 0, 0, 0.1);
   color: #333;
   font-size: 14px;
+  backdrop-filter: blur(5px);
 }
 
 .form-control:focus, .form-select:focus {
   outline: none;
   border-color: #007bff;
   box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+  background: rgba(255, 255, 255, 1);
 }
 
 .btn-sauvegarder {
@@ -163,18 +168,19 @@
   margin-bottom: 20px;
   border: 1px solid transparent;
   border-radius: 4px;
+  backdrop-filter: blur(5px);
 }
 
 .alert-success {
   color: #155724;
-  background-color: #d4edda;
-  border-color: #c3e6cb;
+  background-color: rgba(212, 237, 218, 0.9);
+  border-color: rgba(195, 230, 203, 0.8);
 }
 
 .alert-danger {
   color: #721c24;
-  background-color: #f8d7da;
-  border-color: #f5c6cb;
+  background-color: rgba(248, 215, 218, 0.9);
+  border-color: rgba(245, 198, 203, 0.8);
 }
 
 @keyframes modalSlideIn {
@@ -186,12 +192,5 @@
     transform: translateY(0);
     opacity: 1;
   }
-}
-
-.glass-card {
-  background: rgba(255, 255, 255, 0.95);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(0, 0, 0, 0.08);
 }
 </style> 

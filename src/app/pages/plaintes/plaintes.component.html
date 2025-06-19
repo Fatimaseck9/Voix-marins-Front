@@ -862,11 +862,11 @@ body {
             </div>
 
             <!-- Bouton Ajouter une plainte -->
-            <div class="mb-4 d-flex justify-content-end">
-              <button mat-raised-button color="primary" (click)="ouvrirAjoutPlainte()" class="btn btn-success">
-                <i class="fas fa-plus me-2"></i>Ajouter une plainte
-              </button>
-            </div>
+            <!-- Bouton pour ouvrir le modal Bootstrap -->
+<button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#ajoutPlainteModal">
+  <i class="fas fa-plus me-2"></i>Ajouter une plainte
+</button>
+
 
             <!-- Table Container -->
             <div class="table-container">
@@ -940,8 +940,59 @@ body {
 
     </div>
 
-    <!-- Modal d'édition -->
-    
+   
+    <!-- Modal Bootstrap pour l'ajout de plainte -->
+<div class="modal fade" id="ajoutPlainteModal" tabindex="-1" aria-labelledby="ajoutPlainteLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="ajoutPlainteLabel">Ajouter une nouvelle plainte</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
+      </div>
+      <div class="modal-body">
+        <!-- Formulaire -->
+        <form (ngSubmit)="ajouterPlainte()" #plainteForm="ngForm">
+          <div class="mb-3">
+            <label for="marinId" class="form-label">Marin concerné</label>
+            <select class="form-select" id="marinId" [(ngModel)]="nouvellePlainte.marinId" name="marinId" required>
+              <option value="">-- Sélectionner un marin --</option>
+              <option *ngFor="let marin of marinsAffichage" [value]="marin.id">
+                {{ marin.user?.name }} (N°: {{ marin.numero }}, ID: {{ marin.numeroIdentification }})
+              </option>
+            </select>
+          </div>
+          <div class="mb-3">
+            <label for="titre" class="form-label">Titre</label>
+            <input type="text" class="form-control" id="titre" [(ngModel)]="nouvellePlainte.titre" name="titre" required>
+          </div>
+          <div class="mb-3">
+            <label for="categorie" class="form-label">Catégorie</label>
+            <select class="form-select" id="categorie" [(ngModel)]="nouvellePlainte.categorie" name="categorie" required>
+              <option value="">-- Choisir une catégorie --</option>
+              <option value="harcelement">Harcèlement</option>
+              <option value="violence">Violence physique</option>
+              <option value="nourriture">Refus de nourriture</option>
+              <option value="paiement">Problème de paiement</option>
+            </select>
+          </div>
+          <div class="mb-3">
+            <label for="description" class="form-label">Description</label>
+            <textarea class="form-control" id="description" rows="4" [(ngModel)]="nouvellePlainte.description" name="description" required></textarea>
+          </div>
+          <div class="mb-3">
+            <label for="date" class="form-label">Date de la plainte</label>
+            <input type="date" class="form-control" id="date" [(ngModel)]="nouvellePlainte.date" name="date" required>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+            <button type="submit" class="btn btn-primary">Ajouter</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
 <!-- Modal d'édition -->
 <div *ngIf="isEditModalOpen" class="modal-overlay">
     <div class="modal-container glass-card">

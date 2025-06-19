@@ -11,6 +11,7 @@ import { CookieService } from 'ngx-cookie-service';
 import { Observable, tap, catchError, throwError } from 'rxjs';
 import { MatDialog } from '@angular/material/dialog';
 import { AjouterPlainteAdminComponent } from '../ajouter-plainte-admin/ajouter-plainte-admin.component';
+import { MarinService } from 'src/app/services/marin.service';
 
 @Component({
   selector: 'app-plaintes',
@@ -63,13 +64,23 @@ export class PlaintesComponent implements OnInit, AfterViewInit {
     ]
   };
 
+  marinsAffichage: any[] = [];
+  nouvellePlainte = {
+    marinId: '',
+    titre: '',
+    categorie: '',
+    description: '',
+    date: ''
+  };
+
   constructor(
     private plainteService: PlainteService,
     private sanitizer: DomSanitizer,
     private http: HttpClient,
     private authService: AuthService,
     private cookieService: CookieService,
-    private dialog: MatDialog
+    private dialog: MatDialog,
+    private marinService: MarinService
   ) {}
 
   ngOnInit(): void {
@@ -81,6 +92,12 @@ export class PlaintesComponent implements OnInit, AfterViewInit {
       error: (err) => {
         console.error('Erreur lors du chargement des plaintes:', err);
       }
+    });
+    this.marinService.getMarins().subscribe({
+      next: (marins) => {
+        this.marinsAffichage = marins;
+      },
+      error: () => this.marinsAffichage = []
     });
   }
 
@@ -835,6 +852,28 @@ get nombreTotal(): number {
     dialogRef.afterClosed().subscribe(result => {
       if (result === 'refresh') {
         this.rechargerPlaintes(); // recharge la liste après ajout
+      }
+    });
+  }
+
+  ajouterPlainte() {
+    if (!this.nouvellePlainte.marinId || !this.nouvellePlainte.titre || !this.nouvellePlainte.categorie || !this.nouvellePlainte.description || !this.nouvellePlainte.date) {
+      Swal.fire('Erreur', 'Veuillez remplir tous les champs.', 'error');
+      return;
+    }
+    const formValue = { ...this.nouvellePlainte, marinId: Number(this.nouvellePlainte.marinId) };
+    this.plainteService.submitPlainte(formValue).subscribe({
+      next: () => {
+        Swal.fire('Succès', 'Plainte ajoutée avec succès !', 'success');
+        this.nouvellePlainte = { marinId: '', titre: '', categorie: '', description: '', date: '' };
+        const modal = document.getElementById('ajoutPlainteModal');
+        if (modal) {
+          (window as any).bootstrap.Modal.getInstance(modal)?.hide();
+        }
+        this.rechargerPlaintes();
+      },
+      error: (err) => {
+        Swal.fire('Erreur', "Erreur lors de l'ajout de la plainte.", 'error');
       }
     });
   }
