@@ -31,11 +31,7 @@ export class AjouterPlainteAdminComponent implements OnInit {
   ngOnInit() {
     this.marinService.getMarins().subscribe({
       next: (marins) => {
-        this.marinsAffichage = marins.map(marin => ({
-          id: marin.id,
-          numero: marin.numero,
-          name: marin.user?.name || 'Nom inconnu'
-        }));
+        this.marinsAffichage = marins;
       },
       error: () => this.marinsAffichage = []
     });
