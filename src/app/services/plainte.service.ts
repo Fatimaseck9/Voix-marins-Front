@@ -37,25 +37,7 @@ export class PlainteService {
       tap({
         next: (plaintes) => {
           console.log('Plaintes reçues du serveur:', plaintes);
-          plaintes.forEach(plainte => {
-            // Si la plainte est résolue mais n'a pas d'email dans resolvedBy
-            if (plainte.statut === 'Resolue' && plainte.resolvedBy && !plainte.resolvedBy.email) {
-              const admin = this.getCurrentAdmin();
-              if (admin) {
-                // Mettre à jour la plainte avec l'email de l'admin
-                this.updatePlainte(plainte.id, {
-                  ...plainte,
-                  resolvedBy: {
-                    ...plainte.resolvedBy,
-                    email: admin.email
-                  }
-                }).subscribe({
-                  next: () => console.log('Plainte mise à jour avec l\'email'),
-                  error: (err) => console.error('Erreur lors de la mise à jour:', err)
-                });
-              }
-            }
-          });
+          // Suppression de la mise à jour automatique de resolvedBy
         },
         error: (error) => {
           console.error('Erreur lors de la récupération des plaintes:', error);
