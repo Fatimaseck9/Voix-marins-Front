@@ -14,6 +14,8 @@ export class AjouterPlainteAdminComponent implements OnInit {
   successMessage = '';
   errorMessage = '';
   marins: any[] = [];
+  users: any[] = [];
+  marinsAffichage: any[] = [];
 
   constructor(
     private fb: FormBuilder,
@@ -33,7 +35,20 @@ export class AjouterPlainteAdminComponent implements OnInit {
     this.marinService.getMarins().subscribe({
       next: (marins) => {
         this.marins = marins;
-        console.log('Marins reçus:', this.marins);
+        this.userService.getMarins().subscribe({
+          next: (users) => {
+            this.users = users;
+            this.marinsAffichage = this.marins.map(marin => {
+              const user = this.users.find(u => u.id === marin.userId);
+              return {
+                id: marin.id,
+                numero: marin.numero,
+                name: user ? user.name : 'Nom inconnu'
+              };
+            });
+          },
+          error: () => this.users = []
+        });
       },
       error: () => this.marins = []
     });

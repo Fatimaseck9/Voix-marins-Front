@@ -6,8 +6,8 @@
         <label for="marinId" class="form-label">Marin</label>
         <select id="marinId" class="form-select" formControlName="marinId" required>
           <option value="">Sélectionner un marin</option>
-          <option *ngFor="let marin of marins" [value]="marin.id">
-            {{ marin.name || marin.user?.name || 'Nom inconnu' }} - {{ marin.numero }}
+          <option *ngFor="let marin of marinsAffichage" [value]="marin.id">
+            {{ marin.name }} - {{ marin.numero }}
           </option>
         </select>
       </div>
