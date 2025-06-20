@@ -493,11 +493,21 @@ export class PlainteComponent {
       });
     } catch (error: any) {
       console.error('Erreur:', error);
-      Swal.fire({
-        title: 'Erreur',
-        text: "Erreur lors de l'envoi de la plainte",
-        icon: 'error'
-      });
+      
+      // Gestion spécifique des erreurs
+      if (error.status === 404 && error.error?.message?.includes('Marin lié à l\'utilisateur')) {
+        Swal.fire({
+          title: 'Profil marin manquant',
+          text: 'Votre profil marin n\'est pas trouvé. Veuillez contacter l\'administrateur pour résoudre ce problème.',
+          icon: 'error'
+        });
+      } else {
+        Swal.fire({
+          title: 'Erreur',
+          text: "Erreur lors de l'envoi de la plainte",
+          icon: 'error'
+        });
+      }
     } finally {
       this.isSubmitting = false;
       Swal.close();
