@@ -89,21 +89,10 @@
               
               <!-- Lecteur audio si disponible -->
               <div *ngIf="plainte.audioUrl" class="mt-3">
-                <ng-container *ngIf="isAudioPlayable(plainte.audioUrl); else audioNotSupported">
-                  <audio [src]="plainte.audioUrl" controls>
-                    Votre navigateur ne supporte pas l'audio.
-                  </audio>
-                </ng-container>
-                <ng-template #audioNotSupported>
-                  <div class="alert alert-warning" role="alert">
-                    <i class="fas fa-exclamation-triangle me-2"></i>
-                    <strong>Audio non lisible sur cet appareil</strong><br>
-                    <small>
-                      Ce fichier audio (format .webm) n'est pas supporté sur iPhone/iPad. 
-                      Les enregistrements futurs seront automatiquement convertis en format compatible.
-                    </small>
-                  </div>
-                </ng-template>
+             
+<audio *ngIf="plainte.audioUrl" [src]="plainte.audioUrl" controls>
+   Votre navigateur ne supporte pas l'audio.
+</audio>
               </div>
             </div>
           </div>

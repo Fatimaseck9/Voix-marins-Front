@@ -32,7 +32,6 @@ export class PlainteComponent {
   menuActive = false;
   plaintes: any[] = [];
   isBrowser: boolean;
-  isIOS: boolean;
  
   // États d'enregistrement
   recording = false;
@@ -78,11 +77,6 @@ export class PlainteComponent {
   ) {
     this.isBrowser = isPlatformBrowser(this.platformId);
     if (this.isBrowser) {
-      this.isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !(window as any).MSStream;
-      // Vérifier si MediaRecorder est vraiment supporté pour l'audio
-      if (this.isIOS && (!window.MediaRecorder || !this.isAudioRecordingSupported())) {
-        this.isIOS = true; // Forcer le fallback iOS
-      }
       this.loadPlaintes();
       this.loadCategoriesFromBackend();
     }
@@ -224,59 +218,15 @@ export class PlainteComponent {
  
   // Démarrer l'enregistrement avec vérifications préalables
   async startRecording() {
-    // Détection d'iOS/Safari et gestion du support MediaRecorder
-    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !(window as any).MSStream;
-    
-    // Vérifier d'abord si MediaRecorder est disponible
-    if (!window.MediaRecorder) {
-      if (isIOS) {
-        // Rediriger vers le fallback iOS
-        this.showIOSFallback();
-        return;
-      } else {
-        Swal.fire({
-          title: 'Non supporté',
-          text: "L'enregistrement vocal n'est pas supporté sur ce navigateur. Veuillez utiliser un appareil Android ou un navigateur compatible.",
-          icon: 'error'
-        });
-        return;
-      }
-    }
-
-    // Déterminer le type MIME supporté
-    let mimeType = 'audio/webm;codecs=opus';
-    if (!MediaRecorder.isTypeSupported(mimeType)) {
-      mimeType = 'audio/webm';
-      if (!MediaRecorder.isTypeSupported(mimeType)) {
-        mimeType = 'audio/mp4';
-        if (!MediaRecorder.isTypeSupported(mimeType)) {
-          if (isIOS) {
-            // Rediriger vers le fallback iOS
-            this.showIOSFallback();
-            return;
-          } else {
-            Swal.fire({
-              title: 'Non supporté',
-              text: "Aucun format d'enregistrement audio n'est supporté sur ce navigateur. Veuillez utiliser un appareil Android ou un navigateur compatible.",
-              icon: 'error'
-            });
-            return;
-          }
-        }
-      }
-    }
-
-    // Sur iOS/Safari, il n'est pas possible de demander l'autorisation du micro automatiquement ou de forcer l'affichage du prompt :
-    // Le navigateur doit gérer cela, et il ne propose pas l'API MediaRecorder pour l'audio. Il faut donc informer l'utilisateur.
     try {
       // Vérification des permissions en premier
       const hasPermission = await this.checkMicrophonePermission();
       if (!hasPermission) {
         Swal.fire({
           title: 'Permission requise',
-          text: "Cette application a besoin d'accéder à votre microphone pour enregistrer votre plainte.",
+          text: 'Cette application a besoin d\'accéder à votre microphone pour enregistrer votre plainte.',
           icon: 'info',
-          confirmButtonText: "Autoriser l'accès"
+          confirmButtonText: 'Autoriser l\'accès'
         });
       }
 
@@ -298,43 +248,49 @@ export class PlainteComponent {
       this.stream = await navigator.mediaDevices.getUserMedia(audioConstraints);
       this.prepareRecorderUI();
 
-      // Utiliser le type MIME déjà détecté plus haut
-      this.mediaRecorder = new MediaRecorder(this.stream, { mimeType });
-   
-      this.audioChunks = [];
-   
-      this.mediaRecorder.ondataavailable = (event: BlobEvent) => {
-        if (event.data.size > 0) this.audioChunks.push(event.data);
-      };
-   
-      this.mediaRecorder.addEventListener('stop', () => this.finalizeRecording());
-      this.mediaRecorder.start(1000);
-      this.startTimer();
-    } catch (error: any) {
-      console.error('Erreur microphone:', error);
-      let errorMessage = "Veuillez autoriser l'accès au microphone";
-      let errorTitle = 'Microphone inaccessible';
-   
-      if (error.name === 'NotAllowedError' || error.name === 'PermissionDeniedError') {
-        errorMessage = "L'accès au microphone a été refusé...";
-        errorTitle = 'Permission refusée';
-      } else if (error.name === 'NotFoundError') {
-        errorMessage = 'Aucun microphone détecté.';
-        errorTitle = 'Microphone non trouvé';
-      } else if (error.name === 'NotSupportedError') {
-        errorMessage = "L'enregistrement audio n'est pas supporté sur ce navigateur.";
-        errorTitle = 'Format non supporté';
-      }
-   
-      Swal.fire({
-        title: errorTitle,
-        text: errorMessage,
-        icon: 'error',
-        confirmButtonText: 'Compris',
-        footer: "Essayez de recharger la page et d'autoriser l'accès au micro."
-      });
+     // Détection d’iOS
+    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !(window as any).MSStream;
+
+
+    // Choix du type MIME
+    let mimeType = isIOS ? 'audio/mpeg' : 'audio/webm;codecs=opus';
+    if (!MediaRecorder.isTypeSupported(mimeType)) {
+      mimeType = isIOS ? 'audio/mp3' : 'audio/webm';
     }
+ 
+    this.mediaRecorder = new MediaRecorder(this.stream, { mimeType });
+ 
+    this.audioChunks = [];
+ 
+    this.mediaRecorder.ondataavailable = (event: BlobEvent) => {
+      if (event.data.size > 0) this.audioChunks.push(event.data);
+    };
+ 
+    this.mediaRecorder.addEventListener('stop', () => this.finalizeRecording());
+    this.mediaRecorder.start(1000);
+    this.startTimer();
+  } catch (error: any) {
+    console.error('Erreur microphone:', error);
+    let errorMessage = 'Veuillez autoriser l\'accès au microphone';
+    let errorTitle = 'Microphone inaccessible';
+ 
+    if (error.name === 'NotAllowedError' || error.name === 'PermissionDeniedError') {
+      errorMessage = 'L\'accès au microphone a été refusé...';
+      errorTitle = 'Permission refusée';
+    } else if (error.name === 'NotFoundError') {
+      errorMessage = 'Aucun microphone détecté.';
+      errorTitle = 'Microphone non trouvé';
+    }
+ 
+    Swal.fire({
+      title: errorTitle,
+      text: errorMessage,
+      icon: 'error',
+      confirmButtonText: 'Compris',
+      footer: 'Essayez de recharger la page et d\'autoriser l\'accès au micro.'
+    });
   }
+}
  
   private prepareRecorderUI() {
     this.showRecorderControls = true;
@@ -404,13 +360,13 @@ export class PlainteComponent {
     if (!this.audioBlob) {
       Swal.fire({
         title: 'Aucun enregistrement',
-        text: 'Veuillez effectuer un enregistrement audio ou sélectionner un fichier',
+        text: 'Veuillez effectuer un enregistrement audio',
         icon: 'warning'
       });
       return;
     }
    
-
+ 
     this.isSubmitting = true;
     Swal.fire({
       title: 'Envoi en cours...',
@@ -423,7 +379,7 @@ export class PlainteComponent {
       if (!token) {
         Swal.fire({
           title: 'Erreur',
-          text: "Erreur d'authentification. Veuillez vous reconnecter.",
+          text: 'Erreur d\'authentification. Veuillez vous reconnecter.',
           icon: 'error'
         });
         return;
@@ -431,47 +387,18 @@ export class PlainteComponent {
  
       const userPayload = this.authService.decodeToken(token);
       const userId = userPayload ? userPayload.sub : null;
-
+ 
       if (!userId) {
         Swal.fire({
           title: 'Erreur',
-          text: "Erreur lors de la récupération de l'ID utilisateur.",
+          text: 'Erreur lors de la récupération de l\'ID utilisateur.',
           icon: 'error'
         });
         return;
       }
-
-      // Log pour diagnostiquer le problème d'utilisateur
-      console.log('Informations utilisateur:', {
-        token: token ? 'Présent' : 'Absent',
-        userPayload: userPayload,
-        userId: userId,
-        tokenLength: token ? token.length : 0
-      });
-
-      // Log spécifique pour l'ID utilisateur
-      console.log('ID utilisateur extrait du token:', userId);
-
+ 
       const formData = new FormData();
-      let audioFile: File;
-
-      if (this.audioBlob instanceof File) {
-        // Cas iOS: le blob est déjà un fichier
-        audioFile = this.audioBlob;
-      } else {
-        // Cas standard: le blob vient de MediaRecorder
-        audioFile = new File([this.audioBlob], 'enregistrement.webm', { type: 'audio/webm' });
-      }
-
-      // Log pour diagnostiquer le problème
-      console.log('Fichier audio à envoyer:', {
-        name: audioFile.name,
-        type: audioFile.type,
-        size: audioFile.size,
-        isFile: this.audioBlob instanceof File,
-        isBlob: this.audioBlob instanceof Blob
-      });
-
+      const audioFile = new File([this.audioBlob], 'enregistrement.webm', { type: 'audio/webm' });
       formData.append('audio', audioFile);
       formData.append('titre', this.plainte.titre || 'Plainte vocale');
       formData.append('categorie', this.plainte.categorie || 'Enregistrement vocal');
@@ -496,21 +423,11 @@ export class PlainteComponent {
       });
     } catch (error: any) {
       console.error('Erreur:', error);
-      
-      // Gestion spécifique des erreurs
-      if (error.status === 404 && error.error?.message?.includes('Marin lié à l\'utilisateur')) {
-        Swal.fire({
-          title: 'Profil marin manquant',
-          text: 'Votre profil marin n\'est pas trouvé. Veuillez contacter l\'administrateur pour résoudre ce problème.',
-          icon: 'error'
-        });
-      } else {
-        Swal.fire({
-          title: 'Erreur',
-          text: "Erreur lors de l'envoi de la plainte",
-          icon: 'error'
-        });
-      }
+      Swal.fire({
+        title: 'Erreur',
+        text: 'Erreur lors de l\'envoi de la plainte',
+        icon: 'error'
+      });
     } finally {
       this.isSubmitting = false;
       Swal.close();
@@ -555,7 +472,7 @@ export class PlainteComponent {
     if (!token) {
       Swal.fire({
         title: 'Erreur',
-        text: "Erreur d'authentification. Veuillez vous reconnecter.",
+        text: 'Erreur d\'authentification. Veuillez vous reconnecter.',
         icon: 'error'
       });
       return;
@@ -590,8 +507,8 @@ export class PlainteComponent {
  
   deleteRecording() {
     Swal.fire({
-      title: "Supprimer l'enregistrement",
-      text: "Êtes-vous sûr de vouloir supprimer cet enregistrement ?",
+      title: 'Supprimer l\'enregistrement',
+      text: 'Êtes-vous sûr de vouloir supprimer cet enregistrement ?',
       icon: 'warning',
       showCancelButton: true,
       confirmButtonText: 'Oui, supprimer',
@@ -625,7 +542,7 @@ export class PlainteComponent {
   cancelForm() {
     Swal.fire({
       title: 'Annuler la plainte',
-      text: "Êtes-vous sûr de vouloir annuler ? Tous les changements seront perdus.",
+      text: 'Êtes-vous sûr de vouloir annuler ? Tous les changements seront perdus.',
       icon: 'warning',
       showCancelButton: true,
       confirmButtonText: 'Oui, annuler',
@@ -706,7 +623,7 @@ export class PlainteComponent {
       if (error.error?.message === 'Catégorie non trouvée') {
         Swal.fire({
           title: 'Erreur',
-          text: "La catégorie sélectionnée n'existe pas",
+          text: 'La catégorie sélectionnée n\'existe pas',
           icon: 'error'
         });
       } else if (error.status === 401) {
@@ -751,102 +668,5 @@ export class PlainteComponent {
     this.isPlaying = false;
     this.currentTime = 0;
     console.log("Lecture terminée");
-  }
-
-  onAudioFileSelected(event: Event) {
-    const input = event.target as HTMLInputElement;
-    if (input.files && input.files.length > 0) {
-      const file = input.files[0];
-      
-      // Vérifier si c'est bien un fichier audio
-      if (file.type.startsWith('audio/')) {
-        this.audioBlob = file;
-        this.audioUrl = URL.createObjectURL(file);
-        this.showAudioControls = true;
-        this.showRecorderControls = false;
-        setTimeout(() => this.replayRecording(), 300);
-      } else {
-        // Si ce n'est pas un fichier audio, afficher un message d'erreur
-        Swal.fire({
-          title: 'Format non supporté',
-          text: 'Veuillez sélectionner un fichier audio (mp3, m4a, wav, etc.)',
-          icon: 'error'
-        });
-      }
-    }
-  }
-
-  // Méthode spécifique pour forcer l'enregistrement audio sur iOS
-  startIOSRecording() {
-    // Forcer l'utilisation de MediaRecorder même sur iOS pour éviter l'appareil photo
-    if (window.MediaRecorder) {
-      // Utiliser la même interface que Android/PC
-      this.startRecording();
-    } else {
-      // Si MediaRecorder n'existe pas du tout, afficher un message d'erreur
-      Swal.fire({
-        title: 'Non supporté',
-        text: "L'enregistrement vocal n'est pas supporté sur ce navigateur. Veuillez utiliser un appareil Android ou un navigateur compatible.",
-        icon: 'error'
-      });
-    }
-  }
-
-  // Méthode native pour enregistrement audio
-  openNativeAudioRecorder() {
-    const input = document.createElement('input');
-    input.type = 'file';
-    input.accept = 'audio/mp3,audio/m4a,audio/wav,audio/aac,audio/*';
-    input.style.display = 'none';
-    
-    // Ajouter des attributs spécifiques pour forcer l'audio
-    input.setAttribute('data-ios', 'true');
-    input.setAttribute('webkitdirectory', 'false');
-    
-    input.onchange = (event) => {
-      const target = event.target as HTMLInputElement;
-      if (target.files && target.files.length > 0) {
-        this.onAudioFileSelected(event);
-      }
-    };
-    
-    document.body.appendChild(input);
-    input.click();
-    setTimeout(() => {
-      document.body.removeChild(input);
-    }, 1000);
-  }
-
-  // Méthode pour vérifier si l'enregistrement audio est supporté
-  private isAudioRecordingSupported(): boolean {
-    if (!window.MediaRecorder) return false;
-    
-    const formats = ['audio/webm;codecs=opus', 'audio/webm', 'audio/mp4', 'audio/mpeg'];
-    return formats.some(format => MediaRecorder.isTypeSupported(format));
-  }
-
-  // Méthode pour rediriger vers le fallback iOS
-  private showIOSFallback() {
-    Swal.fire({
-      title: 'Enregistrement vocal',
-      text: "Sur iPhone/iPad, veuillez utiliser le bouton 'Démarrer l'enregistrement' pour accéder à l'enregistreur vocal natif d'iOS.",
-      icon: 'info',
-      confirmButtonText: 'Compris'
-    });
-  }
-
-  // Méthode de test pour forcer le fallback iOS (pour les tests)
-  testIOSFallback() {
-    // Simuler la sélection d'un fichier audio pour test
-    const input = document.createElement('input');
-    input.type = 'file';
-    input.accept = 'audio/*';
-    input.onchange = (event) => {
-      const target = event.target as HTMLInputElement;
-      if (target.files && target.files.length > 0) {
-        this.onAudioFileSelected(event);
-      }
-    };
-    input.click();
   }
 }

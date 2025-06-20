@@ -80,19 +80,9 @@
       <!-- Bouton Démarrer -->
       <div class="mb-4" *ngIf="!showRecorderControls && !showAudioControls">
         <div class="d-flex flex-column flex-md-row gap-2 justify-content-center">
-          
-          <!-- Bouton standard pour Android/Desktop -->
-          <button *ngIf="!isIOS" (click)="startRecording()" class="btn btn-primary">
+          <button (click)="startRecording()" class="btn btn-primary">
             <i class="fas fa-microphone me-2"></i> Démarrer l'enregistrement
           </button>
-          
-          <!-- Fallback pour iOS -->
-          <ng-container *ngIf="isIOS">
-            <button (click)="startIOSRecording()" class="btn btn-primary">
-              <i class="fas fa-microphone me-2"></i> Démarrer l'enregistrement
-            </button>
-          </ng-container>
-
           <button (click)="testMicrophone()" class="btn btn-outline-info d-md-none">
             <i class="fas fa-volume-up me-2"></i> Tester le microphone
           </button>
