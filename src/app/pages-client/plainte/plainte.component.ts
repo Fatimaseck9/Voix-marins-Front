@@ -747,9 +747,24 @@ export class PlainteComponent {
   private showIOSFallback() {
     Swal.fire({
       title: 'Enregistrement vocal',
-      text: "Sur iPhone/iPad, veuillez utiliser le bouton 'Enregistrer ou choisir un audio' pour accéder à l'enregistreur vocal natif d'iOS.",
+      text: "Sur iPhone/iPad, veuillez utiliser le bouton 'Démarrer l'enregistrement' pour accéder à l'enregistreur vocal natif d'iOS.",
       icon: 'info',
       confirmButtonText: 'Compris'
     });
+  }
+
+  // Méthode de test pour forcer le fallback iOS (pour les tests)
+  testIOSFallback() {
+    // Simuler la sélection d'un fichier audio pour test
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = 'audio/*';
+    input.onchange = (event) => {
+      const target = event.target as HTMLInputElement;
+      if (target.files && target.files.length > 0) {
+        this.onAudioFileSelected(event);
+      }
+    };
+    input.click();
   }
 }
