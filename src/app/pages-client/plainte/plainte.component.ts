@@ -762,8 +762,12 @@ export class PlainteComponent {
   openNativeAudioRecorder() {
     const input = document.createElement('input');
     input.type = 'file';
-    input.accept = 'audio/*';
+    input.accept = 'audio/mp3,audio/m4a,audio/wav,audio/aac,audio/*';
     input.style.display = 'none';
+    
+    // Ajouter des attributs spécifiques pour forcer l'audio
+    input.setAttribute('data-ios', 'true');
+    input.setAttribute('webkitdirectory', 'false');
     
     input.onchange = (event) => {
       const target = event.target as HTMLInputElement;
