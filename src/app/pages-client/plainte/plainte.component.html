@@ -89,15 +89,14 @@
           <!-- Fallback pour iOS -->
           <ng-container *ngIf="isIOS">
             <label for="audio-upload" class="btn btn-primary">
-              <i class="fas fa-microphone-alt me-2"></i> Enregistrer ou choisir un audio
+              <i class="fas fa-microphone-alt me-2"></i> Démarrer l'enregistrement
             </label>
             <input 
               type="file" 
               id="audio-upload" 
               accept="audio/*" 
               (change)="onAudioFileSelected($event)" 
-              class="d-none"
-              capture="user">
+              class="d-none">
           </ng-container>
 
           <button (click)="testMicrophone()" class="btn btn-outline-info d-md-none">

@@ -79,6 +79,10 @@ export class PlainteComponent {
     this.isBrowser = isPlatformBrowser(this.platformId);
     if (this.isBrowser) {
       this.isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !(window as any).MSStream;
+      // Vérifier si MediaRecorder est vraiment supporté pour l'audio
+      if (this.isIOS && (!window.MediaRecorder || !this.isAudioRecordingSupported())) {
+        this.isIOS = true; // Forcer le fallback iOS
+      }
       this.loadPlaintes();
       this.loadCategoriesFromBackend();
     }
@@ -225,12 +229,18 @@ export class PlainteComponent {
     
     // Vérifier d'abord si MediaRecorder est disponible
     if (!window.MediaRecorder) {
-      Swal.fire({
-        title: 'Non supporté',
-        text: "L'enregistrement vocal n'est pas supporté sur ce navigateur. Veuillez utiliser un appareil Android ou un navigateur compatible.",
-        icon: 'error'
-      });
-      return;
+      if (isIOS) {
+        // Rediriger vers le fallback iOS
+        this.showIOSFallback();
+        return;
+      } else {
+        Swal.fire({
+          title: 'Non supporté',
+          text: "L'enregistrement vocal n'est pas supporté sur ce navigateur. Veuillez utiliser un appareil Android ou un navigateur compatible.",
+          icon: 'error'
+        });
+        return;
+      }
     }
 
     // Déterminer le type MIME supporté
@@ -240,12 +250,18 @@ export class PlainteComponent {
       if (!MediaRecorder.isTypeSupported(mimeType)) {
         mimeType = 'audio/mp4';
         if (!MediaRecorder.isTypeSupported(mimeType)) {
-          Swal.fire({
-            title: 'Non supporté',
-            text: "Aucun format d'enregistrement audio n'est supporté sur ce navigateur. Veuillez utiliser un appareil Android ou un navigateur compatible.",
-            icon: 'error'
-          });
-          return;
+          if (isIOS) {
+            // Rediriger vers le fallback iOS
+            this.showIOSFallback();
+            return;
+          } else {
+            Swal.fire({
+              title: 'Non supporté',
+              text: "Aucun format d'enregistrement audio n'est supporté sur ce navigateur. Veuillez utiliser un appareil Android ou un navigateur compatible.",
+              icon: 'error'
+            });
+            return;
+          }
         }
       }
     }
@@ -717,5 +733,23 @@ export class PlainteComponent {
       this.showRecorderControls = false; // Masquer les contrôles d'enregistrement
       setTimeout(() => this.replayRecording(), 300); // Lancer la lecture pour vérification
     }
+  }
+
+  // Méthode pour vérifier si l'enregistrement audio est supporté
+  private isAudioRecordingSupported(): boolean {
+    if (!window.MediaRecorder) return false;
+    
+    const formats = ['audio/webm;codecs=opus', 'audio/webm', 'audio/mp4', 'audio/mpeg'];
+    return formats.some(format => MediaRecorder.isTypeSupported(format));
+  }
+
+  // Méthode pour rediriger vers le fallback iOS
+  private showIOSFallback() {
+    Swal.fire({
+      title: 'Enregistrement vocal',
+      text: "Sur iPhone/iPad, veuillez utiliser le bouton 'Enregistrer ou choisir un audio' pour accéder à l'enregistreur vocal natif d'iOS.",
+      icon: 'info',
+      confirmButtonText: 'Compris'
+    });
   }
 }
