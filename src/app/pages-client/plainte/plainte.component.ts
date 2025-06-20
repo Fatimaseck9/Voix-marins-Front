@@ -748,39 +748,8 @@ export class PlainteComponent {
 
   // Méthode spécifique pour forcer l'enregistrement audio sur iOS
   startIOSRecording() {
-    // Essayer d'ouvrir directement l'app Dictaphone d'iOS avec retour automatique
-    try {
-      // URL scheme pour ouvrir l'app Dictaphone avec callback
-      const dictaphoneURL = 'dictaphone://record?callback=' + encodeURIComponent(window.location.href);
-      
-      // Essayer d'ouvrir l'app
-      window.location.href = dictaphoneURL;
-      
-      // Détecter le retour de l'app
-      this.detectAppReturn();
-      
-    } catch (error) {
-      // Fallback : utiliser l'approche native avec capture
-      this.openNativeAudioRecorder();
-    }
-  }
-
-  // Détecter le retour de l'app Dictaphone
-  detectAppReturn() {
-    // Vérifier périodiquement si l'utilisateur est revenu
-    const checkInterval = setInterval(() => {
-      // Si l'utilisateur est revenu sur la page, essayer de récupérer l'enregistrement
-      if (document.hasFocus()) {
-        clearInterval(checkInterval);
-        this.retrieveLatestRecording();
-      }
-    }, 1000);
-  }
-
-  // Récupérer le dernier enregistrement
-  retrieveLatestRecording() {
-    // Essayer d'accéder aux fichiers audio récents
-    this.openAudioFileSelector();
+    // Utiliser l'enregistrement natif du navigateur avec capture microphone
+    this.openNativeAudioRecorder();
   }
 
   // Méthode native pour enregistrement audio
@@ -789,27 +758,6 @@ export class PlainteComponent {
     input.type = 'file';
     input.accept = 'audio/*';
     input.capture = 'microphone';
-    input.style.display = 'none';
-    
-    input.onchange = (event) => {
-      const target = event.target as HTMLInputElement;
-      if (target.files && target.files.length > 0) {
-        this.onAudioFileSelected(event);
-      }
-    };
-    
-    document.body.appendChild(input);
-    input.click();
-    setTimeout(() => {
-      document.body.removeChild(input);
-    }, 1000);
-  }
-
-  // Méthode de fallback pour sélectionner un fichier audio
-  openAudioFileSelector() {
-    const input = document.createElement('input');
-    input.type = 'file';
-    input.accept = 'audio/*';
     input.style.display = 'none';
     
     input.onchange = (event) => {
