@@ -21,8 +21,18 @@ export class AdminAuthGuard implements CanActivate {
         const decodedToken: any = jwtDecode(token);
         console.log('Token décodé:', decodedToken);
         
-        // Vérifie si le compte est actif
-        if (!decodedToken.isActive) {
+        // Vérifier aussi le compte stocké dans les cookies
+        const currentAccount = this.authService.getCurrentAccount();
+        console.log('Compte actuel:', currentAccount);
+        
+        // Vérifie si le compte est actif (dans le token OU dans le compte stocké)
+        const isActiveInToken = decodedToken.isActive;
+        const isActiveInAccount = currentAccount?.isActive;
+        
+        console.log('isActive dans token:', isActiveInToken);
+        console.log('isActive dans compte:', isActiveInAccount);
+        
+        if (!isActiveInToken && !isActiveInAccount) {
           console.log('Compte inactif, redirection vers change-password');
           this.router.navigate(['/change-password']);
           return false;

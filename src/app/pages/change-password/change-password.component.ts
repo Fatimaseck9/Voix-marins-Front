@@ -167,6 +167,15 @@ export class ChangePasswordComponent implements OnInit {
             
             // Mettre à jour le service d'authentification
             this.authService.setAccount(user);
+            
+            // Mettre à jour les rôles si disponibles
+            if (decodedNewToken.role) {
+              this.authService.setAccountRoles([{ name: decodedNewToken.role }]);
+            }
+
+            // Vérifier que le compte est bien mis à jour
+            const updatedAccount = this.authService.getCurrentAccount();
+            console.log('Compte après mise à jour:', updatedAccount);
 
             Swal.fire({
               icon: 'success',
