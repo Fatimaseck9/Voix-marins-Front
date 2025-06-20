@@ -431,7 +431,7 @@ export class PlainteComponent {
  
       const userPayload = this.authService.decodeToken(token);
       const userId = userPayload ? userPayload.sub : null;
- 
+
       if (!userId) {
         Swal.fire({
           title: 'Erreur',
@@ -440,7 +440,15 @@ export class PlainteComponent {
         });
         return;
       }
- 
+
+      // Log pour diagnostiquer le problème d'utilisateur
+      console.log('Informations utilisateur:', {
+        token: token ? 'Présent' : 'Absent',
+        userPayload: userPayload,
+        userId: userId,
+        tokenLength: token ? token.length : 0
+      });
+
       const formData = new FormData();
       let audioFile: File;
 
