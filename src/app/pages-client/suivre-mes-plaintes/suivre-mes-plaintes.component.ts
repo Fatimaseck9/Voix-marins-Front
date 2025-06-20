@@ -174,5 +174,24 @@ export class SuivreMesPlaintesComponent implements OnInit {
     }
   }
 
-  
+  // Détection d'iOS/Safari
+  isIOS(): boolean {
+    return /iPad|iPhone|iPod/.test(navigator.userAgent) && !(window as any).MSStream;
+  }
+
+  // Vérifie si le format audio est lisible sur l'appareil
+  isAudioPlayable(audioUrl: string): boolean {
+    if (!audioUrl) return false;
+    if (this.isIOS()) {
+      // Safari supporte mp3, m4a, aac, wav, mais pas webm/opus
+      return (
+        audioUrl.endsWith('.mp3') ||
+        audioUrl.endsWith('.m4a') ||
+        audioUrl.endsWith('.aac') ||
+        audioUrl.endsWith('.wav')
+      );
+    }
+    // Pour les autres navigateurs, on suppose que tout est lisible
+    return true;
+  }
 }

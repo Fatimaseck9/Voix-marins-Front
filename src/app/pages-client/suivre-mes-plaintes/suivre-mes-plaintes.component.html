@@ -89,10 +89,14 @@
               
               <!-- Lecteur audio si disponible -->
               <div *ngIf="plainte.audioUrl" class="mt-3">
-             
-<audio *ngIf="plainte.audioUrl" [src]="plainte.audioUrl" controls>
-   Votre navigateur ne supporte pas l'audio.
-</audio>
+                <ng-container *ngIf="isAudioPlayable(plainte.audioUrl); else audioNotSupported">
+                  <audio [src]="plainte.audioUrl" controls>
+                    Votre navigateur ne supporte pas l'audio.
+                  </audio>
+                </ng-container>
+                <ng-template #audioNotSupported>
+                  <span class="text-danger">La lecture audio n'est pas supportée sur cet appareil pour ce format.</span>
+                </ng-template>
               </div>
             </div>
           </div>
