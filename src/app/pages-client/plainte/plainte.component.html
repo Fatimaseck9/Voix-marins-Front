@@ -94,10 +94,10 @@
             <input 
               type="file" 
               id="audio-record" 
-              accept="audio/*" 
-              capture="microphone"
+              accept="audio/*"
               (change)="onAudioFileSelected($event)" 
               class="d-none">
+            <!-- Sur iOS, cela devrait ouvrir l'option d'enregistrement audio -->
           </ng-container>
 
           <button (click)="testMicrophone()" class="btn btn-outline-info d-md-none">
