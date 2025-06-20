@@ -222,17 +222,34 @@ export class PlainteComponent {
   async startRecording() {
     // Détection d'iOS/Safari et gestion du support MediaRecorder
     const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !(window as any).MSStream;
-    let mimeType = isIOS ? 'audio/mpeg' : 'audio/webm;codecs=opus';
-
-    // Vérification du support MediaRecorder et du type MIME
-    if (!window.MediaRecorder || !MediaRecorder.isTypeSupported(mimeType)) {
+    
+    // Vérifier d'abord si MediaRecorder est disponible
+    if (!window.MediaRecorder) {
       Swal.fire({
         title: 'Non supporté',
-        text: "L'enregistrement vocal n'est pas supporté sur ce navigateur (iOS/Safari). Veuillez utiliser un appareil Android ou un navigateur compatible.",
+        text: "L'enregistrement vocal n'est pas supporté sur ce navigateur. Veuillez utiliser un appareil Android ou un navigateur compatible.",
         icon: 'error'
       });
       return;
     }
+
+    // Déterminer le type MIME supporté
+    let mimeType = 'audio/webm;codecs=opus';
+    if (!MediaRecorder.isTypeSupported(mimeType)) {
+      mimeType = 'audio/webm';
+      if (!MediaRecorder.isTypeSupported(mimeType)) {
+        mimeType = 'audio/mp4';
+        if (!MediaRecorder.isTypeSupported(mimeType)) {
+          Swal.fire({
+            title: 'Non supporté',
+            text: "Aucun format d'enregistrement audio n'est supporté sur ce navigateur. Veuillez utiliser un appareil Android ou un navigateur compatible.",
+            icon: 'error'
+          });
+          return;
+        }
+      }
+    }
+
     // Sur iOS/Safari, il n'est pas possible de demander l'autorisation du micro automatiquement ou de forcer l'affichage du prompt :
     // Le navigateur doit gérer cela, et il ne propose pas l'API MediaRecorder pour l'audio. Il faut donc informer l'utilisateur.
     try {
@@ -265,49 +282,43 @@ export class PlainteComponent {
       this.stream = await navigator.mediaDevices.getUserMedia(audioConstraints);
       this.prepareRecorderUI();
 
-     // Détection d'iOS
-    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !(window as any).MSStream;
-
-
-    // Choix du type MIME
-    let mimeType = isIOS ? 'audio/mpeg' : 'audio/webm;codecs=opus';
-    if (!MediaRecorder.isTypeSupported(mimeType)) {
-      mimeType = isIOS ? 'audio/mp3' : 'audio/webm';
+      // Utiliser le type MIME déjà détecté plus haut
+      this.mediaRecorder = new MediaRecorder(this.stream, { mimeType });
+   
+      this.audioChunks = [];
+   
+      this.mediaRecorder.ondataavailable = (event: BlobEvent) => {
+        if (event.data.size > 0) this.audioChunks.push(event.data);
+      };
+   
+      this.mediaRecorder.addEventListener('stop', () => this.finalizeRecording());
+      this.mediaRecorder.start(1000);
+      this.startTimer();
+    } catch (error: any) {
+      console.error('Erreur microphone:', error);
+      let errorMessage = "Veuillez autoriser l'accès au microphone";
+      let errorTitle = 'Microphone inaccessible';
+   
+      if (error.name === 'NotAllowedError' || error.name === 'PermissionDeniedError') {
+        errorMessage = "L'accès au microphone a été refusé...";
+        errorTitle = 'Permission refusée';
+      } else if (error.name === 'NotFoundError') {
+        errorMessage = 'Aucun microphone détecté.';
+        errorTitle = 'Microphone non trouvé';
+      } else if (error.name === 'NotSupportedError') {
+        errorMessage = "L'enregistrement audio n'est pas supporté sur ce navigateur.";
+        errorTitle = 'Format non supporté';
+      }
+   
+      Swal.fire({
+        title: errorTitle,
+        text: errorMessage,
+        icon: 'error',
+        confirmButtonText: 'Compris',
+        footer: "Essayez de recharger la page et d'autoriser l'accès au micro."
+      });
     }
- 
-    this.mediaRecorder = new MediaRecorder(this.stream, { mimeType });
- 
-    this.audioChunks = [];
- 
-    this.mediaRecorder.ondataavailable = (event: BlobEvent) => {
-      if (event.data.size > 0) this.audioChunks.push(event.data);
-    };
- 
-    this.mediaRecorder.addEventListener('stop', () => this.finalizeRecording());
-    this.mediaRecorder.start(1000);
-    this.startTimer();
-  } catch (error: any) {
-    console.error('Erreur microphone:', error);
-    let errorMessage = "Veuillez autoriser l'accès au microphone";
-    let errorTitle = 'Microphone inaccessible';
- 
-    if (error.name === 'NotAllowedError' || error.name === 'PermissionDeniedError') {
-      errorMessage = "L'accès au microphone a été refusé...";
-      errorTitle = 'Permission refusée';
-    } else if (error.name === 'NotFoundError') {
-      errorMessage = 'Aucun microphone détecté.';
-      errorTitle = 'Microphone non trouvé';
-    }
- 
-    Swal.fire({
-      title: errorTitle,
-      text: errorMessage,
-      icon: 'error',
-      confirmButtonText: 'Compris',
-      footer: "Essayez de recharger la page et d'autoriser l'accès au micro."
-    });
   }
-}
  
   private prepareRecorderUI() {
     this.showRecorderControls = true;
