@@ -4,6 +4,7 @@ import { Router } from '@angular/router';
 import { BaseService } from 'src/app/shared/base.service';
 import { AuthService } from '../auth/auth.service';
 import { jwtDecode } from 'jwt-decode';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-change-password',
@@ -89,7 +90,13 @@ export class ChangePasswordComponent implements OnInit {
     this.debugFormState();
     
     if (this.isSubmitting || this.changePasswordForm.invalid) {
-      this.message = { text: 'Veuillez corriger les erreurs du formulaire.', type: 'error' };
+      Swal.fire({
+        icon: 'error',
+        title: 'Erreur de validation',
+        text: 'Veuillez corriger les erreurs du formulaire.',
+        confirmButtonText: 'OK',
+        confirmButtonColor: '#2196F3'
+      });
       console.log('Formulaire invalide ou en cours de soumission');
       return;
     }
@@ -97,17 +104,27 @@ export class ChangePasswordComponent implements OnInit {
     const { oldPassword, newPassword } = this.changePasswordForm.value;
     
     if (this.getPasswordStrength(newPassword) < 4) {
-      this.message = { 
+      Swal.fire({
+        icon: 'error',
+        title: 'Mot de passe faible',
         text: 'Le nouveau mot de passe doit contenir au moins 8 caractères, une majuscule, une minuscule, un chiffre et un caractère spécial.',
-        type: 'error'
-      };
+        confirmButtonText: 'OK',
+        confirmButtonColor: '#2196F3'
+      });
       return;
     }
 
     const token = this.authService.getToken();
     if (!token) {
-      this.message = { text: 'Session expirée, veuillez vous reconnecter.', type: 'error' };
-      window.location.href = 'https://gaalgui.sn/login-admin';
+      Swal.fire({
+        icon: 'error',
+        title: 'Session expirée',
+        text: 'Votre session a expiré, veuillez vous reconnecter.',
+        confirmButtonText: 'Se reconnecter',
+        confirmButtonColor: '#2196F3'
+      }).then(() => {
+        window.location.href = 'https://gaalgui.sn/login-admin';
+      });
       return;
     }
 
@@ -151,7 +168,14 @@ export class ChangePasswordComponent implements OnInit {
             // Mettre à jour le service d'authentification
             this.authService.setAccount(user);
 
-            this.message = { text: 'Mot de passe modifié avec succès. Redirection...', type: 'success' };
+            Swal.fire({
+              icon: 'success',
+              title: 'Succès !',
+              text: 'Mot de passe modifié avec succès. Redirection en cours...',
+              timer: 2000,
+              showConfirmButton: false,
+              confirmButtonColor: '#2196F3'
+            });
             
             setTimeout(() => {
               this.router.navigate(['/admin/tableau-bord']).then(
@@ -163,10 +187,17 @@ export class ChangePasswordComponent implements OnInit {
                   window.location.href = 'https://gaalgui.sn/admin/tableau-bord';
                 }
               );
-            }, 1500);
+            }, 2000);
           } else if (response?.status === 'success') {
             // Le serveur a confirmé le changement de mot de passe
-            this.message = { text: 'Mot de passe modifié avec succès. Redirection...', type: 'success' };
+            Swal.fire({
+              icon: 'success',
+              title: 'Succès !',
+              text: 'Mot de passe modifié avec succès. Redirection en cours...',
+              timer: 2000,
+              showConfirmButton: false,
+              confirmButtonColor: '#2196F3'
+            });
             
             // Vérifier si l'utilisateur est toujours authentifié
             const currentToken = this.authService.getToken();
@@ -186,25 +217,34 @@ export class ChangePasswordComponent implements OnInit {
                     window.location.href = 'https://gaalgui.sn/admin/tableau-bord';
                   }
                 );
-              }, 1500);
+              }, 2000);
             } else {
               console.log('Token expiré, redirection vers login');
               setTimeout(() => {
                 this.authService.logout();
                 window.location.href = 'https://gaalgui.sn/login-admin';
-              }, 1500);
+              }, 2000);
             }
           } else {
             console.error('Réponse inattendue du serveur:', response);
-            this.message = { text: 'Erreur lors du changement de mot de passe.', type: 'error' };
+            Swal.fire({
+              icon: 'error',
+              title: 'Erreur',
+              text: 'Erreur lors du changement de mot de passe.',
+              confirmButtonText: 'OK',
+              confirmButtonColor: '#2196F3'
+            });
           }
         },
         error: (err) => {
           this.isSubmitting = false;
-          this.message = { 
-            text: err.error?.message || 'Erreur lors du changement de mot de passe', 
-            type: 'error' 
-          };
+          Swal.fire({
+            icon: 'error',
+            title: 'Erreur',
+            text: err.error?.message || 'Erreur lors du changement de mot de passe',
+            confirmButtonText: 'OK',
+            confirmButtonColor: '#2196F3'
+          });
           if (err.status === 401) {
             // En cas d'erreur d'authentification, rediriger vers la page de connexion
             setTimeout(() => {
@@ -219,9 +259,16 @@ export class ChangePasswordComponent implements OnInit {
         }
       });
     } catch (error) {
-      this.message = { text: 'Token invalide, veuillez vous reconnecter.', type: 'error' };
-      this.authService.logout();
-      window.location.href = 'https://gaalgui.sn/login-admin';
+      Swal.fire({
+        icon: 'error',
+        title: 'Token invalide',
+        text: 'Token invalide, veuillez vous reconnecter.',
+        confirmButtonText: 'Se reconnecter',
+        confirmButtonColor: '#2196F3'
+      }).then(() => {
+        this.authService.logout();
+        window.location.href = 'https://gaalgui.sn/login-admin';
+      });
     }
   }
 
