@@ -123,7 +123,7 @@ export class ChangePasswordComponent implements OnInit {
         confirmButtonText: 'Se reconnecter',
         confirmButtonColor: '#2196F3'
       }).then(() => {
-        window.location.href = 'https://gaalgui.sn/login-admin';
+      window.location.href = 'https://gaalgui.sn/login-admin';
       });
       return;
     }
@@ -167,7 +167,7 @@ export class ChangePasswordComponent implements OnInit {
             
             // Mettre à jour le service d'authentification
             this.authService.setAccount(user);
-            
+
             // Mettre à jour les rôles si disponibles
             if (decodedNewToken.role) {
               this.authService.setAccountRoles([{ name: decodedNewToken.role }]);
@@ -207,6 +207,17 @@ export class ChangePasswordComponent implements OnInit {
               showConfirmButton: false,
               confirmButtonColor: '#2196F3'
             });
+            
+            // Mettre à jour le compte pour marquer comme actif
+            const currentAccount = this.authService.getCurrentAccount();
+            if (currentAccount) {
+              const updatedAccount = {
+                ...currentAccount,
+                isActive: true
+              };
+              console.log('Mise à jour du compte avec isActive: true:', updatedAccount);
+              this.authService.setAccount(updatedAccount);
+            }
             
             // Vérifier si l'utilisateur est toujours authentifié
             const currentToken = this.authService.getToken();
@@ -250,7 +261,7 @@ export class ChangePasswordComponent implements OnInit {
           Swal.fire({
             icon: 'error',
             title: 'Erreur',
-            text: err.error?.message || 'Erreur lors du changement de mot de passe',
+            text: err.error?.message || 'Erreur lors du changement de mot de passe', 
             confirmButtonText: 'OK',
             confirmButtonColor: '#2196F3'
           });
@@ -275,8 +286,8 @@ export class ChangePasswordComponent implements OnInit {
         confirmButtonText: 'Se reconnecter',
         confirmButtonColor: '#2196F3'
       }).then(() => {
-        this.authService.logout();
-        window.location.href = 'https://gaalgui.sn/login-admin';
+      this.authService.logout();
+      window.location.href = 'https://gaalgui.sn/login-admin';
       });
     }
   }
