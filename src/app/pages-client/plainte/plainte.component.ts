@@ -757,8 +757,12 @@ export class PlainteComponent {
     const input = document.createElement('input');
     input.type = 'file';
     input.accept = 'audio/*';
-    input.capture = 'microphone';
     input.style.display = 'none';
+    
+    // Essayer sans capture d'abord, puis avec si nécessaire
+    if (!input.capture) {
+      input.setAttribute('capture', 'microphone');
+    }
     
     input.onchange = (event) => {
       const target = event.target as HTMLInputElement;
