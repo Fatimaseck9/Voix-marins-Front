@@ -449,6 +449,9 @@ export class PlainteComponent {
         tokenLength: token ? token.length : 0
       });
 
+      // Log spécifique pour l'ID utilisateur
+      console.log('ID utilisateur extrait du token:', userId);
+
       const formData = new FormData();
       let audioFile: File;
 

@@ -95,7 +95,14 @@
                   </audio>
                 </ng-container>
                 <ng-template #audioNotSupported>
-                  <span class="text-danger">La lecture audio n'est pas supportée sur cet appareil pour ce format.</span>
+                  <div class="alert alert-warning" role="alert">
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    <strong>Audio non lisible sur cet appareil</strong><br>
+                    <small>
+                      Ce fichier audio (format .webm) n'est pas supporté sur iPhone/iPad. 
+                      Les enregistrements futurs seront automatiquement convertis en format compatible.
+                    </small>
+                  </div>
                 </ng-template>
               </div>
             </div>

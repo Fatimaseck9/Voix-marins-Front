@@ -182,16 +182,60 @@ export class SuivreMesPlaintesComponent implements OnInit {
   // Vérifie si le format audio est lisible sur l'appareil
   isAudioPlayable(audioUrl: string): boolean {
     if (!audioUrl) return false;
+    
+    // Log pour diagnostiquer
+    console.log('Vérification audio:', {
+      url: audioUrl,
+      isIOS: this.isIOS(),
+      extension: audioUrl.split('.').pop()
+    });
+    
     if (this.isIOS()) {
       // Safari supporte mp3, m4a, aac, wav, mais pas webm/opus
-      return (
+      const isPlayable = (
         audioUrl.endsWith('.mp3') ||
         audioUrl.endsWith('.m4a') ||
         audioUrl.endsWith('.aac') ||
         audioUrl.endsWith('.wav')
       );
+      
+      if (!isPlayable) {
+        console.log('Format non supporté sur iOS:', audioUrl);
+      }
+      
+      return isPlayable;
     }
     // Pour les autres navigateurs, on suppose que tout est lisible
     return true;
+  }
+
+  // Méthode pour tester la lecture audio
+  testAudioPlayback(audioUrl: string): void {
+    if (!audioUrl) return;
+    
+    console.log('Test de lecture audio:', {
+      url: audioUrl,
+      isIOS: this.isIOS(),
+      isPlayable: this.isAudioPlayable(audioUrl)
+    });
+    
+    if (!this.isAudioPlayable(audioUrl)) {
+      alert(`Format audio non supporté sur cet appareil: ${audioUrl.split('.').pop()}`);
+      return;
+    }
+    
+    // Créer un élément audio temporaire pour tester
+    const audio = new Audio(audioUrl);
+    audio.onloadstart = () => console.log('Chargement audio démarré');
+    audio.oncanplay = () => console.log('Audio prêt à être lu');
+    audio.onerror = (e) => console.error('Erreur lecture audio:', e);
+    audio.onended = () => console.log('Lecture audio terminée');
+    
+    audio.play().then(() => {
+      console.log('Lecture audio réussie');
+    }).catch(error => {
+      console.error('Erreur lors de la lecture:', error);
+      alert(`Erreur de lecture: ${error.message}`);
+    });
   }
 }
