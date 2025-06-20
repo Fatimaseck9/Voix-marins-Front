@@ -218,6 +218,21 @@ export class PlainteComponent {
  
   // Démarrer l'enregistrement avec vérifications préalables
   async startRecording() {
+    // Détection d’iOS/Safari et gestion du support MediaRecorder
+    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !(window as any).MSStream;
+    let mimeType = isIOS ? 'audio/mpeg' : 'audio/webm;codecs=opus';
+
+    // Vérification du support MediaRecorder et du type MIME
+    if (!window.MediaRecorder || !MediaRecorder.isTypeSupported(mimeType)) {
+      Swal.fire({
+        title: 'Non supporté',
+        text: 'L’enregistrement vocal n’est pas supporté sur ce navigateur (iOS/Safari). Veuillez utiliser un appareil Android ou un navigateur compatible.',
+        icon: 'error'
+      });
+      return;
+    }
+    // Sur iOS/Safari, il n'est pas possible de demander l'autorisation du micro automatiquement ou de forcer l'affichage du prompt :
+    // Le navigateur doit gérer cela, et il ne propose pas l'API MediaRecorder pour l'audio. Il faut donc informer l'utilisateur.
     try {
       // Vérification des permissions en premier
       const hasPermission = await this.checkMicrophonePermission();

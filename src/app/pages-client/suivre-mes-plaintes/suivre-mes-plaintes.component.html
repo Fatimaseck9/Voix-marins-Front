@@ -89,11 +89,10 @@
               
               <!-- Lecteur audio si disponible -->
               <div *ngIf="plainte.audioUrl" class="mt-3">
-                <audio *ngIf="plainte.audioUrl" controls>
-                   <source [src]="plainte.audioUrl" type="audio/webm">
-                      Votre navigateur ne supporte pas l'audio.
-                </audio>
-
+             
+<audio *ngIf="plainte.audioUrl" [src]="plainte.audioUrl" controls>
+   Votre navigateur ne supporte pas l'audio.
+</audio>
               </div>
             </div>
           </div>
