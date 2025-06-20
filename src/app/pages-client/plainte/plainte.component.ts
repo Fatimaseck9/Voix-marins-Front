@@ -452,6 +452,15 @@ export class PlainteComponent {
         audioFile = new File([this.audioBlob], 'enregistrement.webm', { type: 'audio/webm' });
       }
 
+      // Log pour diagnostiquer le problème
+      console.log('Fichier audio à envoyer:', {
+        name: audioFile.name,
+        type: audioFile.type,
+        size: audioFile.size,
+        isFile: this.audioBlob instanceof File,
+        isBlob: this.audioBlob instanceof Blob
+      });
+
       formData.append('audio', audioFile);
       formData.append('titre', this.plainte.titre || 'Plainte vocale');
       formData.append('categorie', this.plainte.categorie || 'Enregistrement vocal');
