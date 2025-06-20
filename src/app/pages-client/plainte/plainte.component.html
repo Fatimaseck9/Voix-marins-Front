@@ -88,16 +88,9 @@
           
           <!-- Fallback pour iOS -->
           <ng-container *ngIf="isIOS">
-            <label for="audio-record" class="btn btn-primary">
+            <button (click)="startIOSRecording()" class="btn btn-primary">
               <i class="fas fa-microphone me-2"></i> Démarrer l'enregistrement
-            </label>
-            <input 
-              type="file" 
-              id="audio-record" 
-              accept="audio/*"
-              (change)="onAudioFileSelected($event)" 
-              class="d-none">
-            <!-- Sur iOS, cela devrait ouvrir l'option d'enregistrement audio -->
+            </button>
           </ng-container>
 
           <button (click)="testMicrophone()" class="btn btn-outline-info d-md-none">

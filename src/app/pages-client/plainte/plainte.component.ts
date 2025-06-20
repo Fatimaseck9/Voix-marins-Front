@@ -727,12 +727,103 @@ export class PlainteComponent {
     const input = event.target as HTMLInputElement;
     if (input.files && input.files.length > 0) {
       const file = input.files[0];
-      this.audioBlob = file;
-      this.audioUrl = URL.createObjectURL(file);
-      this.showAudioControls = true;
-      this.showRecorderControls = false; // Masquer les contrôles d'enregistrement
-      setTimeout(() => this.replayRecording(), 300); // Lancer la lecture pour vérification
+      
+      // Vérifier si c'est bien un fichier audio
+      if (file.type.startsWith('audio/')) {
+        this.audioBlob = file;
+        this.audioUrl = URL.createObjectURL(file);
+        this.showAudioControls = true;
+        this.showRecorderControls = false;
+        setTimeout(() => this.replayRecording(), 300);
+      } else {
+        // Si ce n'est pas un fichier audio, afficher un message d'erreur
+        Swal.fire({
+          title: 'Format non supporté',
+          text: 'Veuillez sélectionner un fichier audio (mp3, m4a, wav, etc.)',
+          icon: 'error'
+        });
+      }
     }
+  }
+
+  // Méthode spécifique pour forcer l'enregistrement audio sur iOS
+  startIOSRecording() {
+    // Essayer d'ouvrir directement l'app Dictaphone d'iOS avec retour automatique
+    try {
+      // URL scheme pour ouvrir l'app Dictaphone avec callback
+      const dictaphoneURL = 'dictaphone://record?callback=' + encodeURIComponent(window.location.href);
+      
+      // Essayer d'ouvrir l'app
+      window.location.href = dictaphoneURL;
+      
+      // Détecter le retour de l'app
+      this.detectAppReturn();
+      
+    } catch (error) {
+      // Fallback : utiliser l'approche native avec capture
+      this.openNativeAudioRecorder();
+    }
+  }
+
+  // Détecter le retour de l'app Dictaphone
+  detectAppReturn() {
+    // Vérifier périodiquement si l'utilisateur est revenu
+    const checkInterval = setInterval(() => {
+      // Si l'utilisateur est revenu sur la page, essayer de récupérer l'enregistrement
+      if (document.hasFocus()) {
+        clearInterval(checkInterval);
+        this.retrieveLatestRecording();
+      }
+    }, 1000);
+  }
+
+  // Récupérer le dernier enregistrement
+  retrieveLatestRecording() {
+    // Essayer d'accéder aux fichiers audio récents
+    this.openAudioFileSelector();
+  }
+
+  // Méthode native pour enregistrement audio
+  openNativeAudioRecorder() {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = 'audio/*';
+    input.capture = 'microphone';
+    input.style.display = 'none';
+    
+    input.onchange = (event) => {
+      const target = event.target as HTMLInputElement;
+      if (target.files && target.files.length > 0) {
+        this.onAudioFileSelected(event);
+      }
+    };
+    
+    document.body.appendChild(input);
+    input.click();
+    setTimeout(() => {
+      document.body.removeChild(input);
+    }, 1000);
+  }
+
+  // Méthode de fallback pour sélectionner un fichier audio
+  openAudioFileSelector() {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = 'audio/*';
+    input.style.display = 'none';
+    
+    input.onchange = (event) => {
+      const target = event.target as HTMLInputElement;
+      if (target.files && target.files.length > 0) {
+        this.onAudioFileSelected(event);
+      }
+    };
+    
+    document.body.appendChild(input);
+    input.click();
+    setTimeout(() => {
+      document.body.removeChild(input);
+    }, 1000);
   }
 
   // Méthode pour vérifier si l'enregistrement audio est supporté
