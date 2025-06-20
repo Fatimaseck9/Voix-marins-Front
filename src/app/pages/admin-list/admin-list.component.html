@@ -1,0 +1,127 @@
+<div class="main-content">
+  <div class="container-fluid">
+    <div class="row">
+      <div class="col-md-12">
+        <div class="card">
+          <div class="card-header card-header-primary">
+            <h4 class="card-title">Liste des Administrateurs</h4>
+            <p class="card-category">Gérez les comptes administrateurs de votre plateforme</p>
+          </div>
+          <div class="card-body">
+            <!-- Loading spinner -->
+            <div *ngIf="loading" class="text-center py-4">
+              <div class="spinner-border text-primary" role="status">
+                <span class="sr-only">Chargement...</span>
+              </div>
+              <p class="mt-2">Chargement des administrateurs...</p>
+            </div>
+
+            <!-- Error message -->
+            <div *ngIf="error && !loading" class="alert alert-danger" role="alert">
+              <i class="material-icons">error</i>
+              {{ error }}
+              <button type="button" class="btn btn-outline-danger btn-sm ml-3" (click)="loadAdmins()">
+                <i class="material-icons">refresh</i> Réessayer
+              </button>
+            </div>
+
+            <!-- Admin list -->
+            <div *ngIf="!loading && !error">
+              <div class="row mb-3">
+                <div class="col-md-6">
+                  <h5>Total: {{ admins.length }} administrateur(s)</h5>
+                </div>
+                <div class="col-md-6 text-right">
+                  <button class="btn btn-primary" (click)="loadAdmins()">
+                    <i class="material-icons">refresh</i> Actualiser
+                  </button>
+                </div>
+              </div>
+
+              <!-- No admins message -->
+              <div *ngIf="admins.length === 0" class="text-center py-5">
+                <i class="material-icons text-muted" style="font-size: 4rem;">people</i>
+                <h5 class="text-muted mt-3">Aucun administrateur trouvé</h5>
+                <p class="text-muted">Aucun administrateur n'a été créé pour le moment.</p>
+              </div>
+
+              <!-- Admin table -->
+              <div *ngIf="admins.length > 0" class="table-responsive">
+                <table class="table table-hover">
+                  <thead class="thead-light">
+                    <tr>
+                      <th>#</th>
+                      <th>Nom</th>
+                      <th>Email</th>
+                      <th>Statut</th>
+                      <th>Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr *ngFor="let admin of admins; let i = index">
+                      <td>{{ i + 1 }}</td>
+                      <td>
+                        <div class="d-flex align-items-center">
+                          <div class="avatar avatar-sm mr-3">
+                            <i class="material-icons">person</i>
+                          </div>
+                          <div>
+                            <strong>{{ admin.name }}</strong>
+                            <br>
+                            <small class="text-muted">ID: {{ admin.id }}</small>
+                          </div>
+                        </div>
+                      </td>
+                      <td>
+                        <div *ngIf="admin.admin; else noEmail">
+                          <i class="material-icons text-primary" style="font-size: 1rem;">email</i>
+                          {{ admin.admin.email }}
+                        </div>
+                        <ng-template #noEmail>
+                          <span class="text-muted">Aucun email</span>
+                        </ng-template>
+                      </td>
+                      <td>
+                        <div *ngIf="admin.admin; else noStatus">
+                          <span class="badge" [ngClass]="getStatusBadgeClass(admin.admin.isActive)">
+                            {{ getStatusText(admin.admin.isActive) }}
+                          </span>
+                        </div>
+                        <ng-template #noStatus>
+                          <span class="badge badge-secondary">Inconnu</span>
+                        </ng-template>
+                      </td>
+                      <td>
+                        <div class="btn-group" role="group">
+                          <!-- Toggle status button -->
+                          <button *ngIf="admin.admin" 
+                                  type="button" 
+                                  class="btn btn-sm" 
+                                  [ngClass]="admin.admin.isActive ? 'btn-warning' : 'btn-success'"
+                                  (click)="toggleAdminStatus(admin)"
+                                  [title]="admin.admin.isActive ? 'Désactiver' : 'Activer'">
+                            <i class="material-icons" [ngClass]="admin.admin.isActive ? 'text-warning' : 'text-success'">
+                              {{ admin.admin.isActive ? 'block' : 'check_circle' }}
+                            </i>
+                          </button>
+
+                          <!-- Delete button -->
+                          <button type="button" 
+                                  class="btn btn-sm btn-danger" 
+                                  (click)="deleteAdmin(admin)"
+                                  title="Supprimer">
+                            <i class="material-icons text-white">delete</i>
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div> 
