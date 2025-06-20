@@ -4,6 +4,7 @@ import { Observable, throwError, of, forkJoin } from 'rxjs';
 import { tap, switchMap, map, catchError } from 'rxjs/operators';
 import { jwtDecode } from 'jwt-decode';
 import { CookieService } from 'ngx-cookie-service';
+import { environment } from 'src/environments/environment';
 
 // Interface pour typer la plainte
 interface Plainte {
@@ -20,7 +21,7 @@ interface Plainte {
   providedIn: 'root'
 })
 export class PlainteService {
-  private apiUrl = 'https://api.gaalgui.sn/plaintes';
+  private apiUrl = `${environment.apiUrl}/plaintes`;
   //private baseUrl = 'https://521a-154-124-68-191.ngrok-free.app/auth';
 
   constructor(

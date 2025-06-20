@@ -7,8 +7,9 @@ import { firstValueFrom } from 'rxjs';
 
 import Swal from 'sweetalert2';
 import { AuthService } from 'src/app/servicesclient/auth.service';
+import { PlainteService } from 'src/app/servicesclient/plainte.service';
 import Recorder from 'recorder-js';
-
+ 
 // Interface pour la réponse du serveur
 interface PlainteResponse {
   audioUrl: string;
@@ -19,7 +20,7 @@ interface PlainteResponse {
   date?: string;
   statut?: string;
 }
-
+ 
 @Component({
   selector: 'app-plainte',
   standalone: true,
@@ -29,11 +30,11 @@ interface PlainteResponse {
 })
 export class PlainteComponent {
   @ViewChild('audioPlayer') audioPlayer!: ElementRef<HTMLAudioElement>;
-
+ 
   menuActive = false;
   plaintes: any[] = [];
   isBrowser: boolean;
-
+ 
   // États d'enregistrement
   recording = false;
   paused = false;
@@ -41,7 +42,7 @@ export class PlainteComponent {
   showAudioControls = false;
   seconds = 0;
   isSubmitting = false;
-
+ 
   // Audio
   audioBlob: Blob | null = null;
   audioUrl = '';
@@ -50,7 +51,7 @@ export class PlainteComponent {
 
   private recorder: Recorder | null = null;
   private audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
-
+ 
   // Formulaire
   showForm = false;
   plainte = {
@@ -59,23 +60,20 @@ export class PlainteComponent {
     description: '',
     date: ''
   };
-
+ 
   categories = [
     { key: 'harcelement', label: 'Harcèlement', image: 'harcelement.jpeg' },
     { key: 'violence', label: 'Violence physique', image: 'violence.jpeg' },
     { key: 'nourriture', label: 'Refus de nourriture', image: 'nourriture.jpeg' },
     { key: 'paiement', label: 'Problème de paiement', image: 'paiement.jpeg' }
   ];
-
-  private apiUrl = 'http://localhost:3001/plaintes';
-   //private apiUrl = 'https://api.gaalgui.sn/plaintes';
-   //private apiUrl = 'https://ce1e-154-124-68-191.ngrok-free.app/plaintes';
-
+ 
   constructor(
     @Inject(PLATFORM_ID) private platformId: Object,
     private router: Router,
     private http: HttpClient,
-    private authService: AuthService
+    private authService: AuthService,
+    private plainteService: PlainteService
   ) {
     this.isBrowser = isPlatformBrowser(this.platformId);
     if (this.isBrowser) {
@@ -87,14 +85,14 @@ export class PlainteComponent {
       this.loadCategoriesFromBackend();
     }
   }
-
+ 
   private async loadCategoriesFromBackend() {
     try {
       if (!this.authService.isLoggedIn()) {
         console.warn('Utilisateur non connecté. Veuillez vous connecter.');
         return;
       }
-
+ 
       const token = await firstValueFrom(this.authService.getToken());
       if (!token) {
         Swal.fire({
@@ -104,15 +102,10 @@ export class PlainteComponent {
         });
         return;
       }
-
+ 
       console.log('Chargement des catégories avec authentification...');
       
-      const headers = new HttpHeaders({
-        'Authorization': `Bearer ${token}`,
-        //'ngrok-skip-browser-warning': 'true'
-      });
-
-      const categories = await firstValueFrom(this.http.get<any[]>(`${this.apiUrl}/categories`, { headers }));
+      const categories = await firstValueFrom(this.plainteService.getCategories());
       
       console.log('Catégories reçues:', categories);
       
@@ -133,7 +126,7 @@ export class PlainteComponent {
       });
     }
   }
-
+ 
   toggleMenu() {
     this.menuActive = !this.menuActive;
   }
@@ -142,7 +135,7 @@ export class PlainteComponent {
     this.authService.logout();
     // La redirection sera gérée par le service AuthService
   }
-
+ 
   @HostListener('window:resize', ['$event'])
   onResize(event: Event) {
     if (window.innerWidth > 768 && this.menuActive) {
@@ -150,7 +143,7 @@ export class PlainteComponent {
       document.body.style.overflow = '';
     }
   }
-
+ 
   // Vérifier les permissions microphone
   async checkMicrophonePermission(): Promise<boolean> {
     try {
@@ -165,7 +158,7 @@ export class PlainteComponent {
       return true; // On essaie quand même
     }
   }
-
+ 
   // Tester le microphone (spécialement pour mobile)
   async testMicrophone() {
     try {
@@ -261,7 +254,7 @@ export class PlainteComponent {
       supportedFormats
     };
   }
-
+ 
   // Démarrer l'enregistrement avec recorder-js
   async startRecording() {
     try {
@@ -303,7 +296,7 @@ export class PlainteComponent {
       console.error('Erreur microphone:', error);
       let errorMessage = 'Veuillez autoriser l\'accès au microphone';
       let errorTitle = 'Microphone inaccessible';
-
+ 
       if (error.name === 'NotAllowedError' || error.name === 'PermissionDeniedError') {
         errorMessage = 'L\'accès au microphone a été refusé...';
         errorTitle = 'Permission refusée';
@@ -311,7 +304,7 @@ export class PlainteComponent {
         errorMessage = 'Aucun microphone détecté.';
         errorTitle = 'Microphone non trouvé';
       }
-
+ 
       Swal.fire({
         title: errorTitle,
         text: errorMessage,
@@ -321,7 +314,7 @@ export class PlainteComponent {
       });
     }
   }
-
+ 
   private prepareRecorderUI() {
     this.showRecorderControls = true;
     this.showAudioControls = false;
@@ -331,7 +324,7 @@ export class PlainteComponent {
     if (this.audioUrl) URL.revokeObjectURL(this.audioUrl);
     this.startTimer();
   }
-
+ 
   pauseRecording() {
     if (this.recorder && this.recording) {
       this.recorder.pause();
@@ -340,7 +333,7 @@ export class PlainteComponent {
       clearInterval(this.recordingInterval);
     }
   }
-
+ 
   resumeRecording() {
     if (this.recorder && this.paused) {
       this.recorder.resume();
@@ -349,7 +342,7 @@ export class PlainteComponent {
       this.startTimer();
     }
   }
-
+ 
   async stopRecording() {
     if (this.recorder) {
       try {
@@ -358,8 +351,8 @@ export class PlainteComponent {
         this.audioUrl = URL.createObjectURL(blob);
         this.showRecorderControls = false;
         this.showAudioControls = true;
-        this.recording = false;
-        this.paused = false;
+      this.recording = false;
+      this.paused = false;
         this.stopStream();
         this.replayRecording();
         clearInterval(this.recordingInterval);
@@ -368,7 +361,7 @@ export class PlainteComponent {
       }
     }
   }
-
+ 
   replayRecording() {
     if (this.audioPlayer?.nativeElement && this.audioUrl) {
       const player = this.audioPlayer.nativeElement;
@@ -376,16 +369,16 @@ export class PlainteComponent {
       player.play().catch(e => console.error('Erreur lecture:', e));
     }
   }
-
+ 
   private startTimer() {
     this.recordingInterval = setInterval(() => this.seconds++, 1000);
   }
-
+ 
   private stopStream() {
     this.stream?.getTracks().forEach(track => track.stop());
     this.stream = null;
   }
-
+ 
   async sendRecording() {
     if (!this.audioBlob) {
       Swal.fire({
@@ -426,21 +419,16 @@ export class PlainteComponent {
         return;
       }
 
-      const formData = new FormData();
-      const audioFile = new File([this.audioBlob], 'enregistrement.wav', { type: 'audio/wav' });
-      formData.append('audio', audioFile);
-      formData.append('titre', this.plainte.titre || 'Plainte vocale');
-      formData.append('categorie', this.plainte.categorie || 'Enregistrement vocal');
-      formData.append('description', this.plainte.description || 'Plainte enregistrée vocalement');
-      formData.append('utilisateurId', userId);
+      const plainteData = {
+        titre: this.plainte.titre || 'Plainte vocale',
+        categorie: this.plainte.categorie || 'Enregistrement vocal',
+        description: this.plainte.description || 'Plainte enregistrée vocalement',
+        utilisateurId: userId
+      };
 
-      await firstValueFrom(
-        this.http.post<PlainteResponse>(`${this.apiUrl}/create`, formData, {
-          headers: new HttpHeaders({
-            'Authorization': `Bearer ${token}`
-          })
-        })
-      );
+      const audioFile = new File([this.audioBlob], 'enregistrement.wav', { type: 'audio/wav' });
+
+      await firstValueFrom(this.plainteService.submitPlainte(plainteData, audioFile));
 
       Swal.fire({
         title: 'Succès',
@@ -507,11 +495,9 @@ export class PlainteComponent {
         return;
       }
 
-      await firstValueFrom(this.http.post<PlainteResponse>(
-        `${this.apiUrl}/form`,
-        { titre, categorie, description, date },
-        { headers: new HttpHeaders({ 'Authorization': `Bearer ${token}` }) }
-      ));
+      // Utiliser le service pour soumettre le formulaire
+      const plainteData = { titre, categorie, description, date };
+      await firstValueFrom(this.plainteService.submitPlainte(plainteData));
 
       Swal.fire({
         title: 'Succès',
@@ -533,7 +519,7 @@ export class PlainteComponent {
       Swal.close();
     }
   }
-
+ 
   deleteRecording() {
     Swal.fire({
       title: 'Supprimer l\'enregistrement',
@@ -550,7 +536,7 @@ export class PlainteComponent {
       }
     });
   }
-
+ 
   private resetRecording() {
     this.recording = false;
     this.paused = false;
@@ -562,11 +548,11 @@ export class PlainteComponent {
     clearInterval(this.recordingInterval);
     this.stopStream();
   }
-
+ 
   toggleForm() {
     this.showForm = !this.showForm;
   }
-
+ 
   cancelForm() {
     Swal.fire({
       title: 'Annuler la plainte',
@@ -581,23 +567,23 @@ export class PlainteComponent {
       }
     });
   }
-
+ 
   private resetForm() {
     this.plainte = { titre: '', categorie: '', description: '', date: '' };
     this.showForm = false;
   }
-
+ 
   private async loadPlaintes() {
     if (this.isBrowser) {
       const saved = localStorage.getItem('plaintes');
       this.plaintes = saved ? JSON.parse(saved) : [];
     }
   }
-
+ 
   private getCategoryLabel(key: string): string {
     return this.categories.find(cat => cat.key === key)?.label || '';
   }
-
+ 
   async selectCategory(categoryKey: string) {
     const result = await Swal.fire({
       title: 'Confirmation',
@@ -630,13 +616,9 @@ export class PlainteComponent {
         return;
       }
 
-      await firstValueFrom(
-        this.http.post<PlainteResponse>(
-          `${this.apiUrl}/categorie/${categoryKey}`,
-          { utilisateurId: userId },
-          { headers: { Authorization: `Bearer ${token}` } }
-        )
-      );
+      // Utiliser le service pour soumettre par catégorie
+      const plainteData = { utilisateurId: userId };
+      await firstValueFrom(this.plainteService.submitPlainte(plainteData));
 
       Swal.fire({
         title: 'Succès',
@@ -672,26 +654,26 @@ export class PlainteComponent {
       Swal.close();
     }
   }
-
+ 
   currentTime: number = 0;
   duration: number = 0;
   isPlaying: boolean = false;
-
+ 
   onPlay() {
     this.isPlaying = true;
   }
-
+ 
   onPause() {
     this.isPlaying = false;
   }
-
+ 
   onTimeUpdate() {
     if (this.audioPlayer?.nativeElement) {
       this.currentTime = this.audioPlayer.nativeElement.currentTime;
       this.duration = this.audioPlayer.nativeElement.duration;
     }
   }
-
+ 
   onAudioEnded() {
     this.isPlaying = false;
     this.currentTime = 0;

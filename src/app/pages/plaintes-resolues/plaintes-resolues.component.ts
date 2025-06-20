@@ -6,6 +6,7 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import Swal from 'sweetalert2';
 import { jwtDecode } from 'jwt-decode';
 import { CookieService } from 'ngx-cookie-service';
+import { environment } from 'src/environments/environment';
 
 @Component({
   selector: 'app-plaintes-resolues',
@@ -139,7 +140,7 @@ export class PlaintesResoluesComponent implements OnInit {
       return pvUrl;
     }
     // Sinon, construire l'URL complète sans double slash
-    return `https://api.gaalgui.sn${pvUrl.startsWith('/') ? '' : '/'}${pvUrl}`;
+    return `${environment.apiUrl}${pvUrl.startsWith('/') ? '' : '/'}${pvUrl}`;
   }
 
   telechargerPV(plainte: any) {
