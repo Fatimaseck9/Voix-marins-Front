@@ -748,8 +748,14 @@ export class PlainteComponent {
 
   // Méthode spécifique pour forcer l'enregistrement audio sur iOS
   startIOSRecording() {
-    // Utiliser l'enregistrement natif du navigateur avec capture microphone
-    this.openNativeAudioRecorder();
+    // Essayer d'abord MediaRecorder si il est supporté sur iOS
+    if (window.MediaRecorder && this.isAudioRecordingSupported()) {
+      // Utiliser la même interface que Android/PC
+      this.startRecording();
+    } else {
+      // Fallback vers l'interface native iOS
+      this.openNativeAudioRecorder();
+    }
   }
 
   // Méthode native pour enregistrement audio
@@ -758,11 +764,6 @@ export class PlainteComponent {
     input.type = 'file';
     input.accept = 'audio/*';
     input.style.display = 'none';
-    
-    // Essayer sans capture d'abord, puis avec si nécessaire
-    if (!input.capture) {
-      input.setAttribute('capture', 'microphone');
-    }
     
     input.onchange = (event) => {
       const target = event.target as HTMLInputElement;

@@ -96,11 +96,6 @@
           <button (click)="testMicrophone()" class="btn btn-outline-info d-md-none">
             <i class="fas fa-volume-up me-2"></i> Tester le microphone
           </button>
-          
-          <!-- Bouton de test pour le fallback iOS (visible seulement en mode développement) -->
-          <button *ngIf="isIOS" (click)="testIOSFallback()" class="btn btn-outline-warning d-md-none">
-            <i class="fas fa-file-audio me-2"></i> Test: Sélectionner fichier audio
-          </button>
         </div>
       </div>
   
