@@ -748,13 +748,17 @@ export class PlainteComponent {
 
   // Méthode spécifique pour forcer l'enregistrement audio sur iOS
   startIOSRecording() {
-    // Essayer d'abord MediaRecorder si il est supporté sur iOS
-    if (window.MediaRecorder && this.isAudioRecordingSupported()) {
+    // Forcer l'utilisation de MediaRecorder même sur iOS pour éviter l'appareil photo
+    if (window.MediaRecorder) {
       // Utiliser la même interface que Android/PC
       this.startRecording();
     } else {
-      // Fallback vers l'interface native iOS
-      this.openNativeAudioRecorder();
+      // Si MediaRecorder n'existe pas du tout, afficher un message d'erreur
+      Swal.fire({
+        title: 'Non supporté',
+        text: "L'enregistrement vocal n'est pas supporté sur ce navigateur. Veuillez utiliser un appareil Android ou un navigateur compatible.",
+        icon: 'error'
+      });
     }
   }
 
