@@ -197,8 +197,47 @@ audio {
   background-color: #f8f9fa;
 }
 
-audio::-webkit-media-controls-panel {
-  background-color: #f8f9fa;
+.audio-player-container {
+  margin-top: 1rem;
+  padding: 0.5rem;
+  background: #f8f9fa;
+  border-radius: 8px;
+  border: 1px solid #e9ecef;
+}
+
+.audio-player-container audio {
+  width: 100%;
+  max-width: 300px;
+  height: 40px;
+  border-radius: 20px;
+  background: white;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.audio-player-container small {
+  font-size: 0.8rem;
+  color: #6c757d;
+  margin-top: 0.5rem;
+  display: block;
+}
+
+/* Gestion des erreurs audio */
+.alert-warning {
+  background-color: #fff3cd;
+  border-color: #ffeaa7;
+  color: #856404;
+  padding: 0.75rem;
+  border-radius: 6px;
+  margin-top: 0.5rem;
+}
+
+.alert-link {
+  color: #533f03;
+  text-decoration: underline;
+}
+
+.alert-link:hover {
+  color: #2c1e00;
 }
 
 /* Footer content */

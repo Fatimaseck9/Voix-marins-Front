@@ -31,9 +31,9 @@ export class SuivreMesPlaintesComponent implements OnInit {
   menuActive = false;
   plaintes: Plainte[] = [];
   isBrowser: boolean;
-  private apiUrl = 'https://api.gaalgui.sn/plaintes';
+  private apiUrl = 'http://localhost:3001/plaintes';
+ // private apiUrl = 'https://api.gaalgui.sn/plaintes';
  // private apiUrl ='https://ce1e-154-124-68-191.ngrok-free.app/plaintes';
- // private apiUrl = 'http://10.100.200.20:3001/plaintes';
 
   constructor(
     @Inject(PLATFORM_ID) private platformId: Object,
@@ -50,10 +50,10 @@ export class SuivreMesPlaintesComponent implements OnInit {
     }
   }
 
-  readonly backendBaseUrl = 'https://api.gaalgui.sn';
+  readonly backendBaseUrl = 'http://localhost:3001';
   
-  //readonly backendBaseUrl = 'https://ce1e-154-124-68-191.ngrok-free.app';
-   //readonly backendBaseUrl ='http://10.100.200.20:3001';
+  //readonly backendBaseUrl = 'https://api.gaalgui.sn';
+   //readonly backendBaseUrl = 'https://ce1e-154-124-68-191.ngrok-free.app';
 
  async loadPlaintes() {
   try {
@@ -174,5 +174,27 @@ export class SuivreMesPlaintesComponent implements OnInit {
     }
   }
 
-  
+  // Méthode pour gérer les erreurs audio
+  onAudioError(event: any, plainte: Plainte) {
+    console.error('Erreur audio pour la plainte:', plainte.id, event);
+    // Optionnel : afficher un message à l'utilisateur
+    const audioElement = event.target;
+    audioElement.style.display = 'none';
+    
+    // Créer un message d'erreur
+    const errorDiv = document.createElement('div');
+    errorDiv.className = 'alert alert-warning mt-2';
+    errorDiv.innerHTML = `
+      <i class="fas fa-exclamation-triangle me-2"></i>
+      Impossible de lire l'audio. 
+      <a href="${plainte.audioUrl}" target="_blank" class="alert-link">Télécharger le fichier</a>
+    `;
+    audioElement.parentNode.appendChild(errorDiv);
+  }
+
+  // Méthode pour vérifier si l'audio est supporté
+  isAudioSupported(): boolean {
+    const audio = document.createElement('audio');
+    return !!(audio.canPlayType && audio.canPlayType('audio/mpeg').replace(/no/, ''));
+  }
 }

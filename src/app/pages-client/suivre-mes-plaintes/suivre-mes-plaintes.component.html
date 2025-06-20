@@ -89,10 +89,21 @@
               
               <!-- Lecteur audio si disponible -->
               <div *ngIf="plainte.audioUrl" class="mt-3">
-             
-<audio *ngIf="plainte.audioUrl" [src]="plainte.audioUrl" controls>
-   Votre navigateur ne supporte pas l'audio.
-</audio>
+                <div class="audio-player-container">
+                  <audio [src]="plainte.audioUrl" 
+                         controls 
+                         preload="metadata"
+                         controlsList="nodownload"
+                         (error)="onAudioError($event, plainte)"
+                         style="width: 100%; max-width: 300px;">
+                    <p>Votre navigateur ne supporte pas l'audio HTML5. 
+                       <a [href]="plainte.audioUrl" target="_blank">Télécharger l'audio</a>
+                    </p>
+                  </audio>
+                  <small class="text-muted d-block mt-1">
+                    <i class="fas fa-headphones me-1"></i> Enregistrement vocal
+                  </small>
+                </div>
               </div>
             </div>
           </div>
