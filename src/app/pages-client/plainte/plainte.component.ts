@@ -7,8 +7,7 @@ import { firstValueFrom } from 'rxjs';
 
 import Swal from 'sweetalert2';
 import { AuthService } from 'src/app/servicesclient/auth.service';
-import { PlainteService } from 'src/app/servicesclient/plainte.service';
-import Recorder from 'recorder-js';
+import { environment } from 'src/environments/environment';
  
 // Interface pour la réponse du serveur
 interface PlainteResponse {
@@ -46,11 +45,10 @@ export class PlainteComponent {
   // Audio
   audioBlob: Blob | null = null;
   audioUrl = '';
+  mediaRecorder: MediaRecorder | null = null;
+  audioChunks: Blob[] = [];
   recordingInterval: any;
   stream: MediaStream | null = null;
-
-  private recorder: Recorder | null = null;
-  private audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
  
   // Formulaire
   showForm = false;
@@ -68,12 +66,16 @@ export class PlainteComponent {
     { key: 'paiement', label: 'Problème de paiement', image: 'paiement.jpeg' }
   ];
  
+  //private apiUrl = 'http://localhost:3001/plaintes';
+  // private apiUrl = 'https://api.gaalgui.sn/plaintes';
+     private apiUrl =`${environment.apiUrl}/plaintes`
+   //private apiUrl = 'https://ce1e-154-124-68-191.ngrok-free.app/plaintes';
+ 
   constructor(
     @Inject(PLATFORM_ID) private platformId: Object,
     private router: Router,
     private http: HttpClient,
-    private authService: AuthService,
-    private plainteService: PlainteService
+    private authService: AuthService
   ) {
     this.isBrowser = isPlatformBrowser(this.platformId);
     if (this.isBrowser) {
@@ -105,7 +107,12 @@ export class PlainteComponent {
  
       console.log('Chargement des catégories avec authentification...');
       
-      const categories = await firstValueFrom(this.plainteService.getCategories());
+      const headers = new HttpHeaders({
+        'Authorization': `Bearer ${token}`,
+        //'ngrok-skip-browser-warning': 'true'
+      });
+ 
+      const categories = await firstValueFrom(this.http.get<any[]>(`${this.apiUrl}/categories`, { headers }));
       
       console.log('Catégories reçues:', categories);
       
@@ -226,8 +233,7 @@ export class PlainteComponent {
       userAgent: navigator.userAgent,
       mediaDevices: !!navigator.mediaDevices,
       getUserMedia: !!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia),
-      AudioContext: !!window.AudioContext,
-      webkitAudioContext: !!(window as any).webkitAudioContext
+      MediaRecorder: !!window.MediaRecorder
     });
 
     // Test des formats supportés
@@ -244,20 +250,44 @@ export class PlainteComponent {
 
     console.log('Formats audio supportés:', supportedFormats);
 
+    // Test MediaRecorder
+    if (window.MediaRecorder) {
+      const mimeTypes = [
+        'audio/webm;codecs=opus',
+        'audio/webm',
+        'audio/mp4',
+        'audio/mpeg'
+      ];
+      
+      const supportedMimeTypes = mimeTypes.filter(type => MediaRecorder.isTypeSupported(type));
+      console.log('Types MIME MediaRecorder supportés:', supportedMimeTypes);
+    }
+
     return {
       isIOS,
       isSafari,
       hasMediaDevices: !!navigator.mediaDevices,
       hasGetUserMedia: !!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia),
-      hasAudioContext: !!window.AudioContext,
-      hasWebkitAudioContext: !!(window as any).webkitAudioContext,
-      supportedFormats
+      hasMediaRecorder: !!window.MediaRecorder,
+      supportedFormats,
+      supportedMimeTypes: window.MediaRecorder ? 
+        ['audio/webm;codecs=opus', 'audio/webm', 'audio/mp4', 'audio/mpeg']
+          .filter(type => MediaRecorder.isTypeSupported(type)) : []
     };
   }
  
-  // Démarrer l'enregistrement avec recorder-js
+  // Démarrer l'enregistrement avec vérifications préalables
   async startRecording() {
     try {
+      // Détection d'iOS
+      const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !(window as any).MSStream;
+      
+      if (isIOS) {
+        console.log('Appareil iOS détecté, utilisation de la méthode spécialisée');
+        await this.startRecordingIOS();
+        return;
+      }
+
       // Vérification des permissions en premier
       const hasPermission = await this.checkMicrophonePermission();
       if (!hasPermission) {
@@ -285,13 +315,28 @@ export class PlainteComponent {
       };
 
       this.stream = await navigator.mediaDevices.getUserMedia(audioConstraints);
-      
-      // Initialiser recorder-js
-      this.recorder = new Recorder(this.audioContext, { type: 'audio/wav' });
-      await this.recorder.init(this.stream);
-      this.recorder.start();
-
       this.prepareRecorderUI();
+
+      // Choix du type MIME pour Android et autres
+      let mimeType = 'audio/webm;codecs=opus';
+      if (!MediaRecorder.isTypeSupported(mimeType)) {
+        mimeType = 'audio/webm';
+      }
+      if (!MediaRecorder.isTypeSupported(mimeType)) {
+        mimeType = 'audio/mp4';
+      }
+ 
+      this.mediaRecorder = new MediaRecorder(this.stream, { mimeType });
+ 
+      this.audioChunks = [];
+ 
+      this.mediaRecorder.ondataavailable = (event: BlobEvent) => {
+        if (event.data.size > 0) this.audioChunks.push(event.data);
+      };
+ 
+      this.mediaRecorder.addEventListener('stop', () => this.finalizeRecording());
+      this.mediaRecorder.start(1000);
+      this.startTimer();
     } catch (error: any) {
       console.error('Erreur microphone:', error);
       let errorMessage = 'Veuillez autoriser l\'accès au microphone';
@@ -314,6 +359,83 @@ export class PlainteComponent {
       });
     }
   }
+
+  // Méthode spécialisée pour iOS
+  private async startRecordingIOS() {
+    try {
+      // Pour iOS, on doit d'abord demander explicitement les permissions
+      Swal.fire({
+        title: 'Accès au microphone',
+        text: 'Cette application a besoin d\'accéder à votre microphone. Veuillez autoriser l\'accès quand Safari le demande.',
+        icon: 'info',
+        confirmButtonText: 'Autoriser',
+        showCancelButton: true,
+        cancelButtonText: 'Annuler'
+      }).then(async (result) => {
+        if (result.isConfirmed) {
+          try {
+            // Configuration audio spécifique pour iOS
+            const audioConstraints = {
+              audio: {
+                echoCancellation: true,
+                noiseSuppression: true,
+                autoGainControl: true,
+                sampleRate: 44100,
+                channelCount: 1
+              }
+            };
+
+            this.stream = await navigator.mediaDevices.getUserMedia(audioConstraints);
+            this.prepareRecorderUI();
+
+            // Type MIME spécifique pour iOS
+            let mimeType = 'audio/mp4';
+            if (!MediaRecorder.isTypeSupported(mimeType)) {
+              mimeType = 'audio/mpeg';
+            }
+            if (!MediaRecorder.isTypeSupported(mimeType)) {
+              mimeType = 'audio/webm';
+            }
+
+            this.mediaRecorder = new MediaRecorder(this.stream, { mimeType });
+            this.audioChunks = [];
+
+            this.mediaRecorder.ondataavailable = (event: BlobEvent) => {
+              if (event.data.size > 0) this.audioChunks.push(event.data);
+            };
+
+            this.mediaRecorder.addEventListener('stop', () => this.finalizeRecording());
+            this.mediaRecorder.start(1000);
+            this.startTimer();
+
+            Swal.fire({
+              title: '✅ Enregistrement démarré',
+              text: 'Vous pouvez maintenant parler. Appuyez sur "Arrêter" quand vous avez terminé.',
+              icon: 'success',
+              timer: 2000
+            });
+
+          } catch (error: any) {
+            console.error('Erreur iOS:', error);
+            Swal.fire({
+              title: 'Erreur iOS',
+              text: 'Impossible d\'accéder au microphone sur iOS. Assurez-vous d\'avoir autorisé l\'accès dans les paramètres Safari.',
+              icon: 'error',
+              confirmButtonText: 'Compris'
+            });
+          }
+        }
+      });
+    } catch (error: any) {
+      console.error('Erreur lors de l\'initialisation iOS:', error);
+      Swal.fire({
+        title: 'Erreur iOS',
+        text: 'Problème lors de l\'initialisation de l\'enregistrement sur iOS.',
+        icon: 'error',
+        confirmButtonText: 'Compris'
+      });
+    }
+  }
  
   private prepareRecorderUI() {
     this.showRecorderControls = true;
@@ -321,13 +443,23 @@ export class PlainteComponent {
     this.recording = true;
     this.paused = false;
     this.seconds = 0;
+    this.audioChunks = [];
     if (this.audioUrl) URL.revokeObjectURL(this.audioUrl);
-    this.startTimer();
+  }
+ 
+  private finalizeRecording() {
+    this.audioBlob = new Blob(this.audioChunks, { type: 'audio/webm;codecs=opus' });
+    this.audioUrl = URL.createObjectURL(this.audioBlob);
+    this.showAudioControls = true;
+    this.showRecorderControls = false;
+    clearInterval(this.recordingInterval);
+    this.stopStream();
+    setTimeout(() => this.replayRecording(), 300);
   }
  
   pauseRecording() {
-    if (this.recorder && this.recording) {
-      this.recorder.pause();
+    if (this.mediaRecorder?.state === 'recording') {
+      this.mediaRecorder.pause();
       this.recording = false;
       this.paused = true;
       clearInterval(this.recordingInterval);
@@ -335,30 +467,20 @@ export class PlainteComponent {
   }
  
   resumeRecording() {
-    if (this.recorder && this.paused) {
-      this.recorder.resume();
+    if (this.mediaRecorder?.state === 'paused') {
+      this.mediaRecorder.resume();
       this.recording = true;
       this.paused = false;
       this.startTimer();
     }
   }
  
-  async stopRecording() {
-    if (this.recorder) {
-      try {
-        const { blob } = await this.recorder.stop();
-        this.audioBlob = blob;
-        this.audioUrl = URL.createObjectURL(blob);
-        this.showRecorderControls = false;
-        this.showAudioControls = true;
+  stopRecording() {
+    if (this.mediaRecorder && (this.recording || this.paused)) {
+      this.mediaRecorder.stop();
       this.recording = false;
       this.paused = false;
-        this.stopStream();
-        this.replayRecording();
-        clearInterval(this.recordingInterval);
-      } catch (error) {
-        console.error('Erreur lors de l\'arrêt de l\'enregistrement:', error);
-      }
+      setTimeout(() => !this.showAudioControls && this.finalizeRecording(), 300);
     }
   }
  
@@ -388,14 +510,15 @@ export class PlainteComponent {
       });
       return;
     }
-
+   
+ 
     this.isSubmitting = true;
     Swal.fire({
       title: 'Envoi en cours...',
       allowOutsideClick: false,
       didOpen: () => Swal.showLoading()
     });
-
+ 
     try {
       const token = this.authService.getStoredToken();
       if (!token) {
@@ -406,10 +529,10 @@ export class PlainteComponent {
         });
         return;
       }
-
+ 
       const userPayload = this.authService.decodeToken(token);
       const userId = userPayload ? userPayload.sub : null;
-
+ 
       if (!userId) {
         Swal.fire({
           title: 'Erreur',
@@ -418,18 +541,23 @@ export class PlainteComponent {
         });
         return;
       }
-
-      const plainteData = {
-        titre: this.plainte.titre || 'Plainte vocale',
-        categorie: this.plainte.categorie || 'Enregistrement vocal',
-        description: this.plainte.description || 'Plainte enregistrée vocalement',
-        utilisateurId: userId
-      };
-
-      const audioFile = new File([this.audioBlob], 'enregistrement.wav', { type: 'audio/wav' });
-
-      await firstValueFrom(this.plainteService.submitPlainte(plainteData, audioFile));
-
+ 
+      const formData = new FormData();
+      const audioFile = new File([this.audioBlob], 'enregistrement.webm', { type: 'audio/webm' });
+      formData.append('audio', audioFile);
+      formData.append('titre', this.plainte.titre || 'Plainte vocale');
+      formData.append('categorie', this.plainte.categorie || 'Enregistrement vocal');
+      formData.append('description', this.plainte.description || 'Plainte enregistrée vocalement');
+      formData.append('utilisateurId', userId);
+ 
+      await firstValueFrom(
+        this.http.post<PlainteResponse>(`${this.apiUrl}/create`, formData, {
+          headers: new HttpHeaders({
+            'Authorization': `Bearer ${token}`
+          })
+        })
+      );
+ 
       Swal.fire({
         title: 'Succès',
         text: 'Enregistrement envoyé avec succès ✅',
@@ -450,75 +578,77 @@ export class PlainteComponent {
       Swal.close();
     }
   }
-
-  async submitForm() {
-    const { titre, categorie, description, date } = this.plainte;
-
-    if (!titre || !categorie || !description || !date) {
+ 
+ async submitForm() {
+  const { titre, categorie, description, date } = this.plainte;
+ 
+  if (!titre || !categorie || !description || !date) {
+    Swal.fire({
+      title: 'Champs manquants',
+      text: 'Veuillez remplir tous les champs',
+      icon: 'warning'
+    });
+    return;
+  }
+ 
+  const result = await Swal.fire({
+    title: 'Confirmer la soumission',
+    text: 'Voulez-vous vraiment soumettre cette plainte ?',
+    icon: 'question',
+    showCancelButton: true,
+    confirmButtonText: 'Oui, soumettre',
+    cancelButtonText: 'Annuler'
+  });
+ 
+  if (!result.isConfirmed) {
+    return; // L'utilisateur a annulé
+  }
+ 
+  this.isSubmitting = true;
+ 
+  Swal.fire({
+    title: 'Envoi en cours...',
+    allowOutsideClick: false,
+    didOpen: () => Swal.showLoading()
+  });
+ 
+  try {
+    const token = await firstValueFrom(this.authService.getToken());
+    if (!token) {
       Swal.fire({
-        title: 'Champs manquants',
-        text: 'Veuillez remplir tous les champs',
-        icon: 'warning'
+        title: 'Erreur',
+        text: 'Erreur d\'authentification. Veuillez vous reconnecter.',
+        icon: 'error'
       });
       return;
     }
-
-    const result = await Swal.fire({
-      title: 'Confirmer la soumission',
-      text: 'Voulez-vous vraiment soumettre cette plainte ?',
-      icon: 'question',
-      showCancelButton: true,
-      confirmButtonText: 'Oui, soumettre',
-      cancelButtonText: 'Annuler'
-    });
-
-    if (!result.isConfirmed) {
-      return; // L'utilisateur a annulé
-    }
-
-    this.isSubmitting = true;
-
+ 
+    await firstValueFrom(this.http.post<PlainteResponse>(
+      `${this.apiUrl}/form`,
+      { titre, categorie, description, date },
+      { headers: new HttpHeaders({ 'Authorization': `Bearer ${token}` }) }
+    ));
+ 
     Swal.fire({
-      title: 'Envoi en cours...',
-      allowOutsideClick: false,
-      didOpen: () => Swal.showLoading()
+      title: 'Succès',
+      text: 'Plainte soumise avec succès ✅',
+      icon: 'success'
+    }).then(() => {
+      this.resetForm();
+      this.router.navigate(['marin/suivre-plaintes']);
     });
-
-    try {
-      const token = await firstValueFrom(this.authService.getToken());
-      if (!token) {
-        Swal.fire({
-          title: 'Erreur',
-          text: 'Erreur d\'authentification. Veuillez vous reconnecter.',
-          icon: 'error'
-        });
-        return;
-      }
-
-      // Utiliser le service pour soumettre le formulaire
-      const plainteData = { titre, categorie, description, date };
-      await firstValueFrom(this.plainteService.submitPlainte(plainteData));
-
-      Swal.fire({
-        title: 'Succès',
-        text: 'Plainte soumise avec succès ✅',
-        icon: 'success'
-      }).then(() => {
-        this.resetForm();
-        this.router.navigate(['marin/suivre-plaintes']);
-      });
-    } catch (error: any) {
-      console.error('Erreur:', error);
-      Swal.fire({
-        title: 'Erreur',
-        text: 'Erreur lors de la soumission de la plainte',
-        icon: 'error'
-      });
-    } finally {
-      this.isSubmitting = false;
-      Swal.close();
-    }
+  } catch (error: any) {
+    console.error('Erreur:', error);
+    Swal.fire({
+      title: 'Erreur',
+      text: 'Erreur lors de la soumission de la plainte',
+      icon: 'error'
+    });
+  } finally {
+    this.isSubmitting = false;
+    Swal.close();
   }
+}
  
   deleteRecording() {
     Swal.fire({
@@ -544,6 +674,7 @@ export class PlainteComponent {
     this.showAudioControls = false;
     this.audioBlob = null;
     this.audioUrl = '';
+    this.audioChunks = [];
     this.seconds = 0;
     clearInterval(this.recordingInterval);
     this.stopStream();
@@ -593,20 +724,20 @@ export class PlainteComponent {
       confirmButtonText: 'Oui',
       cancelButtonText: 'Non'
     });
-
+ 
     if (!result.isConfirmed) return;
-
+ 
     this.isSubmitting = true;
     Swal.fire({
       title: 'Envoi en cours...',
       allowOutsideClick: false,
       didOpen: () => Swal.showLoading()
     });
-
+ 
     try {
       const userId = this.authService.getUserId();
       const token = this.authService.getStoredToken();
-
+ 
       if (!userId || !token) {
         Swal.fire({
           title: 'Erreur',
@@ -615,11 +746,15 @@ export class PlainteComponent {
         });
         return;
       }
-
-      // Utiliser le service pour soumettre par catégorie
-      const plainteData = { utilisateurId: userId };
-      await firstValueFrom(this.plainteService.submitPlainte(plainteData));
-
+ 
+      await firstValueFrom(
+        this.http.post<PlainteResponse>(
+          `${this.apiUrl}/categorie/${categoryKey}`,
+          { utilisateurId: userId },
+          { headers: { Authorization: `Bearer ${token}` } }
+        )
+      );
+ 
       Swal.fire({
         title: 'Succès',
         text: 'Plainte soumise avec succès ✅',
@@ -629,7 +764,7 @@ export class PlainteComponent {
       });
     } catch (error: any) {
       console.error('Erreur:', error);
-
+ 
       if (error.error?.message === 'Catégorie non trouvée') {
         Swal.fire({
           title: 'Erreur',
