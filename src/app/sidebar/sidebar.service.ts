@@ -3,7 +3,7 @@ import { RouteInfos } from "../models/routeInfo";
 import { AuthService } from "../pages/auth/auth.service";
 import { BaseService } from "../shared/base.service";
 import { lastValueFrom } from 'rxjs';
-import { environment } from "src/environments/environment.prod";
+import { environment } from "src/environments/environment";
 
 @Injectable({
     providedIn: "root",
