@@ -8,6 +8,7 @@ import { firstValueFrom } from 'rxjs';
 import Swal from 'sweetalert2';
 import { AuthService } from 'src/app/servicesclient/auth.service';
 import { environment } from 'src/environments/environment';
+import { PlainteService } from 'src/app/servicesclient/plainte.service';
  
 // Interface pour la réponse du serveur
 interface PlainteResponse {
@@ -66,16 +67,12 @@ export class PlainteComponent {
     { key: 'paiement', label: 'Problème de paiement', image: 'paiement.jpeg' }
   ];
  
-  //private apiUrl = 'http://localhost:3001/plaintes';
-  // private apiUrl = 'https://api.gaalgui.sn/plaintes';
-     private apiUrl =`${environment.apiUrl}/plaintes`
-   //private apiUrl = 'https://ce1e-154-124-68-191.ngrok-free.app/plaintes';
- 
   constructor(
     @Inject(PLATFORM_ID) private platformId: Object,
     private router: Router,
     private http: HttpClient,
-    private authService: AuthService
+    private authService: AuthService,
+    private plainteService: PlainteService
   ) {
     this.isBrowser = isPlatformBrowser(this.platformId);
     if (this.isBrowser) {
@@ -107,12 +104,7 @@ export class PlainteComponent {
  
       console.log('Chargement des catégories avec authentification...');
       
-      const headers = new HttpHeaders({
-        'Authorization': `Bearer ${token}`,
-        //'ngrok-skip-browser-warning': 'true'
-      });
- 
-      const categories = await firstValueFrom(this.http.get<any[]>(`${this.apiUrl}/categories`, { headers }));
+      const categories = await firstValueFrom(this.plainteService.getCategories());
       
       console.log('Catégories reçues:', categories);
       
@@ -542,20 +534,15 @@ export class PlainteComponent {
         return;
       }
  
-      const formData = new FormData();
       const audioFile = new File([this.audioBlob], 'enregistrement.webm', { type: 'audio/webm' });
-      formData.append('audio', audioFile);
-      formData.append('titre', this.plainte.titre || 'Plainte vocale');
-      formData.append('categorie', this.plainte.categorie || 'Enregistrement vocal');
-      formData.append('description', this.plainte.description || 'Plainte enregistrée vocalement');
-      formData.append('utilisateurId', userId);
  
       await firstValueFrom(
-        this.http.post<PlainteResponse>(`${this.apiUrl}/create`, formData, {
-          headers: new HttpHeaders({
-            'Authorization': `Bearer ${token}`
-          })
-        })
+        this.plainteService.submitPlainte({
+          titre: this.plainte.titre || 'Plainte vocale',
+          categorie: this.plainte.categorie || 'Enregistrement vocal',
+          description: this.plainte.description || 'Plainte enregistrée vocalement',
+          utilisateurId: userId
+        }, audioFile)
       );
  
       Swal.fire({
@@ -623,11 +610,7 @@ export class PlainteComponent {
       return;
     }
  
-    await firstValueFrom(this.http.post<PlainteResponse>(
-      `${this.apiUrl}/form`,
-      { titre, categorie, description, date },
-      { headers: new HttpHeaders({ 'Authorization': `Bearer ${token}` }) }
-    ));
+    await firstValueFrom(this.plainteService.submitPlainteForm({ titre, categorie, description, date }));
  
     Swal.fire({
       title: 'Succès',
@@ -747,13 +730,7 @@ export class PlainteComponent {
         return;
       }
  
-      await firstValueFrom(
-        this.http.post<PlainteResponse>(
-          `${this.apiUrl}/categorie/${categoryKey}`,
-          { utilisateurId: userId },
-          { headers: { Authorization: `Bearer ${token}` } }
-        )
-      );
+      await firstValueFrom(this.plainteService.submitPlainteByCategory(categoryKey, userId.toString()));
  
       Swal.fire({
         title: 'Succès',

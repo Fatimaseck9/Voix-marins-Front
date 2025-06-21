@@ -68,6 +68,26 @@ export class PlainteService {
     return this.http.get(`${this.apiUrl}/categories`, { headers });
   }
 
+  // Méthode pour soumettre une plainte par formulaire
+  submitPlainteForm(plainteData: any): Observable<any> {
+    const token = this.authService.getStoredToken();
+    const headers = new HttpHeaders({
+      'Authorization': `Bearer ${token}`,
+      'Content-Type': 'application/json'
+    });
+    return this.http.post(`${this.apiUrl}/form`, plainteData, { headers });
+  }
+
+  // Méthode pour soumettre une plainte par catégorie
+  submitPlainteByCategory(categoryKey: string, userId: string): Observable<any> {
+    const token = this.authService.getStoredToken();
+    const headers = new HttpHeaders({
+      'Authorization': `Bearer ${token}`,
+      'Content-Type': 'application/json'
+    });
+    return this.http.post(`${this.apiUrl}/categorie/${categoryKey}`, { utilisateurId: userId }, { headers });
+  }
+
   // Méthode temporaire pour tester sans authentification
   getCategoriesPublic(): Observable<any> {
     const headers = new HttpHeaders({
