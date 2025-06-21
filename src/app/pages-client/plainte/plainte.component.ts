@@ -155,77 +155,6 @@ export class PlainteComponent {
     }
   }
  
-  // Vérifier les permissions microphone
-  async checkMicrophonePermission(): Promise<boolean> {
-    try {
-      if (!navigator.permissions) {
-        return true; // Si l'API permissions n'est pas disponible, on essaie quand même
-      }
-      
-      const permission = await navigator.permissions.query({ name: 'microphone' as PermissionName });
-      return permission.state === 'granted';
-    } catch (error) {
-      console.log('Permission API non disponible:', error);
-      return true; // On essaie quand même
-    }
-  }
- 
-  // Tester le microphone (spécialement pour mobile)
-  async testMicrophone() {
-    try {
-      Swal.fire({
-        title: 'Test du microphone',
-        text: 'Test de l\'accès au microphone en cours...',
-        allowOutsideClick: false,
-        didOpen: () => Swal.showLoading()
-      });
-
-      const stream = await navigator.mediaDevices.getUserMedia({ 
-        audio: {
-          echoCancellation: true,
-          noiseSuppression: true,
-          autoGainControl: true
-        }
-      });
-
-      // Test réussi, arrêter le stream
-      stream.getTracks().forEach(track => track.stop());
-
-      Swal.fire({
-        title: '✅ Microphone fonctionnel !',
-        text: 'Votre microphone fonctionne correctement. Vous pouvez maintenant enregistrer votre plainte.',
-        icon: 'success',
-        confirmButtonText: 'Parfait !',
-        timer: 3000
-      });
-
-    } catch (error: any) {
-      console.error('Test microphone échoué:', error);
-      
-      let errorMessage = 'Impossible d\'accéder au microphone.';
-      let instructions = '';
-      
-      if (error.name === 'NotAllowedError') {
-        errorMessage = 'L\'accès au microphone a été refusé.';
-        instructions = 'Veuillez :\n1. Recharger la page\n2. Cliquer sur "Autoriser" quand le navigateur demande l\'accès\n3. Réessayer';
-      } else if (error.name === 'NotFoundError') {
-        errorMessage = 'Aucun microphone détecté.';
-        instructions = 'Vérifiez que votre appareil dispose d\'un microphone.';
-      } else if (error.name === 'NotSupportedError') {
-        errorMessage = 'Votre navigateur ne supporte pas l\'enregistrement.';
-        instructions = 'Essayez avec Chrome, Firefox ou Safari.';
-      }
-
-      Swal.fire({
-        title: '❌ Test échoué',
-        text: errorMessage + '\n\n' + instructions,
-        icon: 'error',
-        confirmButtonText: 'Compris',
-        footer: 'Conseil : Rechargez la page et autorisez l\'accès au microphone'
-      });
-    }
-  }
-
   // Méthode pour tester la compatibilité audio
   testAudioCompatibility() {
     const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !(window as any).MSStream;
@@ -269,17 +198,6 @@ export class PlainteComponent {
   // Démarrer l'enregistrement avec recorder-js
   async startRecording() {
     try {
-      // Vérification des permissions en premier
-      const hasPermission = await this.checkMicrophonePermission();
-      if (!hasPermission) {
-        Swal.fire({
-          title: 'Permission requise',
-          text: 'Cette application a besoin d\'accéder à votre microphone pour enregistrer votre plainte.',
-          icon: 'info',
-          confirmButtonText: 'Autoriser l\'accès'
-        });
-      }
-
       // Vérifier si getUserMedia est disponible
       if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
         throw new Error('getUserMedia not supported');
