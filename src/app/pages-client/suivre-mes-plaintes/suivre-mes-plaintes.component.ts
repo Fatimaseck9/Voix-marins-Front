@@ -6,7 +6,7 @@ import { firstValueFrom } from 'rxjs';
 
 import { AuthService } from 'src/app/servicesclient/auth.service';
 import { PlainteService } from 'src/app/servicesclient/plainte.service';
-import { environment } from 'src/environments/environment';
+
 
 interface Plainte {
   id: string;
@@ -31,6 +31,9 @@ export class SuivreMesPlaintesComponent implements OnInit {
   menuActive = false;
   plaintes: Plainte[] = [];
   isBrowser: boolean;
+  private apiUrl = 'http://localhost:3001/plaintes';
+ // private apiUrl = 'https://api.gaalgui.sn/plaintes';
+ // private apiUrl ='https://ce1e-154-124-68-191.ngrok-free.app/plaintes';
 
   constructor(
     @Inject(PLATFORM_ID) private platformId: Object,
@@ -47,53 +50,78 @@ export class SuivreMesPlaintesComponent implements OnInit {
     }
   }
 
-  async loadPlaintes() {
-    try {
-      // Vérifier si l'utilisateur est connecté
-      if (!this.authService.isLoggedIn()) {
-        console.warn('Utilisateur non connecté. Veuillez vous connecter.');
-        return;
-      }
+  readonly backendBaseUrl = 'http://localhost:3001';
+  
+  //readonly backendBaseUrl = 'https://api.gaalgui.sn';
+   //readonly backendBaseUrl = 'https://ce1e-154-124-68-191.ngrok-free.app';
 
-      // Récupérer le token (ou ID de l'utilisateur) pour charger les plaintes
-      const token = await firstValueFrom(this.authService.getToken());
-      if (!token) {
-        console.error('Token invalide. Vérifiez votre connexion.');
-        return;
-      }
-
-      // Décodons le token pour obtenir l'ID de l'utilisateur
-      const user = this.authService.decodeToken(token);
-      const userId = user.sub; // Assurez-vous que 'sub' contient bien l'ID de l'utilisateur
-
-      // Utiliser le service pour récupérer les plaintes de l'utilisateur
-      const response = await firstValueFrom(this.plainteService.getPlaintes());
-
-      // Filtrer les plaintes pour l'utilisateur actuel
-      this.plaintes = response
-        .filter((p: any) => p.utilisateurId === userId || p.utilisateur === userId)
-        .map((p: any) => {
-          console.log('Plainte audio URL:', p.audioUrl); // 🔍 Ajout ici
-          return {
-            ...p,
-            audioUrl: p.audioUrl ? `${environment.apiUrl}${p.audioUrl}` : undefined
-          };
-        });
-
-      console.log('Réponse du backend (list of plaintes):', response); // Ajout
-    } catch (error) {
-      console.error('Erreur lors du chargement des plaintes:', error);
-      this.plaintes = [];
+ async loadPlaintes() {
+  try {
+    // Vérifier si l'utilisateur est connecté
+    if (!this.authService.isLoggedIn()) {
+      console.warn('Utilisateur non connecté. Veuillez vous connecter.');
+      return;
     }
-  }
 
+    // Récupérer le token (ou ID de l'utilisateur) pour charger les plaintes
+    const token = await firstValueFrom(this.authService.getToken());
+    if (!token) {
+      console.error('Token invalide. Vérifiez votre connexion.');
+      return;
+    }
+
+    // Décodons le token pour obtenir l'ID de l'utilisateur
+    const user = this.authService.decodeToken(token);
+    const userId = user.sub; // Assurez-vous que 'sub' contient bien l'ID de l'utilisateur
+
+    // Configurez les en-têtes avec le token d'authentification
+    const headers = new HttpHeaders({
+      'Authorization': `Bearer ${token}`,
+      'Content-Type': 'application/json',
+      //'ngrok-skip-browser-warning': 'true'
+    });
+
+
+    // Utilisez l'endpoint /plaintes/user/:userId
+    const response = await firstValueFrom(
+      this.http.get<Plainte[]>(`${this.apiUrl}/user/${userId}`, { headers }) // Ajoutez l'en-tête ici
+    );
+
+    //this.plaintes = response;
+    this.plaintes = response.map(p => {
+  console.log('Plainte audio URL:', p.audioUrl); // 🔍 Ajout ici
+  return {
+    ...p,
+    audioUrl: p.audioUrl ? `${this.backendBaseUrl.replace(/\/$/, '')}${p.audioUrl}` : undefined
+  };
+});
+
+
+ 
+    
+     console.log('Réponse du backend (list of plaintes):', response); // Ajou
+  } catch (error) {
+    console.error('Erreur lors du chargement des plaintes:', error);
+    this.plaintes = [];
+  }
+}
   async annulerPlainte(plainte: Plainte) {
     if (confirm('Êtes-vous sûr de vouloir annuler cette plainte ?')) {
       try {
-        // Utiliser le service pour supprimer la plainte
-        await firstValueFrom(this.plainteService.supprimerPlainte(plainte.id));
+        // 1. Créer les en-têtes avec le token d'authentification
+        const token = await firstValueFrom(this.authService.getToken());
+        const headers = new HttpHeaders({
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+          //'ngrok-skip-browser-warning': 'true'
+        });
 
-        // Mettre à jour la liste locale
+        // 2. Utiliser l'endpoint /plaintes/:id avec DELETE et les en-têtes
+        await firstValueFrom(
+          this.http.delete(`${this.apiUrl}/${plainte.id}`, { headers })
+        );
+
+        // 3. Mettre à jour la liste locale
         this.plaintes = this.plaintes.filter(p => p.id !== plainte.id);
       } catch (error) {
         console.error('Erreur lors de l\'annulation de la plainte:', error);

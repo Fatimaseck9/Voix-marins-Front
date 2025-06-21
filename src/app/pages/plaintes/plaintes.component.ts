@@ -12,7 +12,6 @@ import { Observable, tap, catchError, throwError } from 'rxjs';
 import { MatDialog } from '@angular/material/dialog';
 import { AjouterPlainteAdminComponent } from '../ajouter-plainte-admin/ajouter-plainte-admin.component';
 import { MarinService } from 'src/app/services/marin.service';
-import { environment } from 'src/environments/environment';
 
 @Component({
   selector: 'app-plaintes',
@@ -146,7 +145,7 @@ export class PlaintesComponent implements OnInit, AfterViewInit {
     if (!relativeUrl) return '';
     // Assurez-vous que l'URL ne commence pas déjà par http
     if (relativeUrl.startsWith('http')) return relativeUrl;
-    return `${environment.apiUrl}${relativeUrl.startsWith('/') ? '' : '/'}${relativeUrl}`;
+    return `https://api.gaalgui.sn${relativeUrl.startsWith('/') ? '' : '/'}${relativeUrl}`;
   }
 
   traiterPlainte(plainte: any) {
@@ -675,7 +674,7 @@ get nombreTotal(): number {
   // Retourne l'URL complète du PV
   getFullPVUrl(pvUrl: string): string {
     if (!pvUrl) return '';
-    return pvUrl.startsWith('http') ? pvUrl : `${environment.apiUrl}/${pvUrl}`;
+    return pvUrl.startsWith('http') ? pvUrl : `https://api.gaalgui.sn/${pvUrl}`;
   }
 
   // Modifier la méthode closeModal pour réinitialiser l'alerte

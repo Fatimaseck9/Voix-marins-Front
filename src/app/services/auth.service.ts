@@ -3,7 +3,6 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { tap } from 'rxjs/operators';
 import { jwtDecode } from 'jwt-decode';
-import { environment } from 'src/environments/environment';
 
 @Injectable({
   providedIn: 'root'
@@ -15,7 +14,7 @@ export class AuthService {
   constructor(private http: HttpClient) {}
 
   login(credentials: { username: string; password: string }): Observable<any> {
-    return this.http.post<any>(`${environment.apiUrl}/auth/login`, credentials).pipe(
+    return this.http.post<any>('https://api.gaalgui.sn/auth/login', credentials).pipe(
       tap(response => {
         if (response.access_token) {
           // Supprimer l'ancien token et les données utilisateur

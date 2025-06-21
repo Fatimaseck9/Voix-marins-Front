@@ -2,14 +2,13 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { AuthService } from './auth.service';
-import { environment } from 'src/environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class PlainteService {
  // private apiUrl = 'https://ce1e-154-124-68-191.ngrok-free.app/plaintes';
-   private apiUrl = `${environment.apiUrl}/plaintes`;
+   private apiUrl = 'https://api.gaalgui.sn/plaintes';
   
   //private apiUrl = 'https://voix-marins-backend-production.up.railway.app/plaintes';
   
@@ -28,7 +27,7 @@ export class PlainteService {
 
     // Helper pour générer les headers avec le token
   private getAuthHeaders(): HttpHeaders {
-    const token = this.authService.getStoredToken(); // Correction: utiliser getStoredToken au lieu de getToken
+    const token = this.authService.getToken(); // on suppose que ton AuthService a une méthode getToken()
     return new HttpHeaders({
       'Authorization': `Bearer ${token}`,
       'Content-Type': 'application/json',
@@ -38,7 +37,7 @@ export class PlainteService {
 
   // Nouvelle méthode pour soumettre une plainte avec ou sans audio
   submitPlainte(plainteData: any, audioFile?: File): Observable<any> {
-    const token = this.authService.getStoredToken(); // Correction: utiliser getStoredToken
+    const token = this.authService.getToken();
     const headers = new HttpHeaders({
       'Authorization': `Bearer ${token}`
       // Ne pas mettre Content-Type ici, il sera géré automatiquement par FormData
@@ -66,26 +65,6 @@ export class PlainteService {
   getCategories(): Observable<any> {
     const headers = this.getAuthHeaders();
     return this.http.get(`${this.apiUrl}/categories`, { headers });
-  }
-
-  // Méthode pour soumettre une plainte par formulaire
-  submitPlainteForm(plainteData: any): Observable<any> {
-    const token = this.authService.getStoredToken();
-    const headers = new HttpHeaders({
-      'Authorization': `Bearer ${token}`,
-      'Content-Type': 'application/json'
-    });
-    return this.http.post(`${this.apiUrl}/form`, plainteData, { headers });
-  }
-
-  // Méthode pour soumettre une plainte par catégorie
-  submitPlainteByCategory(categoryKey: string, userId: string): Observable<any> {
-    const token = this.authService.getStoredToken();
-    const headers = new HttpHeaders({
-      'Authorization': `Bearer ${token}`,
-      'Content-Type': 'application/json'
-    });
-    return this.http.post(`${this.apiUrl}/categorie/${categoryKey}`, { utilisateurId: userId }, { headers });
   }
 
   // Méthode temporaire pour tester sans authentification
