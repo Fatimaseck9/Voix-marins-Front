@@ -4,13 +4,17 @@ import { Observable, BehaviorSubject, throwError, of } from 'rxjs';
 import { isPlatformBrowser } from '@angular/common';
 import { tap, catchError, finalize, map } from 'rxjs/operators';
 import { Router } from '@angular/router';
+import { environment } from 'src/environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
 //private baseUrl = 'https://ce1e-154-124-68-191.ngrok-free.app/auth';
-  private baseUrl = 'https://api.gaalgui.sn/auth';
+  //private baseUrl = 'https://api.gaalgui.sn/auth';
+  
+  private baseUrl = `${environment.apiUrl}/auth`;
+
     //private baseUrl = 'https://voix-marins-backend-production.up.railway.app/auth'
   //private baseUrl = 'http://localhost:3001/auth';
   private currentUserSubject = new BehaviorSubject<any>(null);

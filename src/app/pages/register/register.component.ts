@@ -1,5 +1,6 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
+import { environment } from 'src/environments/environment';
 
 @Component({
   selector: 'app-register-cmp',
@@ -35,7 +36,7 @@ export class RegisterComponent implements OnInit, OnDestroy {
       isActive: false 
     };
 
-    this.http.post('https://api.gaalgui.sn/users/admin', payload).subscribe({
+    this.http.post(`${environment.apiUrl}/users/admin`, payload).subscribe({
       next: (res) => {
         console.log('Administrateur ajouté', res);
         alert('Administrateur ajouté avec succès !');

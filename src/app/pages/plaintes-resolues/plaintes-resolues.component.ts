@@ -6,6 +6,7 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import Swal from 'sweetalert2';
 import { jwtDecode } from 'jwt-decode';
 import { CookieService } from 'ngx-cookie-service';
+import { environment } from 'src/environments/environment';
 
 @Component({
   selector: 'app-plaintes-resolues',
@@ -129,17 +130,14 @@ export class PlaintesResoluesComponent implements OnInit {
   }
 
   getFullPVUrl(pvUrl: string): string {
-    if (!pvUrl) return '';
-    // Si l'URL contient gaalgui.sn, la remplacer par api.gaalgui.sn
-    if (pvUrl.includes('gaalgui.sn') && !pvUrl.includes('api.gaalgui.sn')) {
-      return pvUrl.replace('gaalgui.sn', 'api.gaalgui.sn');
-    }
-    // Si c'est déjà une URL complète avec api.gaalgui.sn, la retourner telle quelle
+ 
+  
+   
     if (pvUrl.startsWith('http')) {
       return pvUrl;
     }
     // Sinon, construire l'URL complète sans double slash
-    return `https://api.gaalgui.sn${pvUrl.startsWith('/') ? '' : '/'}${pvUrl}`;
+    return `${environment.apiUrl}/${pvUrl.startsWith('/') ? '' : '/'}${pvUrl}`;
   }
 
   telechargerPV(plainte: any) {

@@ -6,6 +6,7 @@ import { firstValueFrom } from 'rxjs';
 
 import { AuthService } from 'src/app/servicesclient/auth.service';
 import { PlainteService } from 'src/app/servicesclient/plainte.service';
+import { environment } from 'src/environments/environment';
 
 
 interface Plainte {
@@ -31,7 +32,9 @@ export class SuivreMesPlaintesComponent implements OnInit {
   menuActive = false;
   plaintes: Plainte[] = [];
   isBrowser: boolean;
-  private apiUrl = 'http://localhost:3001/plaintes';
+  //private apiUrl = 'http://localhost:3001/plaintes';
+
+   private apiUrl = `${environment.apiUrl}/plaintes`;
  // private apiUrl = 'https://api.gaalgui.sn/plaintes';
  // private apiUrl ='https://ce1e-154-124-68-191.ngrok-free.app/plaintes';
 
@@ -50,7 +53,8 @@ export class SuivreMesPlaintesComponent implements OnInit {
     }
   }
 
-  readonly backendBaseUrl = 'http://localhost:3001';
+  //readonly backendBaseUrl = 'http://localhost:3001';
+    readonly backendBaseUrl = `${environment.apiUrl}`;
   
   //readonly backendBaseUrl = 'https://api.gaalgui.sn';
    //readonly backendBaseUrl = 'https://ce1e-154-124-68-191.ngrok-free.app';

@@ -8,6 +8,7 @@ import { firstValueFrom } from 'rxjs';
 import Swal from 'sweetalert2';
 import { AuthService } from 'src/app/servicesclient/auth.service';
 import Recorder from 'recorder-js';
+import { environment } from 'src/environments/environment';
  
 // Interface pour la réponse du serveur
 interface PlainteResponse {
@@ -67,7 +68,10 @@ export class PlainteComponent {
     { key: 'paiement', label: 'Problème de paiement', image: 'paiement.jpeg' }
   ];
  
-  private apiUrl = 'http://localhost:3001/plaintes';
+  //private apiUrl = 'http://localhost:3001/plaintes';
+  
+      private apiUrl = `${environment.apiUrl}/plaintes`;
+    
    //private apiUrl = 'https://api.gaalgui.sn/plaintes';
    //private apiUrl = 'https://ce1e-154-124-68-191.ngrok-free.app/plaintes';
  

@@ -2,14 +2,16 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { AuthService } from './auth.service';
+import { environment } from 'src/environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class PlainteService {
  // private apiUrl = 'https://ce1e-154-124-68-191.ngrok-free.app/plaintes';
-   private apiUrl = 'https://api.gaalgui.sn/plaintes';
+  // private apiUrl = 'https://api.gaalgui.sn/plaintes';
   
+  private apiUrl = `${environment.apiUrl}/plaintes`;
   //private apiUrl = 'https://voix-marins-backend-production.up.railway.app/plaintes';
   
   categories = [

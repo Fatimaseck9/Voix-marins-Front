@@ -5,6 +5,7 @@ import { BaseService } from 'src/app/shared/base.service';
 import { AuthService } from '../auth/auth.service';
 import { jwtDecode } from 'jwt-decode';
 import Swal from 'sweetalert2';
+import { environment } from 'src/environments/environment';
 
 @Component({
   selector: 'app-change-password',
@@ -123,7 +124,7 @@ export class ChangePasswordComponent implements OnInit {
         confirmButtonText: 'Se reconnecter',
         confirmButtonColor: '#2196F3'
       }).then(() => {
-      window.location.href = 'https://gaalgui.sn/login-admin';
+     window.location.href = `${environment.apiUrl}/login-admin`;
       });
       return;
     }
@@ -193,7 +194,8 @@ export class ChangePasswordComponent implements OnInit {
                 },
                 (error) => {
                   console.error('Erreur de redirection:', error);
-                  window.location.href = 'https://gaalgui.sn/admin/tableau-bord';
+                 window.location.href = `${environment.apiUrl}/admin/tableau-bord`;
+
                 }
               );
             }, 2000);
@@ -234,7 +236,8 @@ export class ChangePasswordComponent implements OnInit {
                     console.error('Erreur de redirection vers tableau de bord:', error);
                     // En cas d'échec, essayer avec window.location
                     console.log('Tentative de redirection avec window.location');
-                    window.location.href = 'https://gaalgui.sn/admin/tableau-bord';
+                   window.location.href = `${environment.apiUrl}/admin/tableau-bord`;
+
                   }
                 );
               }, 2000);
@@ -242,7 +245,8 @@ export class ChangePasswordComponent implements OnInit {
               console.log('Token expiré, redirection vers login');
               setTimeout(() => {
                 this.authService.logout();
-                window.location.href = 'https://gaalgui.sn/login-admin';
+                window.location.href = `${environment.apiUrl}/login-admin`;
+
               }, 2000);
             }
           } else {
@@ -269,7 +273,8 @@ export class ChangePasswordComponent implements OnInit {
             // En cas d'erreur d'authentification, rediriger vers la page de connexion
             setTimeout(() => {
               this.authService.logout();
-              window.location.href = 'https://gaalgui.sn/login-admin';
+           window.location.href = `${environment.apiUrl}/login-admin`;
+
             }, 2000);
           }
           console.error('Erreur détaillée:', err);
@@ -287,7 +292,8 @@ export class ChangePasswordComponent implements OnInit {
         confirmButtonColor: '#2196F3'
       }).then(() => {
       this.authService.logout();
-      window.location.href = 'https://gaalgui.sn/login-admin';
+      window.location.href = `${environment.apiUrl}/login-admin`;
+
       });
     }
   }
